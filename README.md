@@ -21,9 +21,8 @@ O sistema contará com funcionalidades como:
 
 ---
 
-## 👩‍💻 Integrantes
 
 ## 👩‍💻 Integrantes
-- ![GitHub](https://img.shields.io/badge/GitHub-rayannenunes-blue?logo=github) [Rayanne Nunes](https://github.com/rayannenunes)  
-- ![GitHub](https://img.shields.io/badge/GitHub-joaosilva-blue?logo=github) [Sara Beatriz](https://github.com/SaraBeatris)  
-- ![GitHub](https://img.shields.io/badge/GitHub-mariaoliveira-blue?logo=github) [Luiz Freitas](https://github.com/Lafreit)  
+- [Rayanne Nunes](https://github.com/rayannenunes)  
+- [Sara Beatriz](https://github.com/SaraBeatris)  
+- [Luiz Freitas](https://github.com/Lafreit)  
