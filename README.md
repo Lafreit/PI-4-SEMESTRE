@@ -17,7 +17,6 @@ O sistema contará com funcionalidades como:
 - **Framework Web:** Django 🌐
 - **Banco de Dados:** SQLite 
 - **Controle de versão:** Git + GitHub
-- **API Externa:** Google Maps API (ou alternativa gratuita, como OpenSt
 
 ---
 
