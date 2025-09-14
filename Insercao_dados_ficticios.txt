@@ -1,0 +1,24 @@
+-- Usuários
+INSERT INTO usuarios (nome, email, senha, telefone, tipo_usuario)
+VALUES 
+('Ana Silva', 'ana@email.com', 'senha123', '11999999999', 'motorista'),
+('Carlos Lima', 'carlos@email.com', 'senha456', '11988888888', 'passageiro'),
+('Beatriz Souza', 'bia@email.com', 'senha789', '11977777777', 'passageiro');
+
+-- Veículo de Ana
+INSERT INTO veiculos (usuario_id, modelo, placa, cor, capacidade)
+VALUES (1, 'Fiat Uno', 'ABC1234', 'Prata', 3);
+
+-- Carona oferecida por Ana
+INSERT INTO caronas (motorista_id, origem, destino, horario_saida, valor_total, vagas_disponiveis, observacoes)
+VALUES (1, 'Araras', 'Campinas', '2025-09-07 07:30:00', 30.00, 3, 'Saída pontual, sem paradas.');
+
+-- Passageiros na carona
+INSERT INTO carona_passageiros (carona_id, passageiro_id, status)
+VALUES 
+(1, 2, 'confirmado'),
+(1, 3, 'pendente');
+
+-- Avaliação de Carlos para Ana
+INSERT INTO avaliacoes (avaliador_id, avaliado_id, nota, comentario)
+VALUES (2, 1, 5, 'Motorista pontual e educada.');

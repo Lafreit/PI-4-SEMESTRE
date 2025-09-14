@@ -1,0 +1,40 @@
+Caminho 2: API REST com Flask + SQLite
+Aqui está um exemplo básico de uma API com cadastro de usuários e listagem de caronas:
+
+from flask import Flask, request, jsonify
+import sqlite3
+
+app = Flask(__name__)
+
+def conectar():
+    conn = sqlite3.connect("caronas.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
+@app.route("/usuarios", methods=["POST"])
+def cadastrar_usuario():
+    dados = request.json
+    conn = conectar()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO usuarios (nome, email, senha, tipo_usuario) VALUES (?, ?, ?, ?)",
+                       (dados["nome"], dados["email"], dados["senha"], dados["tipo_usuario"]))
+        conn.commit()
+        return jsonify({"mensagem": "Usuário cadastrado com sucesso"}), 201
+    except sqlite3.IntegrityError:
+        return jsonify({"erro": "Email já cadastrado"}), 400
+
+@app.route("/caronas", methods=["GET"])
+def listar_caronas():
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("""
+    SELECT c.origem, c.destino, c.horario_saida, u.nome AS motorista
+    FROM caronas c
+    JOIN usuarios u ON c.motorista_id = u.id
+    """)
+    caronas = [dict(row) for row in cursor.fetchall()]
+    return jsonify(caronas)
+
+if __name__ == "__main__":
+    app.run(debug=True)
