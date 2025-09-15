@@ -1,4 +1,4 @@
-# PI-4-TRIMESTRE
+# PI-4-SEMESTRE
 
 # 🚗 Projeto de Gestão de Caronas
 
