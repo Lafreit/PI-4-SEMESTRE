@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Veículo</title>
+    <link rel="stylesheet" href="{% static 'cadastraveiculo.css' %}">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Cadastrar Veículo</h1>
+        <form method="post">
+            <input type="text" name="marca" placeholder="Marca (ex: Ford)" required>
+            <br><br>
+            <input type="text" name="modelo" placeholder="Modelo (ex: Ka)" required>
+            <br><br>
+            <input type="number" name="ano" placeholder="Ano (ex: 2020)" required min="1900" max="2099">
+            <br><br>
+            <input type="text" name="placa" placeholder="Placa (ex: ABC-1234)" required>
+            <br><br>
+            <button type="submit">Cadastrar</button>
+        </form>
+    </div>
+</body>
+</html>

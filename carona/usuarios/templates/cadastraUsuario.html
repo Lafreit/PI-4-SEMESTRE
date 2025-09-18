@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar-se</title>
+    <link rel="stylesheet" href="{% static 'cadastraUsuario.css' %}">
+</head>
+<body>
+    <!-- Carro animado -->
+    <div class="carro" id="carro">🚗</div>
+
+    <div class="container">
+        <!-- Lado esquerdo - Cadastro -->
+        <div class="form-section">
+            <div class="form-content">
+                <h1>🚗 CARONA</h1>
+                <p class="subtitle">Registre-se na plataforma</p>
+                <form>
+                    <input type="text" placeholder="Nome completo">
+                    <input type="text" placeholder="CPF">
+                    <input type="text" placeholder="CEP">
+                    <input type="email" placeholder="Email">
+                    <input type="password" placeholder="Senha">
+                    <input type="password" placeholder="Confirme a senha">
+                    <button type="submit">Registrar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lado direito - Central de dúvidas -->
+        <div class="faq-section">
+            <div class="faq-content">
+                <h2>❓ Central de dúvidas</h2>
+                <ul>
+                    <li><a href="link1.html">Por que precisamos dos seus dados?</a></li>
+                    <li><a href="link2.html">Como se cadastrar como motorista?</a></li>
+                    <li><a href="link3.html">Dados necessários para cadastro</a></li>
+                    <li><a href="link4.html">Segurança do carona e do motorista</a></li>
+                    <li><a href="link5.html">Rastreamento de veículos</a></li>
+                    <li><a href="link6.html">Forma de pagamento</a></li>
+                    <li><a href="link7.html">Acesso VIP e privilégios</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS do carro animado -->
+    <script>
+        window.addEventListener("load", () => {
+            const carro = document.getElementById("carro");
+            carro.style.opacity = "1";
+            carro.style.transform = "translateX(120vw)"; // atravessa a tela
+
+            // depois de 4s desaparece
+            setTimeout(() => {
+                carro.style.opacity = "0";
+            }, 4000);
+        });
+    </script>
+</body>
+</html>

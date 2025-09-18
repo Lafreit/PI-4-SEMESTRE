@@ -4,6 +4,13 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegistroForm
 
+
+def pagina_inicial(request):
+    return render(request, 'paginainicial.html')
+
+def cadastra_usuario(request):
+    return render(request, 'cadastraUsuario.html')
+
 # -----------------------------
 # VIEW DE REGISTRO
 # -----------------------------
