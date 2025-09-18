@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Inicial Completa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'paginainicial.css' %}">
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Logo</div>
+                <ul class="nav-links">
+                    <li><a href="#hero">Início</a></li>
+                    <li><a href="#about">Sobre</a></li>
+                    <li><a href="#faq">Dúvidas</a></li>
+                    <li><a href="#contact">Contato</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="carousel-images">
+                <img src="https://via.placeholder.com/1920x800/2a5298/FFFFFF?text=Slide+1" alt="Imagem 1">
+                <img src="https://via.placeholder.com/1920x800/1e3c72/FFFFFF?text=Slide+2" alt="Imagem 2">
+                <img src="https://via.placeholder.com/1920x800/2a5298/FFFFFF?text=Slide+3" alt="Imagem 3">
+            </div>
+        </section>
+
+        <section id="about" class="container">
+            <h2>Sobre Nós</h2>
+            <p>Somos uma empresa dedicada a fornecer as melhores soluções para nossos clientes. Com anos de experiência e uma equipe talentosa, estamos prontos para transformar suas ideias em realidade. Nosso compromisso é com a qualidade e a satisfação total do cliente.</p>
+        </section>
+
+        <section id="faq" class="container">
+            <h2>Perguntas Frequentes</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Como eu reseto minha senha?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Para resetar sua senha, clique em "Esqueci a senha" na página de login e siga as instruções enviadas para o seu e-mail.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Quais são as opções de preço?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Oferecemos diversos planos, desde opções gratuitas até pacotes premium com recursos avançados. Visite nossa página de preços para mais detalhes.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Como posso entrar em contato com o suporte?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Você pode entrar em contato com nosso suporte através do chat online, e-mail (suporte@exemplo.com) ou pelo telefone (XX) XXXX-XXXX.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>É possível cancelar a qualquer momento?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Sim, você pode cancelar sua assinatura a qualquer momento, sem taxas adicionais. O cancelamento entra em vigor no final do seu ciclo de cobrança atual.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="container">
+            <h2>Contato</h2>
+            <p style="text-align: center;">Entre em contato conosco para mais informações. Estamos ansiosos para ouvir de você!</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Sua Empresa. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Lógica do Carrossel
+        const carousel = document.querySelector('.carousel-images');
+        let index = 0;
+        const totalSlides = 3;
+
+        setInterval(() => {
+            index = (index + 1) % totalSlides;
+            const offset = -index * 100;
+            carousel.style.transform = `translateX(${offset}vw)`;
+        }, 5000); // Muda de slide a cada 5 segundos
+
+        // Lógica da Central de Dúvidas (FAQ)
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        faqItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                
+                // Fecha todas as outras perguntas
+                faqItems.forEach(otherItem => {
+                    otherItem.classList.remove('active');
+                    otherItem.querySelector('.faq-question span:last-child').textContent = '+';
+                });
+
+                // Abre ou fecha a pergunta clicada
+                if (!isActive) {
+                    item.classList.add('active');
+                    item.querySelector('.faq-question span:last-child').textContent = '-';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
