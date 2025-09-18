@@ -8,7 +8,9 @@
     <nav>
         {% if user.is_authenticated %}
             Olá {{ user.nome }} |
-            <a href="{% url 'logout' %}">Sair</a>
+            <a href="{% url 'logout' %}">Sair</a>  |
+            <a href="{% url 'cadastrar_veiculo' %}">Cadatrar veiculos</a>  |
+            <a href="{% url 'cadastra_usuario' %}">Cadastrar usuarios</a>  |
         {% else %}
             <a href="{% url 'login' %}">Entrar</a> |
             <a href="{% url 'register' %}">Registrar</a>
