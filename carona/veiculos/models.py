@@ -1,10 +1,11 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 class Veiculo (models.Model):
-    Veiculo_id = models.AutoField(primary_key=True)
+    veiculo_id = models.AutoField(primary_key=True)
     motorista = models.ForeignKey(
-        'usuarios.Usuario', 
+        settings.AUTH_USER_MODEL, 
         on_delete= models.CASCADE,
         related_name= 'veiculos'
     )

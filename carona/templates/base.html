@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Gestão de Caronas</title>
+</head>
+<body>
+    <nav>
+        {% if user.is_authenticated %}
+            Olá {{ user.nome }} |
+            <a href="{% url 'logout' %}">Sair</a>
+        {% else %}
+            <a href="{% url 'login' %}">Entrar</a> |
+            <a href="{% url 'register' %}">Registrar</a>
+        {% endif %}
+    </nav>
+
+    {% if messages %}
+        <ul>
+            {% for m in messages %}
+                <li>{{ m }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</body>
+</html>
