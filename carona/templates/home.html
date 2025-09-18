@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Bem-vindo ao sistema de gestão de caronas</h1>
+{% if user.is_authenticated %}
+    <p>Você está logado como {{ user.nome }}</p>
+{% else %}
+    <p>Faça login para continuar.</p>
+{% endif %}
+{% endblock %}
