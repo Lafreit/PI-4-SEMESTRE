@@ -20,10 +20,10 @@ class UsuarioManager(BaseUserManager):
         return self.create_user(email, nome, password, **extra_fields)
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
-    MOTORISTA = 'MOTORISTA'
+    # MOTORISTA = 'MOTORISTA'
     PASSAGEIRO = 'PASSAGEIRO'
     TIPO_USUARIO_CHOICE = [
-        (MOTORISTA, 'Motorista'),
+        # (MOTORISTA, 'Motorista'),
         (PASSAGEIRO, 'Passageiro'),
     ]
 
