@@ -1,25 +1,13 @@
-{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão de Caronas</title>
-
-    <!-- CSS global -->
-    <link rel="stylesheet" href="{% static 'usuarios/css/mostra_senha.css' %}">
+    {% load static %}
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav>
-        {% if user.is_authenticated %}
-            Olá {{ user.nome }} |
-            <a href="{% url 'logout' %}">Sair</a>  |
-            <a href="{% url 'cadastra_usuario' %}">Cadastrar usuarios</a>  |
-        {% else %}
-            <a href="{% url 'login' %}">Entrar</a> |
-            <a href="{% url 'register' %}">Registrar</a>
-        {% endif %}
-    </nav>
-
     {% if messages %}
         <ul>
             {% for m in messages %}
@@ -29,8 +17,5 @@
     {% endif %}
 
     {% block content %}{% endblock %}
-
-    <!-- JS global -->
-    <script src="{% static 'usuarios/js/mostra_senha.js' %}"></script>
 </body>
 </html>
