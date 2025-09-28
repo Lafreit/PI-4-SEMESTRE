@@ -1,9 +1,157 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+{% endblock %}
+
 {% block content %}
-<h1>Bem-vindo ao sistema de gestão de caronas</h1>
-{% if user.is_authenticated %}
-    <p>Você está logado como {{ user.nome }}</p>
-{% else %}
-    <p>Faça login para continuar.</p>
-{% endif %}
+
+<header>
+    <div class="container">
+        <nav>
+            <div class="logo">Carona</div>
+            <ul class="nav-links">
+                <li><a href="#about">Sobre</a></li>
+                <li><a href="#faq">Dúvidas</a></li>
+                <li><a href="#contact">Contato</a></li>
+                <li><a href="{% url 'login' %}">Entrar</a></li> 
+                <li><a href="{% url 'register' %}" class="btn-register">Registrar</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <section id="how-it-works" class="container">
+    <h2>Como nosso aplicativo funciona?</h2>
+    <p style="text-align: center; max-width: 800px; margin: 0 auto 30px;">
+        Entenda o processo simples e rápido para usar nossa plataforma de caronas.
+        Em apenas três passos, você estará pronto para oferecer ou encontrar uma carona.
+    </p>
+
+    <div class="steps-container" style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
+        <div class="step" style="text-align: center; max-width: 250px;">
+            <img src="{% static 'img/login.png' %}" alt="Passo 1" style="width: 300px; height: 300px; border-radius: 50%;">
+            <h3>1. Cadastre-se</h3>
+            <p>Crie sua conta de forma rápida e segura. Preencha seus dados e escolha seu perfil: motorista ou passageiro.</p>
+        </div>
+        <div class="step" style="text-align: center; max-width: 250px;">
+            <img src="{% static 'img/2.png' %}" alt="Passo 2" style="width: 300px; height: 300px; border-radius: 50%;">
+            <h3>2. Encontre ou Ofereça</h3>
+            <p>Busque caronas por destino e horário ou publique a sua própria rota com as informações da viagem.</p>
+        </div>
+        <div class="step" style="text-align: center; max-width: 250px;">
+            <img src="{% static 'img/3.png' %}" alt="Passo 3" style="width: 300px; height: 300px; border-radius: 50%;">
+            <h3>3. Viaje e Avalie</h3>
+            <p>Combine os detalhes da viagem, aproveite a carona e, ao final, avalie o motorista ou passageiro.</p>
+        </div>
+    </div>
+    </section>
+    
+    <section id="about">
+    <div class="container about-section">
+        <div class="about-text">
+            <h2>Sobre Nós</h2>
+            <p>
+                Somos uma empresa dedicada a fornecer as melhores soluções para nossos clientes. 
+                Com anos de experiência e uma equipe talentosa, estamos prontos para transformar 
+                suas ideias em realidade. Nosso compromisso é com a qualidade e a satisfação total 
+                do cliente.
+            </p>
+<br>
+            <h2 class="why-choose-us-title">Por que nos escolher?</h2>
+            <p>
+                Nos destacamos pela nossa abordagem inovadora e pelo suporte personalizado que oferecemos. 
+                Nossa equipe de especialistas está sempre disponível para garantir que suas necessidades 
+                sejam atendidas com eficiência e profissionalismo. Escolher-nos é garantir um serviço 
+                de alta qualidade, confiança e resultados que superam as expectativas.
+            </p>
+        </div>
+        <div class="about-image">
+            <img src="{% static 'img/sobrenos.png' %}" alt="Sobre Nós">
+        </div>
+    </div>
+    </section>
+
+    <section id="faq" class="container">
+        <h2>Perguntas Frequentes</h2>
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Como eu reseto minha senha?</span>
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Para resetar sua senha, clique em "Esqueci a senha" na página de login e siga as instruções enviadas para o seu e-mail.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Quais são as opções de preço?</span>
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Oferecemos diversos planos, desde opções gratuitas até pacotes premium com recursos avançados.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Como posso entrar em contato com o suporte?</span>
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Você pode entrar em contato com nosso suporte via chat online, e-mail ou telefone.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>É possível cancelar a qualquer momento?</span>
+                    <span>+</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Sim, você pode cancelar sua assinatura a qualquer momento, sem taxas adicionais.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="container">
+        <h2>Contato</h2>
+        <p style="text-align: center;">Entre em contato conosco para mais informações. Estamos ansiosos para ouvir de você!</p>
+    </section>
+
+    <section id="user-status" class="container">
+        {% if user.is_authenticated %}
+            <p>Você está logado como <strong>{{ user.nome }}</strong></p>
+        {% else %}
+            <p>Faça login para continuar.</p>
+        {% endif %}
+    </section>
+</main>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2025 Sua Empresa. Todos os direitos reservados.</p>
+    </div>
+</footer>
+
+<script>
+    // FAQ
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const isActive = item.classList.contains('active');
+            faqItems.forEach(otherItem => {
+                otherItem.classList.remove('active');
+                otherItem.querySelector('.faq-question span:last-child').textContent = '+';
+            });
+            if (!isActive) {
+                item.classList.add('active');
+                item.querySelector('.faq-question span:last-child').textContent = '-';
+            }
+        });
+    });
+</script>
+
 {% endblock %}
