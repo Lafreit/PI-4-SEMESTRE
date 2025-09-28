@@ -1,15 +1,18 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>Gestão de Caronas</title>
+
+    <!-- CSS global -->
+    <link rel="stylesheet" href="{% static 'usuarios/css/mostra_senha.css' %}">
 </head>
 <body>
     <nav>
         {% if user.is_authenticated %}
             Olá {{ user.nome }} |
             <a href="{% url 'logout' %}">Sair</a>  |
-            <a href="{% url 'cadastrar_veiculo' %}">Cadatrar veiculos</a>  |
             <a href="{% url 'cadastra_usuario' %}">Cadastrar usuarios</a>  |
         {% else %}
             <a href="{% url 'login' %}">Entrar</a> |
@@ -26,5 +29,8 @@
     {% endif %}
 
     {% block content %}{% endblock %}
+
+    <!-- JS global -->
+    <script src="{% static 'usuarios/js/mostra_senha.js' %}"></script>
 </body>
 </html>
