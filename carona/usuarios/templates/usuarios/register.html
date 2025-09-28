@@ -1,9 +1,57 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'register.css' %}">
+{% endblock %}
+
 {% block content %}
-<h1>Cadastro</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Registrar</button>
-</form>
+<div class="register-page-wrapper">
+
+    <!-- Coluna da imagem -->
+    <div class="register-image-section">
+        <img src="{% static 'img/registrar.png' %}" alt="Ilustração de cadastro" class="register-side-img">
+    </div>
+
+    <!-- Coluna do formulário -->
+    <div class="register-form-section">
+        <div class="register-box">
+            <h1>Cadastro</h1>
+            <form method="post">
+                {% csrf_token %}
+
+                <p>
+                    {{ form.nome.label_tag }}
+                    {{ form.nome }}
+                </p>
+                <p>
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                </p>
+                <p>
+                    {{ form.telefone.label_tag }}
+                    {{ form.telefone }}
+                </p>
+                <p>
+                    {{ form.tipo_usuario.label_tag }}
+                    {{ form.tipo_usuario }}
+                </p>
+                <p>
+                    {{ form.senha1.label_tag }}
+                    {{ form.senha1 }}
+                </p>
+                <p>
+                    {{ form.senha2.label_tag }}
+                    {{ form.senha2 }}
+                </p>
+
+                <button type="submit">Registrar</button>
+            </form>
+
+            <div class="login-link">
+                Já tem uma conta? <a href="{% url 'login' %}">Entrar</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

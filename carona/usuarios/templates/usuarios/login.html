@@ -1,9 +1,58 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+{% endblock %}
+
 {% block content %}
-<h1>Login</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Entrar</button>
-</form>
+<div class="login-page-wrapper">
+    
+    <div class="login-illustration-section">
+        <img src="{% static 'img/carona.png' %}" alt="Ilustração Carona Login" class="login-illustration">
+        
+        <div class="value-proposition">
+            <h3>Encontre a carona ideal de forma rápida e segura.</h3>
+            
+        </div>
+    </div>
+
+    <div class="login-form-section">
+        <div class="login-box">
+            <h2>Carona</h2>
+            <p class="security-text">Entre com sua conta ou Crie um nova conta.</p>
+            
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <p>
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <span class="error-message">{{ error }}</span>
+                        {% endfor %}
+                    </p>
+                {% endfor %}
+                
+                {% if form.non_field_errors %}
+                    <div class="non-field-errors">
+                        {% for error in form.non_field_errors %}
+                            <p class="error-message">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <input type="submit" value="Entrar">
+            </form>
+            
+            <div class="extra-links">
+                Não tem uma conta? <a href="{% url 'register' %}">Cadastre-se</a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
