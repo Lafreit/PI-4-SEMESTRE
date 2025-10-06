@@ -1,240 +1,180 @@
-/* ====== Layout Geral - Página de Registro ====== */
-.register-page-wrapper {
+/* ==============================================
+   register.css - ESTILOS FINAIS (DUAS COLUNAS COM AJUDA AGRUPADA)
+   ============================================== */
+
+/* Variáveis de Cores (Boas Práticas) */
+:root {
+    --primary-color: #1A4F8B; 
+    --secondary-color: #113661;
+    --background-light: #f0f4f8; 
+    --card-background: #ffffff;
+    --text-dark: #333333;
+    --text-light: #666666;
+    --border-color: #d4d8dc;
+    --shadow-soft: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Layout Principal (Contêiner Flexbox) ===== */
+.register-single-wrapper {
     display: flex;
-    justify-content: center;
-    align-items: stretch; /* CRUCIAL: Faz com que as colunas tenham a mesma altura */
-    min-height: 100vh;
-    background-color: #f0f2f5; /* Fundo cinza claro */
+    justify-content: center; 
+    align-items: center; 
+    min-height: calc(100vh - 70px); 
     padding: 40px 20px;
-    gap: 60px; /* Espaço entre as duas colunas */
-    flex-wrap: wrap; 
-    overflow: auto; 
+    background-color: var(--background-light); 
 }
 
-/* ====== Coluna da Imagem (lado esquerdo) ====== */
-.register-image-section {
-    flex: 1.5; 
-    max-width: 650px; 
-    
-    /* Garante que o fundo da seção seja branco e preencha a altura total */
-    background-color: #fff; 
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Sombra suave */
-    
-    /* Centraliza a imagem e o texto internamente */
+/* ===== O Contêiner de Duas Colunas (Card Principal) ===== */
+.register-container {
     display: flex;
-    flex-direction: column; 
-    align-items: center;    
-    justify-content: center;
-    padding: 30px; 
-    text-align: center;
-    /* Define uma altura mínima para caso o formulário seja muito pequeno */
-    min-height: 400px; 
+    background: var(--card-background);
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft); 
+    width: 100%;
+    max-width: 950px; 
+    overflow: hidden; 
+    min-height: 600px; /* Garante altura mínima para proporção */
 }
 
-.register-side-img {
-    max-width: 100%;
-    max-height: 90%; /* Limita a altura para dar espaço ao texto/padding */
-    width: auto;
-    object-fit: contain; /* Garante que a imagem se ajuste sem cortar */
-}
-
-/* --- Informações Adicionais sob a Imagem (opcional) --- */
-.register-image-section .info-text {
-    font-size: 1.1rem;
-    color: #2a5298; /* Azul principal */
-    font-weight: 600;
-    margin-top: 10px;
-    line-height: 1.4;
-}
-
-
-/* ====== Coluna do Formulário (lado direito) ====== */
-.register-form-section {
-    flex: 1; 
-    max-width: 400px; 
-    display: flex;
-    justify-content: center;
-    align-items: stretch; /* CRUCIAL: Permite que o .register-box estique na altura */
-}
-
+/* ===== Coluna do Formulário (Esquerda) ===== */
 .register-box {
-    background: #fff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-    width: 100%;
+    padding: 40px 50px; 
+    width: 60%; 
+    box-sizing: border-box;
     text-align: center;
+    flex-grow: 1; 
+}
+
+/* ===== Coluna de Conteúdo Lateral (Direita: Imagem + Dicas + Botões) ===== */
+.side-content {
+    width: 40%; 
+    background-color: #e7eef4; 
+    padding: 30px; /* Mantém o padding */
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Centraliza o conteúdo verticalmente dentro do box */
+    justify-content: space-between; /* Distribui espaço verticalmente */
+    align-items: center;
+    box-sizing: border-box;
+    flex-shrink: 0; 
 }
 
-/* ====== Estilo do Formulário ====== */
-.register-box h1 {
-    font-size: 2rem; 
-    color: #2a5298; /* Azul principal */
-    margin-bottom: 20px;
-    font-weight: 700;
-}
+/* --- ESTILOS DO CONTEÚDO LATERAL --- */
 
-.register-box form p {
-    margin-bottom: 18px; 
-    text-align: left;
-    display: flex; 
-    flex-direction: column;
-}
-
-.register-box label {
-    display: block;
-    font-weight: 600; 
-    color: #555; 
-    margin-bottom: 8px;
-    font-size: 0.95rem; 
-}
-
-/* Estilo para todos os inputs e select */
-.register-box input[type="text"],
-.register-box input[type="email"],
-.register-box input[type="password"],
-.register-box input[type="number"],
-.register-box select,
-.register-box textarea {
+/* Grupo Imagem + Dicas (Top da Coluna Direita) */
+.side-top-group {
     width: 100%;
-    padding: 12px 15px; 
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1rem;
-    color: #333; 
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-/* Estilo para SELECT (com seta customizada para consistência) */
-.register-box select {
-    -webkit-appearance: none; 
-    -moz-appearance: none;
-    appearance: none;
-    background-color: #fff; 
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13%205.8l-123.2%20123.5-123.3-123.5a17.6%2017.6%200%200%200-25%200%2017.6%2017.6%200%200%200%200%2025L133.7%20223%20287%2069.4z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat;
-    background-position: right 10px top 50%;
-    background-size: 0.65em auto;
-}
-
-.register-box input:focus, 
-.register-box select:focus,
-.register-box textarea:focus {
-    border-color: #2a5298; /* Borda azul ao focar */
-    box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.2); 
-    outline: none;
-}
-
-/* Botão Registrar */
-.register-box button[type="submit"] {
-    background-color: #2a5298; /* Azul principal */
-    color: #fff;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 6px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.1s;
-    margin-top: 25px; 
-    width: 100%; 
-}
-
-.register-box button[type="submit"]:hover {
-    background-color: #1e3a6a; /* Tom mais escuro no hover */
-    transform: translateY(-1px); 
-}
-
-/* Link para login */
-.login-link {
     text-align: center;
-    margin-top: 30px; 
-    font-size: 0.9rem;
-    color: #777; 
+    padding-top: 15px; /* Espaçamento no topo */
 }
 
-.login-link a {
-    color: #2a5298; 
+.side-top-group img {
+    max-width: 90%; /* AUMENTA A LARGURA MÁXIMA DA IMAGEM */
+    height: auto;
+    object-fit: contain;
+    margin-bottom: 25px; /* Mais espaço para as dicas */
+}
+
+.side-top-group h2 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.side-top-group ul {
+    list-style: disc inside;
+    padding-left: 0;
+    text-align: left;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+}
+
+/* Grupo de Botões (Fundo da Coluna Direita) */
+.side-actions {
+    width: 100%;
+    text-align: center;
+    padding-bottom: 15px; /* Espaçamento na base */
+    border-top: 1px solid var(--border-color); /* Linha divisória sutil */
+    padding-top: 20px;
+}
+
+.btn-help, .btn-back {
+    display: block;
+    width: 90%; /* Ajusta a largura para não colar nas bordas */
+    margin-left: auto; /* Centraliza o botão */
+    margin-right: auto;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
-    transition: color 0.3s;
+    transition: background-color 0.3s, border-color 0.3s;
+    font-size: 1rem; /* Tamanho da fonte dos botões */
 }
 
-.login-link a:hover {
-    text-decoration: underline;
-    color: #1e3a6a;
+.btn-help {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: 1px solid var(--primary-color);
 }
 
-/* Mensagens de Erro e Ajuda */
-.error-message { 
-    color: #dc3545; 
-    font-size: 0.85rem; 
-    margin-top: 5px; 
-    display: block; 
-    text-align: left; 
+.btn-help:hover {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
 }
 
-.help-text { 
-    color: #6c757d; 
-    font-size: 0.85rem; 
-    margin-top: 5px; 
-    display: block; 
-    text-align: left; 
+.btn-back {
+    background-color: transparent;
+    color: var(--text-dark);
+    border: 1px solid var(--border-color);
 }
 
-/* Estilos para regras de senha customizadas (se estiver usando no HTML) */
-.help-text-custom {
-    display: block;
-    margin-top: 10px;
-    font-size: 0.9rem;
-    color: #4a4a4a;
-    text-align: left;
-}
-.help-text-custom ul {
-    list-style: none; 
-    padding-left: 0;
-    margin-top: 5px;
-}
-.help-text-custom li::before {
-    content: '•'; 
-    margin-right: 5px;
-    color: #2a5298;
-    font-weight: bold;
+.btn-back:hover {
+    background-color: #e0e4eb;
+    border-color: #c9d2db;
 }
 
-.errorlist { 
-    color: #dc3545; 
-    list-style: none;
-    padding: 0;
-    margin-top: 5px;
-    font-size: 0.9rem;
-    text-align: left;
-}
+/* --- ESTILOS DO FORMULÁRIO (MANTIDOS) --- */
+.register-box h1 { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 10px; font-weight: 700; }
+.register-box .subtitle { font-size: 1.1rem; color: var(--text-light); margin-bottom: 30px; }
+.register-box form p { margin-bottom: 18px; text-align: left; }
+.register-box label { font-weight: 600; color: var(--text-dark); margin-bottom: 8px; display: block; font-size: 1rem; }
+.register-box input, .register-box select, .register-box textarea { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1.05rem; color: var(--text-dark); box-sizing: border-box; transition: all 0.3s ease; }
+.register-box input:focus, .register-box select:focus, .register-box textarea:focus { border-color: #2a5298; box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1); outline: none; }
+.register-box button[type="submit"] { background: var(--primary-color); color: #fff; padding: 14px; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: 700; width: 100%; cursor: pointer; margin-top: 25px; box-shadow: 0 4px 10px rgba(26, 79, 139, 0.3); transition: background-color 0.3s, transform 0.2s; }
+.register-box button[type="submit"]:hover { background: var(--secondary-color); transform: translateY(-1px); }
+.login-link { margin-top: 30px; font-size: 1rem; color: var(--text-light); }
+.login-link a { color: var(--primary-color); font-weight: 600; text-decoration: none; }
+.login-link a:hover { text-decoration: underline; }
 
-/* ====== Responsividade ====== */
-@media (max-width: 992px) {
-    .register-page-wrapper {
-        flex-direction: column;
-        gap: 30px;
-        padding: 20px; 
+
+/* ===== Responsividade (Mobile: Desativa duas colunas) ===== */
+@media (max-width: 950px) {
+    .register-container {
+        flex-direction: column; 
+        max-width: 480px; 
+        min-height: auto;
     }
-
-    .register-image-section { 
-        order: -1; /* Move a imagem para o topo em mobile */
-        max-width: 100%;
-        min-height: auto; /* Remove altura mínima em mobile */
-        box-shadow: none; 
-        background-color: transparent; 
-        padding: 0; 
+    .register-box,
+    .side-content {
+        width: 100%;
+        min-width: auto;
     }
-
-    .register-side-img { max-width: 300px; margin-bottom: 10px; }
-    
-    .register-form-section { max-width: 100%; }
-    
-    .register-box { padding: 30px 20px; }
+    .register-box {
+        padding: 30px 20px;
+        order: 2; 
+    }
+    .side-content {
+        padding: 30px 20px;
+        order: 1; 
+    }
+    .side-actions {
+        margin-top: 20px;
+        border-top: none; /* Remove a borda no mobile */
+        padding-top: 0;
+    }
+    .btn-help, .btn-back {
+        width: 100%; /* Ocupa toda a largura no mobile */
+    }
 }
