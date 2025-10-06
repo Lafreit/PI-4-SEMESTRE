@@ -2,48 +2,61 @@
 {% load static %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'register.css' %}">
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+    <link rel="stylesheet" href="{% static 'register.css' %}"> 
 {% endblock %}
 
 {% block content %}
-<div class="register-page-wrapper">
-
-    <!-- Coluna da imagem -->
-    <div class="register-image-section">
-        <img src="{% static 'img/registrar.png' %}" alt="Ilustração de cadastro" class="register-side-img">
+<header>
+    <div class="container">
+        <nav>
+            <div class="logo">Carona</div>
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}">Início</a></li> 
+                <li><a href="{% url 'home' %}#about">Sobre</a></li>
+                <li><a href="{% url 'home' %}#faq">Dúvidas</a></li>
+                <li><a href="{% url 'home' %}#contact">Contato</a></li>
+                <li><a href="{% url 'login' %}">Entrar</a></li> 
+                <li><a href="{% url 'register' %}" class="btn-register">Registrar</a></li>
+            </ul>
+        </nav>
     </div>
+</header>
 
-    <!-- Coluna do formulário -->
-    <div class="register-form-section">
+<div class="register-single-wrapper">
+    <div class="register-container">
+        
         <div class="register-box">
             <h1>Cadastro</h1>
+            <p class="subtitle">Preencha os campos abaixo para criar sua nova conta.</p>
+            
+            {% if form.non_field_errors %}
+                <div class="non-field-errors">
+                    {% for error in form.non_field_errors %}
+                        <p class="error-message">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
             <form method="post">
                 {% csrf_token %}
 
-                <p>
-                    {{ form.nome.label_tag }}
-                    {{ form.nome }}
-                </p>
-                <p>
-                    {{ form.email.label_tag }}
-                    {{ form.email }}
-                </p>
-                <p>
-                    {{ form.telefone.label_tag }}
-                    {{ form.telefone }}
-                </p>
-                <p>
-                    {{ form.tipo_usuario.label_tag }}
-                    {{ form.tipo_usuario }}
-                </p>
-                <p>
-                    {{ form.senha1.label_tag }}
-                    {{ form.senha1 }}
-                </p>
-                <p>
-                    {{ form.senha2.label_tag }}
-                    {{ form.senha2 }}
-                </p>
+                {% for field in form %}
+                    <p>
+                        {{ field.label_tag }}
+                        
+                        {{ field }}
+                        
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        
+                        {% for error in field.errors %}
+                            <span class="error-message">{{ error }}</span>
+                        {% endfor %}
+                    </p>
+                {% endfor %}
 
                 <button type="submit">Registrar</button>
             </form>
@@ -52,6 +65,42 @@
                 Já tem uma conta? <a href="{% url 'login' %}">Entrar</a>
             </div>
         </div>
+        
+        <div class="side-content">
+            
+            <div class="side-top-group">
+                
+                <img src="{% static 'img/img2.png' %}"
+                     alt="Ilustração de Pessoas Usando o App">
+                     
+                <div class="tip-section">
+                    <h2>Dicas para seu Cadastro:</h2>
+                    <ul>
+                        <li>Use um e-mail válido para confirmar sua conta.</li>
+                        <li>Escolha uma senha forte e única para sua segurança.</li>
+                        <li>Preencha seu telefone corretamente para contato.</li>
+                        <li>Revise seus dados antes de enviar.</li>
+                    </ul>
+                </div>
+                
+                <div class="tip-section" style="margin-top: 20px;">
+                    <h2>Vantagens de se cadastrar:</h2>
+                    <ul>
+                        <li>Conecte-se a motoristas e passageiros de forma segura.</li>
+                        <li>Escolha seu perfil (Passageiro ou Motorista) a qualquer hora.</li>
+                        <li>Economize nos custos de viagem ou ganhe uma renda extra.</li>
+                        <li>Seus dados são protegidos e confidenciais.</li>
+                    </ul>
+                </div>
+
+            </div>
+            
+            <div class="side-actions">
+                <a href="{% url 'home' %}" class="btn-help">Central de Dúvidas</a>
+                <a href="{% url 'home' %}" class="btn-back">Voltar para a Home</a>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

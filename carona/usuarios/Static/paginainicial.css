@@ -1,149 +1,506 @@
-/* Reset */
-* {
+/* Core Layout & Background */
+body {
+  background: #f0f2f5; /* Um cinza bem claro para o fundo */
+  font-family: 'Poppins', sans-serif; /* Mantendo a fonte */
+  margin: 0;
+  padding: 0;
+  color: #333; /* Cor de texto padrão */
+}
+
+.dashboard-container {
+  display: flex;
+  min-height: 100vh; /* Garante que o container ocupe toda a altura */
+}
+
+/* Sidebar Styling */
+.sidebar {
+  width: 280px; /* Um pouco mais largo para melhor leitura */
+  background-color: #ffffff; /* Fundo branco para a sidebar */
+  color: #333; /* Texto escuro na sidebar */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05); /* Sombra mais sutil */
+  border-right: 1px solid #e0e0e0; /* Linha sutil na borda */
+}
+
+.user-info {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee; /* Separador */
+  margin-bottom: 20px;
+}
+
+.user-avatar-small { /* Novo estilo para um avatar menor */
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  border: 2px solid #1d4ed8; /* Borda azul para destaque */
+}
+
+.user-info h3 {
+  color: #1d4ed8; /* Nome do usuário em azul */
+  margin: 5px 0 0;
+  font-size: 1.2em;
+}
+
+.user-type {
+  font-size: 0.9em;
+  color: #666;
+  margin-top: 5px;
+}
+
+.menu {
+  flex-grow: 1; /* Ocupa o espaço restante */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Espaçamento menor entre itens */
+}
+
+.menu-item {
+  color: #555; /* Cor de texto padrão dos itens */
+  text-decoration: none;
+  font-weight: 500;
+  padding: 12px 15px;
+  border-radius: 8px;
+  transition: background 0.3s, color 0.3s;
+  display: flex; /* Para alinhar ícone e texto */
+  align-items: center;
+  gap: 10px; /* Espaço entre ícone e texto */
+}
+
+.menu-item:hover {
+  background-color: #e6f0ff; /* Fundo azul claro ao passar o mouse */
+  color: #1d4ed8; /* Texto azul ao passar o mouse */
+}
+
+.menu-item.active { /* Para o item ativo no menu */
+  background-color: #1d4ed8;
+  color: #fff;
+  font-weight: 600;
+}
+
+.menu-item.active:hover {
+  background-color: #2563eb; /* Azul um pouco mais escuro no hover do ativo */
+  color: #fff;
+}
+
+.logout {
+  background-color: #fca5a5; /* Um vermelho mais suave */
+  color: #b91c1c; /* Texto vermelho mais escuro */
+  margin-top: 30px; /* Mais espaço antes do botão de sair */
+  font-weight: 600;
+}
+
+.logout:hover {
+  background-color: #ef4444; /* Vermelho mais forte no hover */
+  color: #fff;
+}
+
+/* Main Content Styling */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0; /* Remove padding do container principal */
+}
+
+.header-banner {
+  background: linear-gradient(90deg, #1d4ed8, #2563eb); /* Gradiente azul como sua landing page */
+  color: #fff;
+  padding: 40px 30px; /* Mais padding para dar espaço */
+  text-align: center;
+  border-bottom-left-radius: 20px; /* Bordas arredondadas para um toque moderno */
+  border-bottom-right-radius: 20px;
+  margin-bottom: 30px; /* Espaço abaixo do banner */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  /* Para adicionar uma imagem de fundo sutil: */
+  /* background-image: url('{% static "img/map-background-pattern.png" %}'); */
+  /* background-size: cover; */
+  /* background-position: center; */
+}
+
+.header-banner h1 {
+  margin: 0 0 10px;
+  font-size: 2.5em;
+  font-weight: 700;
+}
+
+.header-banner p {
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
+.map-and-actions {
+  display: flex;
+  gap: 30px; /* Espaço entre o mapa e o card de ações */
+  margin: 0 30px 30px 30px; /* Padding nas laterais e inferior */
+  flex-wrap: wrap; /* Permite que os itens quebrem linha em telas menores */
+}
+
+#map {
+  flex: 3; /* Ocupa 3 partes do espaço disponível */
+  min-height: 400px; /* Altura mínima para o mapa */
+  height: 55vh; /* Ocupa uma boa porção da viewport */
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Garante que os cantos arredondados funcionem */
+}
+
+.action-card {
+  flex: 1; /* Ocupa 1 parte do espaço, ao lado do mapa */
+  min-width: 280px; /* Garante que o card não fique muito estreito */
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza o conteúdo verticalmente */
+}
+
+.action-card h2 {
+  color: #1d4ed8;
+  margin-top: 0;
+  font-size: 1.5em;
+}
+
+.action-card p {
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.action-btn {
+  background-color: #1d4ed8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-weight: bold;
+  font-size: 1.1em;
+  cursor: pointer;
+  margin-top: auto; /* Empurra o botão para baixo se houver espaço */
+  transition: background-color 0.3s ease;
+}
+
+.action-btn:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px); /* Efeito sutil ao passar o mouse */
+}
+
+/* Safety Tips Section */
+.safety-tips {
+  margin: 0 30px 30px 30px; /* Padding igual aos outros blocos */
+}
+
+.card { /* Estilo geral para cards */
+  background: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.safety-tips h3 {
+  color: #1d4ed8;
+  margin-bottom: 15px;
+  font-size: 1.4em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.safety-tips ul {
+  list-style: none;
+  padding: 0;
+}
+
+.safety-tips li {
+  padding: 8px 0;
+  color: #555;
+  border-bottom: 1px dashed #eee; /* Linha tracejada suave */
+}
+
+.safety-tips li:last-child {
+  border-bottom: none; /* Remove a linha do último item */
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+    padding: 15px;
+  }
+  .map-and-actions {
+    flex-direction: column; /* Em telas menores, mapa e ações empilham */
+    margin: 0 20px 20px 20px;
+    gap: 20px;
+  }
+  #map {
+    height: 45vh; /* Mapa um pouco menor em telas menores */
+    min-height: 300px;
+  }
+  .action-card, .safety-tips {
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column; /* Sidebar em cima em telas muito pequenas */
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    flex-direction: row; /* Itens da sidebar em linha */
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+  .user-info {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .user-info h3, .user-type {
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+  }
+  .menu {
+    flex-direction: row;
+    flex-wrap: wrap; /* Itens do menu podem quebrar linha */
+    justify-content: center;
+    gap: 10px;
+  }
+  .menu-item {
+    padding: 8px 12px;
+  }
+  .logout {
+    margin-top: 0;
+  }
+  .main-content {
+    padding-top: 20px; /* Espaço para o menu que agora está em cima */
+  }
+  .header-banner {
+    padding: 30px 20px;
+    margin-bottom: 20px;
+  }
+  .header-banner h1 {
+    font-size: 2em;
+  }
+  .map-and-actions, .safety-tips {
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+}
+/* ======================================= */
+/* VARIÁVEIS DE CORES E ESTILOS CORE */
+/* ======================================= */
+
+:root {
+    /* Paleta de Cores (Foco em Azul) */
+    --color-primary-dark: #1d4ed8;      /* Azul Profundo (Linhas, Títulos, Hover da Navbar) */
+    --color-primary-light: #6495ed;     /* AZUL CLARO (Navbar, Header, Botões de Ação) */
+    
+    /* Cores Secundárias */
+    --color-background: #f0f2f5;        /* Fundo geral (cinza claro) */
+    --color-card-bg: #ffffff;           /* Fundo dos cards (branco puro) */
+    --color-text: #333;
+    --color-text-subtle: #666;
+    --color-shadow: rgba(0, 0, 0, 0.1);
 }
 
 body {
-    background-color: #f0f2f5;
-    color: #333;
-    line-height: 1.6;
+  background: var(--color-background);
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: var(--color-text);
 }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
+/* Remove o display flex vertical que era da sidebar */
+.dashboard-container {
+    min-height: 100vh;
 }
 
-/* Header e Menu de Navegação */
-header {
-    background: #fff;
-    padding: 20px 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+/* ======================================= */
+/* NAVBAR HORIZONTAL (AZUL CLARO) */
+/* ======================================= */
 
-nav {
+.navbar {
+    background-color: var(--color-primary-light); /* Fundo AZUL CLARO */
+    color: #fff;
+    padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 4px 10px var(--color-shadow);
 }
 
 .logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #2a5298;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    margin-right: 30px;
 }
 
 .nav-links {
-    list-style: none;
     display: flex;
+    gap: 20px;
+}
+
+.nav-item {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.nav-item:hover {
+    background-color: var(--color-primary-dark); /* Hover para AZUL ESCURO */
+}
+
+/* Botão Sair dentro da Navbar */
+.nav-logout {
+    background-color: #ef4444; 
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.nav-logout:hover {
+    background-color: #dc2626;
+}
+
+/* ======================================= */
+/* MAIN CONTENT E HEADER */
+/* ======================================= */
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+/* Header Banner (Em AZUL CLARO, para combinar com a Navbar) */
+.header-banner {
+  background: var(--color-primary-light); 
+  color: #fff;
+  padding: 40px 30px;
+  text-align: left;
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  position: relative; /* Necessário para posicionar o botão Voltar, se for usar */
+}
+
+.header-banner h1 { margin: 0 0 5px; font-size: 2.5em; font-weight: 700; letter-spacing: -0.5px; }
+.header-banner p { font-size: 1.1em; opacity: 0.9; }
+
+/* ======================================= */
+/* CARDS (BRANCOS com Destaque Azul) */
+/* ======================================= */
+
+.profile-container { padding: 30px; max-width: 1200px; margin: 0 auto; }
+
+.profile-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 25px;
 }
 
-.nav-links a {
-    text-decoration: none;
-    color: #555;
-    font-weight: 600;
-    transition: color 0.3s;
+.card {
+  background: var(--color-card-bg); /* Fundo BRANCO PURO */
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px var(--color-shadow);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+  border-top: 5px solid var(--color-primary-dark); /* Destaque superior em AZUL ESCURO */
+}
+.card:hover { transform: translateY(-5px); }
+
+.card h3 {
+  color: var(--color-primary-dark); /* Títulos em AZUL ESCURO */
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.4em;
+  padding-bottom: 10px;
+  position: relative;
+}
+.card h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 50px; 
+    height: 2px;
+    background-color: var(--color-primary-dark);
 }
 
-.nav-links a:hover {
-    color: #2a5298;
+.card p { color: var(--color-text-subtle); line-height: 1.6; }
+.card strong { font-weight: 600; color: var(--color-text); }
+
+
+/* Action Button (Em AZUL CLARO) */
+.action-btn {
+  background-color: var(--color-primary-light); /* BOTÃO AGORA EM AZUL CLARO */
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 30px;
+  font-weight: 600;
+  font-size: 1.1em;
+  cursor: pointer;
+  margin-top: auto;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  letter-spacing: 0.5px;
+}
+.action-btn:hover {
+  background-color: var(--color-primary-dark); /* Hover com o AZUL ESCURO */
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(100, 149, 237, 0.4);
 }
 
-/* Seções Gerais */
-section {
-    padding: 80px 0;
-}
+/* Estilos de Detalhes dos Cards */
+.rating-value { font-size: 3em; font-weight: 700; color: #f59e0b; margin-bottom: 5px; }
+.status.approved { color: #10b981; font-weight: bold; }
+.status.pending { color: #f59e0b; font-weight: bold; }
+.link-details { color: var(--color-primary-dark); text-decoration: none; font-weight: 500; transition: color 0.3s; margin-top: 15px; }
+.link-details:hover { color: var(--color-primary-light); text-decoration: underline; }
 
-h2 {
-    font-size: 2.5rem;
-    color: #2a5298;
-    text-align: center;
-    margin-bottom: 50px;
-}
+/* Planos */
+.plan-item { padding: 10px 0; border-bottom: 1px dashed #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+.plan-status.active { color: #10b981; font-weight: 600; }
+.plan-status.upgrade { color: #f59e0b; font-weight: 600; cursor: pointer; }
+.plan-status.upgrade:hover { text-decoration: underline; }
 
-/* Carrossel de Imagens */
-#hero {
-    position: relative;
-    height: 60vh;
-    overflow: hidden;
-}
 
-.carousel-images {
-    display: flex;
-    width: 300%; /* Para 3 imagens */
-    height: 100%;
-    transition: transform 0.5s ease-in-out;
-}
-
-.carousel-images img {
-    width: 100vw;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* Seção Sobre Nós */
-#about {
-    background-color: #fff;
-    text-align: center;
-}
-
-/* Central de Dúvidas (FAQ) */
-#faq {
-    background: #e9ecef;
-}
-
-.faq-item {
-    background: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.faq-item:hover {
-    background-color: #f7f7f7;
-}
-
-.faq-question {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: bold;
-    color: #2a5298;
-}
-
-.faq-answer {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-in-out;
-    padding-top: 0;
-    color: #555;
-}
-
-.faq-answer p {
-    padding-top: 15px;
-}
-
-.faq-item.active .faq-answer {
-    max-height: 200px; /* Altura suficiente para mostrar o conteúdo */
-    padding-top: 15px;
-}
-
-.faq-question span {
-    font-size: 1.5rem;
-}
-
-/* Rodapé */
-footer {
-    background: #2a5298;
-    color: #fff;
-    text-align: center;
-    padding: 40px 0;
+/* ======================================= */
+/* RESPONSIVIDADE */
+/* ======================================= */
+@media (max-width: 768px) {
+  .navbar { padding: 10px 15px; flex-wrap: wrap; }
+  .logo { flex-basis: 100%; text-align: center; margin-bottom: 10px; }
+  .nav-links { gap: 10px; justify-content: center; flex-grow: 1; }
+  .nav-item { padding: 5px 8px; font-size: 0.9em; }
+  .nav-logout { margin-top: 10px; flex-basis: 100%; text-align: center; padding: 8px 0; }
+  
+  .profile-container { margin: 20px 15px; padding: 0; }
+  .header-banner { border-radius: 0; margin-bottom: 20px; padding: 30px 15px; }
+  .profile-cards-grid { grid-template-columns: 1fr; }
 }

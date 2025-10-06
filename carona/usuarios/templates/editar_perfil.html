@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'paginainicial.css' %}">
+    <style>
+        /* Estilos básicos de formulário para que fique parecido com seus cards */
+        .form-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--color-card-bg);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px var(--color-shadow);
+            border-top: 5px solid var(--color-primary-dark);
+        }
+        .form-container h2 {
+            color: var(--color-primary-dark);
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .form-field p { margin-bottom: 15px; }
+        .form-field label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 5px; 
+            color: var(--color-text);
+        }
+        .form-field input, .form-field select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .form-field input:focus { border-color: var(--color-primary-light); outline: none; }
+
+        /* Estilo do botão Salvar (usando o estilo action-btn do seu CSS) */
+        .submit-btn {
+            margin-top: 20px;
+            /* Adaptação dos estilos de action-btn para a classe submit-btn */
+            background-color: var(--color-primary-light);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 30px;
+            font-weight: 600;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            width: auto; /* Para não ocupar 100% da largura */
+        }
+        .submit-btn:hover {
+            background-color: var(--color-primary-dark);
+            transform: translateY(-2px);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Editar Perfil de {{ usuario.username }}</h2>
+    
+    {% if messages %}
+        <ul style="list-style: none; padding: 0;">
+            {% for message in messages %}
+                <li style="color: green; margin-bottom: 10px;">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form method="post" action="{% url 'editar_perfil' %}" class="form-field">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <button type="submit" class="submit-btn">Salvar Alterações</button>
+        <a href="{% url 'meu_perfil' %}" class="submit-btn" style="background-color: #6c757d; text-decoration: none; display: inline-block;">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

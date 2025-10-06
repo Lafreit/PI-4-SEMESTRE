@@ -1,132 +1,132 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Inicial Completa</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'paginainicial.css' %}">
-</head>
-<body>
 
-    <header>
-        <div class="container">
-            <nav>
-                <div class="logo">Logo</div>
-                <ul class="nav-links">
-                    <li><a href="#hero">Início</a></li>
-                    <li><a href="#about">Sobre</a></li>
-                    <li><a href="#faq">Dúvidas</a></li>
-                    <li><a href="#contact">Contato</a></li>
-                </ul>
-            </nav>
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'paginainicial.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <div class="user-info">
+      {# Removido o user-avatar para um estilo mais clean como a landing page #}
+      <img src="{% static 'img/user.png' %}" alt="Usuário" class="user-avatar-small"> {# Um ícone menor e mais discreto, se quiser manter #}
+      <h3>Olá, {{ user.username }}!</h3> {# A saudação principal agora fica no main #}
+      <p class="user-type">{{ user.get_tipo_display }}</p>
+    </div>
+
+    <nav class="menu">
+      <a href="{% url 'meu_perfil' %}" class="menu-item active">👤 Meu Perfil</a>
+      <a href="#" class="menu-item">🕓 Minhas Viagens</a>
+      {% if user.tipo == 'motorista' %}
+        <a href="#" class="menu-item">🚗 Corridas Ativas</a>
+        <a href="#" class="menu-item">💰 Meus Ganhos</a>
+      {% else %}
+        <a href="#" class="menu-item">🧭 Procurar Motorista</a>
+        <a href="#" class="menu-item">⭐ Motoristas Favoritos</a>
+      {% endif %}
+      <a href="#" class="menu-item logout">🚪 Sair</a>
+    </nav>
+  </aside>
+
+  <main class="main-content"> {# Renomeado para main-content para melhor semântica #}
+    <div class="header-banner">
+      <h1 id="greeting-message"></h1> {# Saudação dinâmica será injetada aqui #}
+      <p>Pronto para sua próxima viagem?</p>
+      {# Você pode adicionar uma imagem de fundo aqui via CSS para um estilo de capa #}
+    </div>
+
+    <div class="map-and-actions">
+        <div id="map"></div>
+        <div class="action-card">
+            {% if user.tipo == 'motorista' %}
+            <h2>Você está online?</h2>
+            <p>Altere seu status para aceitar novas corridas.</p>
+            <button class="action-btn start">Ficar Online</button>
+            {% else %}
+            <h2>Encontre seu motorista</h2>
+            <p>Inicie sua busca agora e encontre a melhor carona!</p>
+            <button class="action-btn search">Procurar Carona</button>
+            {% endif %}
         </div>
-    </header>
+    </div>
 
-    <main>
-        <section id="hero">
-            <div class="carousel-images">
-                <img src="https://via.placeholder.com/1920x800/2a5298/FFFFFF?text=Slide+1" alt="Imagem 1">
-                <img src="https://via.placeholder.com/1920x800/1e3c72/FFFFFF?text=Slide+2" alt="Imagem 2">
-                <img src="https://via.placeholder.com/1920x800/2a5298/FFFFFF?text=Slide+3" alt="Imagem 3">
-            </div>
-        </section>
+    <section class="safety-tips card"> {# Adicionado classe 'card' para estilo #}
+      <h3>Dicas de Segurança <span class="icon">🛡️</span></h3>
+      <ul>
+        <li>Verifique o nome e a placa do motorista antes de entrar no carro.</li>
+        <li>Compartilhe sua viagem com amigos ou familiares.</li>
+        <li>Sente-se no banco traseiro em corridas individuais.</li>
+        <li>Evite informar dados pessoais ao motorista.</li>
+        <li>Em caso de emergência, use o botão de ajuda no aplicativo.</li>
+      </ul>
+    </section>
+  </main>
+</div>
 
-        <section id="about" class="container">
-            <h2>Sobre Nós</h2>
-            <p>Somos uma empresa dedicada a fornecer as melhores soluções para nossos clientes. Com anos de experiência e uma equipe talentosa, estamos prontos para transformar suas ideias em realidade. Nosso compromisso é com a qualidade e a satisfação total do cliente.</p>
-        </section>
+<script>
+function getGreeting() {
+  const hour = new Date().getHours();
+  let greeting;
+  if (hour < 12) {
+    greeting = "Bom dia";
+  } else if (hour < 18) {
+    greeting = "Boa tarde";
+  } else {
+    greeting = "Boa noite";
+  }
+  document.getElementById('greeting-message').textContent = `${greeting}, {{ user.username }}!`;
+}
 
-        <section id="faq" class="container">
-            <h2>Perguntas Frequentes</h2>
-            <div class="faq-list">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Como eu reseto minha senha?</span>
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Para resetar sua senha, clique em "Esqueci a senha" na página de login e siga as instruções enviadas para o seu e-mail.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Quais são as opções de preço?</span>
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Oferecemos diversos planos, desde opções gratuitas até pacotes premium com recursos avançados. Visite nossa página de preços para mais detalhes.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Como posso entrar em contato com o suporte?</span>
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Você pode entrar em contato com nosso suporte através do chat online, e-mail (suporte@exemplo.com) ou pelo telefone (XX) XXXX-XXXX.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>É possível cancelar a qualquer momento?</span>
-                        <span>+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Sim, você pode cancelar sua assinatura a qualquer momento, sem taxas adicionais. O cancelamento entra em vigor no final do seu ciclo de cobrança atual.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+function initMap() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const userLocation = [
+        position.coords.latitude,
+        position.coords.longitude
+      ];
 
-        <section id="contact" class="container">
-            <h2>Contato</h2>
-            <p style="text-align: center;">Entre em contato conosco para mais informações. Estamos ansiosos para ouvir de você!</p>
-        </section>
-    </main>
+      const map = L.map('map').setView(userLocation, 14); 
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Sua Empresa. Todos os direitos reservados.</p>
-        </div>
-    </footer>
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
 
-    <script>
-        // Lógica do Carrossel
-        const carousel = document.querySelector('.carousel-images');
-        let index = 0;
-        const totalSlides = 3;
+      L.marker(userLocation)
+        .addTo(map)
+        .bindPopup("Você está aqui!")
+        .openPopup();
+        
+    }, function(error) {
+        console.error("Erro de geolocalização: ", error); // Para depuração
+        alert("Não foi possível obter sua localização. Verifique as permissões do navegador.");
+        
+        // Exibe um mapa padrão caso a geolocalização falhe
+        const defaultLocation = [-23.5505, -46.6333]; // Ex: São Paulo
+        const map = L.map('map').setView(defaultLocation, 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        L.marker(defaultLocation).addTo(map).bindPopup("Localização padrão");
+    });
+  } else {
+    alert("Geolocalização não suportada pelo seu navegador.");
+    // Exibe um mapa padrão se a geolocalização não for suportada
+    const defaultLocation = [-23.5505, -46.6333]; 
+    const map = L.map('map').setView(defaultLocation, 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    L.marker(defaultLocation).addTo(map).bindPopup("Localização padrão");
+  }
+}
 
-        setInterval(() => {
-            index = (index + 1) % totalSlides;
-            const offset = -index * 100;
-            carousel.style.transform = `translateX(${offset}vw)`;
-        }, 5000); // Muda de slide a cada 5 segundos
-
-        // Lógica da Central de Dúvidas (FAQ)
-        const faqItems = document.querySelectorAll('.faq-item');
-
-        faqItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const isActive = item.classList.contains('active');
-                
-                // Fecha todas as outras perguntas
-                faqItems.forEach(otherItem => {
-                    otherItem.classList.remove('active');
-                    otherItem.querySelector('.faq-question span:last-child').textContent = '+';
-                });
-
-                // Abre ou fecha a pergunta clicada
-                if (!isActive) {
-                    item.classList.add('active');
-                    item.querySelector('.faq-question span:last-child').textContent = '-';
-                }
-            });
-        });
-    </script>
-
-</body>
-</html>
+// Chamar ambas as funções no carregamento
+window.onload = function() {
+  getGreeting();
+  initMap();
+};
+</script>
+{% endblock %}
