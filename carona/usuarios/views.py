@@ -3,8 +3,11 @@ from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegistroForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .forms import PerfilPassageiroForm
 
-
+@login_required
 def pagina_inicial(request):
     return render(request, 'paginainicial.html')
 
@@ -41,7 +44,7 @@ def login_view(request):
             user = form.get_user()
             login(request, user)  # loga o usuário
             messages.success(request, 'Login realizado com sucesso!')
-            return redirect('home')
+            return redirect('pagina_inicial')
         else:
             messages.error(request, 'Email ou senha inválidos.')
     else:
@@ -58,3 +61,47 @@ def logout_view(request):
     logout(request)  # encerra sessão do usuário
     messages.success(request, 'Logout realizado com sucesso!')
     return redirect('login')
+
+# VIEW DE PERFIL PASSAGEIRO OU MOTORISTA
+# -----------------------------
+@login_required
+def meu_perfil(request):
+    
+    user_tipo = 'passageiro'  # tipo de usuario
+
+    try:
+        # Acessa o tipo através da relação 'profile' (request.user.profile.tipo)
+        user_tipo = request.user.profile.tipo
+    except AttributeError:
+        # Se houver um erro (o objeto 'profile' ainda não existe), mantém o padrão 'passageiro'
+        pass
+
+    if user_tipo == 'motorista':
+        template_name = 'usuarios/perfil_motorista.html' 
+    else:
+        # Se for passageiro ou se houver falha ao ler o perfil
+        template_name = 'usuarios/perfil_passageiro.html'
+        
+    # O objeto 'user' é passado para o template, incluindo o 'profile' associado
+    return render(request, template_name, {'user': request.user})
+@login_required
+def editar_perfil(request):
+    usuario_logado = request.user
+    
+    if request.method == 'POST':
+        form = PerfilPassageiroForm(request.POST, instance=usuario_logado)
+        
+        if form.is_valid():
+            # O form.save() customizado em PerfilPassageiroForm lida com a senha
+            form.save()
+            messages.success(request, 'Seu perfil e/ou senha foram atualizados com sucesso!')
+            return redirect('meu_perfil') 
+    else:
+        form = PerfilPassageiroForm(instance=usuario_logado)
+
+    context = {
+        'form': form,
+        'usuario': usuario_logado
+    }
+    
+    return render(request, 'editar_perfil.html', context)
