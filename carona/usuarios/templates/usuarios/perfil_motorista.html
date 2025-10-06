@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'paginainicial.css' %}">
+    {% endblock %}
+
+{% block content %}
+<nav class="navbar">
+    <a href="{% url 'home' %}" class="logo">CaronaApp</a>
+    <div class="nav-links">
+        <a href="{% url 'pagina_inicial' %}" class="nav-item">Início</a>
+        <a href="{% url 'meu_perfil' %}" class="nav-item">Meu Perfil</a>
+        <a href="#" class="nav-item">Minhas Viagens</a>
+        <a href="#" class="nav-item">Central de Ajuda</a>
+    </div>
+    <a href="{% url 'logout' %}" class="nav-logout">Sair</a>
+</nav>
+
+<main class="profile-container">
+    <div class="header-banner">
+        <h1>Meu Perfil 🚗</h1>
+        <p>Gerencie sua conta, veículo, desempenho e vantagens exclusivas.</p>
+    </div>
+
+    <div class="profile-cards-grid">
+        
+        <section class="card profile-info-card">
+            <h3>Dados Pessoais</h3>
+            <p><strong>Nome:</strong> {{ user.nome }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Tipo de Usuário:</strong> {{ user.tipo_usuario|capfirst }}</p>
+            
+            <a href="{% url 'editar_perfil' %}" class="action-btn edit-btn" style="text-align: center; margin-top: auto; display: block;">
+                Editar Dados
+            </a>
+        </section>
+
+        <section class="card vehicle-info-card">
+            <h3>Informações do Veículo</h3>
+            <p><strong>Modelo:</strong> {{ user.profile_data.modelo_veiculo|default:"Não Cadastrado" }}</p>
+            <p><strong>Placa:</strong> {{ user.profile_data.placa|default:"N/A" }}</p>
+            <p><strong>CPF Cadastrado:</strong> {{ user.profile_data.cpf|default:"N/A" }}</p>
+            <p><strong>Status de Aprovação:</strong> <span class="status approved">Aprovado</span></p>
+            
+            <a href="{% url 'editar_perfil' %}" class="action-btn secondary-btn" style="text-align: center; margin-top: 15px; display: block;">
+                Atualizar Veículo
+            </a>
+        </section>
+
+        <section class="card plans-card">
+            <h3>Planos Disponíveis 💎</h3>
+            <div class="plan-item">
+                <span>**Plano Motorista Pro (Mensal)**</span>
+                <span class="plan-status active">Ativo</span>
+            </div>
+            <div class="plan-item">
+                <span>**Plano VIP Completo**</span>
+                <span class="plan-status upgrade">Fazer Upgrade</span>
+            </div>
+            <p style="margin-top: 15px;">Seu plano atual garante taxas de comissão reduzidas.</p>
+            <button class="action-btn secondary-btn">Gerenciar Assinatura</button>
+        </section>
+
+        <section class="card ratings-card">
+            <h3>Minhas Avaliações</h3>
+            <p class="rating-value">4.9 ⭐</p>
+            <p>Total de corridas: 150</p>
+            <p>Avaliações 5 Estrelas: 98%</p>
+            <a href="#" class="link-details">Ver Detalhes</a>
+        </section>
+
+        <section class="card documents-card">
+            <h3>Documentos</h3>
+            <p>Verifique se sua CNH e CRLV estão em dia.</p>
+            <p>Próxima Verificação: 10/12/2025</p>
+            <button class="action-btn primary-btn">Ver Documentos</button>
+        </section>
+
+        <section class="card help-center-card">
+            <h3>Central de Ajuda ❓</h3>
+            <p>Encontre respostas rápidas, envie feedback ou reporte um problema na rota.</p>
+            <p>Horário de Atendimento: 24/7</p>
+            <a href="#" class="action-btn secondary-btn">Acessar Suporte</a>
+        </section>
+
+    </div>
+</main>
+{% endblock %}
