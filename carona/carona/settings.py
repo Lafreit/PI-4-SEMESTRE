@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'usuarios',
     'passageiros',
     'pagamentos',
+    'corrida',
 ]
 
 MIDDLEWARE = [
@@ -139,4 +140,8 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'pagina_inicial'
 LOGOUT_REDIRECT_URL = 'login'
+
+# Fazer a sessão expirar ao fechar o navegador
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 

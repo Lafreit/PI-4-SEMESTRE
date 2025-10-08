@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'corrida/css/cadastrar_corrida.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="corrida-container">
+    <section class="corrida-card">
+        <h3>Cadastrar Corrida 🚗</h3>
+
+        <form method="POST" class="form-corrida">
+            {% csrf_token %}
+
+            {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if form.non_field_errors %}
+            <div class="alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <!-- Origem e Destino -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.origem.id_for_label }}">Origem</label>
+                    {{ form.origem }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.destino.id_for_label }}">Destino</label>
+                    {{ form.destino }}
+                </div>
+            </div>
+
+            <!-- Data e Horários -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.data.id_for_label }}">Data</label>
+                    {{ form.data }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.horario_saida.id_for_label }}">Horário de Saída</label>
+                    {{ form.horario_saida }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.horario_chegada.id_for_label }}">Horário de Chegada</label>
+                    {{ form.horario_chegada }}
+                </div>
+            </div>
+
+            <!-- Vagas e Valor -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.vagas_disponiveis.id_for_label }}">Vagas Disponíveis</label>
+                    {{ form.vagas_disponiveis }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.valor.id_for_label }}">Valor</label>
+                    {{ form.valor }}
+                </div>
+            </div>
+
+            <!-- Observações -->
+            <div class="form-group">
+                <label for="{{ form.observacoes.id_for_label }}">Observações</label>
+                {{ form.observacoes }}
+            </div>
+
+            <button type="submit" class="action-btn">Cadastrar Corrida</button>
+        </form>
+    </section>
+</div>
+{% endblock %}

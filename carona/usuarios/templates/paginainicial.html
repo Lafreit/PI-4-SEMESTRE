@@ -13,21 +13,23 @@
     <div class="user-info">
       {# Removido o user-avatar para um estilo mais clean como a landing page #}
       <img src="{% static 'img/user.png' %}" alt="Usuário" class="user-avatar-small"> {# Um ícone menor e mais discreto, se quiser manter #}
-      <h3>Olá, {{ user.username }}!</h3> {# A saudação principal agora fica no main #}
+      <h3>Olá, {{ user.nome }}!</h3> {# A saudação principal agora fica no main #}
       <p class="user-type">{{ user.get_tipo_display }}</p>
     </div>
 
     <nav class="menu">
-      <a href="{% url 'meu_perfil' %}" class="menu-item active">👤 Meu Perfil</a>
+      <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">👤 Meu Perfil</a>
       <a href="#" class="menu-item">🕓 Minhas Viagens</a>
-      {% if user.tipo == 'motorista' %}
+      
+      {% if user.tipo_usuario == 'motorista' %}
+        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">📝 Cadastrar Corrida</a>
         <a href="#" class="menu-item">🚗 Corridas Ativas</a>
         <a href="#" class="menu-item">💰 Meus Ganhos</a>
       {% else %}
         <a href="#" class="menu-item">🧭 Procurar Motorista</a>
         <a href="#" class="menu-item">⭐ Motoristas Favoritos</a>
       {% endif %}
-      <a href="#" class="menu-item logout">🚪 Sair</a>
+      <a href="{% url 'usuarios:logout' %}" class="menu-item logout">🚪 Sair</a>
     </nav>
   </aside>
 
@@ -41,7 +43,7 @@
     <div class="map-and-actions">
         <div id="map"></div>
         <div class="action-card">
-            {% if user.tipo == 'motorista' %}
+            {% if user.tipo_usuario == 'motorista' %}
             <h2>Você está online?</h2>
             <p>Altere seu status para aceitar novas corridas.</p>
             <button class="action-btn start">Ficar Online</button>
@@ -77,7 +79,7 @@ function getGreeting() {
   } else {
     greeting = "Boa noite";
   }
-  document.getElementById('greeting-message').textContent = `${greeting}, {{ user.username }}!`;
+  document.getElementById('greeting-message').textContent = `${greeting}, {{ user.nome }}!`;
 }
 
 function initMap() {

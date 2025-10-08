@@ -9,12 +9,12 @@
 <nav class="navbar">
     <a href="{% url 'home' %}" class="logo">CaronaApp</a>
     <div class="nav-links">
-        <a href="{% url 'pagina_inicial' %}" class="nav-item">Início</a>
-        <a href="{% url 'meu_perfil' %}" class="nav-item">Meu Perfil</a>
+        <a href="{% url 'usuarios:pagina_inicial' %}" class="nav-item">Início</a>
+        <a href="{% url 'usuarios:meu_perfil' %}" class="nav-item">Meu Perfil</a>
         <a href="#" class="nav-item">Minhas Viagens</a>
         <a href="#" class="nav-item">Central de Ajuda</a>
     </div>
-    <a href="{% url 'logout' %}" class="nav-logout">Sair</a>
+    <a href="{% url 'usuarios:logout' %}" class="nav-logout">Sair</a>
 </nav>
 <main class="profile-container">
     <div class="header-banner" style="padding-top: 20px; padding-bottom: 20px;">
@@ -26,10 +26,10 @@
         
         <section class="card profile-info-card">
             <h3>Dados Pessoais</h3>
-            <p><strong>Nome:</strong> {{ user.username }}</p>
+            <p><strong>Nome:</strong> {{ user.nome }}</p>
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p><strong>Tipo de Usuário:</strong> Passageiro</p>
-             <a href="{% url 'editar_perfil' %}" class="action-btn edit-btn" 
+             <a href="{% url 'usuarios:editar_perfil' %}" class="action-btn edit-btn" 
        style="text-align: center; margin-top: auto; display: block;">
         Editar Dados
     </a>

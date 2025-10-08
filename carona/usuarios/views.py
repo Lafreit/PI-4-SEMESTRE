@@ -24,7 +24,7 @@ def register_view(request):
             user = form.save()  # salva usuário com senha em hash
             login(request, user)  # loga automaticamente
             messages.success(request, 'Cadastro realizado com sucesso!')
-            return redirect('home')
+            return redirect('usuarios:pagina_inicial')
         else:
             messages.error(request, 'Erro no cadastro. Verifique os dados.')
     else:
@@ -43,8 +43,8 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)  # loga o usuário
-            messages.success(request, 'Login realizado com sucesso!')
-            return redirect('pagina_inicial')
+            #messages.success(request, 'Login realizado com sucesso!')
+            return redirect('usuarios:pagina_inicial')
         else:
             messages.error(request, 'Email ou senha inválidos.')
     else:
@@ -59,8 +59,9 @@ def login_view(request):
 # -----------------------------
 def logout_view(request):
     logout(request)  # encerra sessão do usuário
-    messages.success(request, 'Logout realizado com sucesso!')
-    return redirect('login')
+    #messages.success(request, 'Logout realizado com sucesso!')
+    return redirect('home')
+
 
 # VIEW DE PERFIL PASSAGEIRO OU MOTORISTA
 # -----------------------------
@@ -84,6 +85,7 @@ def meu_perfil(request):
         
     # O objeto 'user' é passado para o template, incluindo o 'profile' associado
     return render(request, template_name, {'user': request.user})
+
 @login_required
 def editar_perfil(request):
     usuario_logado = request.user
@@ -95,7 +97,7 @@ def editar_perfil(request):
             # O form.save() customizado em PerfilPassageiroForm lida com a senha
             form.save()
             messages.success(request, 'Seu perfil e/ou senha foram atualizados com sucesso!')
-            return redirect('meu_perfil') 
+            return redirect('usuarios:meu_perfil') 
     else:
         form = PerfilPassageiroForm(instance=usuario_logado)
 

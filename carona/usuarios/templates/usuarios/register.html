@@ -17,8 +17,8 @@
                 <li><a href="{% url 'home' %}#about">Sobre</a></li>
                 <li><a href="{% url 'home' %}#faq">Dúvidas</a></li>
                 <li><a href="{% url 'home' %}#contact">Contato</a></li>
-                <li><a href="{% url 'login' %}">Entrar</a></li> 
-                <li><a href="{% url 'register' %}" class="btn-register">Registrar</a></li>
+                <li><a href="{% url 'usuarios:login' %}">Entrar</a></li> 
+                <li><a href="{% url 'usuarios:register' %}" class="btn-register">Registrar</a></li>
             </ul>
         </nav>
     </div>
@@ -62,7 +62,7 @@
             </form>
 
             <div class="login-link">
-                Já tem uma conta? <a href="{% url 'login' %}">Entrar</a>
+                Já tem uma conta? <a href="{% url 'usuarios:login' %}">Entrar</a>
             </div>
         </div>
         

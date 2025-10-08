@@ -61,7 +61,7 @@
 
 {% block content %}
 <div class="form-container">
-    <h2>Editar Perfil de {{ usuario.username }}</h2>
+    <h2>Editar Perfil de {{ usuario.nome }}</h2>
     
     {% if messages %}
         <ul style="list-style: none; padding: 0;">
@@ -71,12 +71,12 @@
         </ul>
     {% endif %}
 
-    <form method="post" action="{% url 'editar_perfil' %}" class="form-field">
+    <form method="post" action="{% url 'usuarios:editar_perfil' %}" class="form-field">
         {% csrf_token %}
         {{ form.as_p }}
         
         <button type="submit" class="submit-btn">Salvar Alterações</button>
-        <a href="{% url 'meu_perfil' %}" class="submit-btn" style="background-color: #6c757d; text-decoration: none; display: inline-block;">Cancelar</a>
+        <a href="{% url 'usuarios:meu_perfil' %}" class="submit-btn" style="background-color: #6c757d; text-decoration: none; display: inline-block;">Cancelar</a>
     </form>
 </div>
 {% endblock %}
