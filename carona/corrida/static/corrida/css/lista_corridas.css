@@ -1,0 +1,141 @@
+/* --- Container e alertas existentes --- */
+.corridas-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.corridas-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.alert {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.alert.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.alert.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* --- Botões existentes --- */
+.btn {
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: 0.3s;
+    text-align: center;
+    cursor: pointer;
+}
+
+.btn.editar {
+    background: #2196f3;
+    color: white;
+}
+
+.btn.editar:hover {
+    background: #0d8bf2;
+}
+
+.btn.cancelar {
+    background: #e53935;
+    color: white;
+}
+
+.btn.cancelar:hover {
+    background: #c62828;
+}
+
+.btn.reativar {
+    background: #43a047;
+    color: white;
+}
+
+.btn.reativar:hover {
+    background: #2e7d32;
+}
+
+/* --- Tabela nova --- */
+.table-responsive {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.corridas-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.corridas-table th,
+.corridas-table td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(20,20,20,0.08);
+    font-size: 0.95rem;
+    color: #22303a;
+}
+
+.corridas-table thead th {
+    background: #f9fff9; /* manter coerente com card ativo */
+    font-weight: 700;
+}
+
+.corridas-table tbody tr:hover {
+    background: #f1f7ff;
+}
+
+/* Linha cancelada na tabela */
+.corridas-table tbody tr.cancelada {
+    background-color: #f8d7da;
+    color: #721c24;
+    opacity: 0.9;
+}
+
+/* Status dentro da tabela */
+.corridas-table td .badge {
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.corridas-table td .badge.ativa {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.corridas-table td .badge.cancelada {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Botões dentro da tabela */
+.corridas-table td .btn {
+    margin-right: 4px;
+}
+
+/* Responsividade */
+@media (max-width: 720px) {
+    .corridas-table th, .corridas-table td {
+        padding: 8px 6px;
+        font-size: 0.9rem;
+    }
+}

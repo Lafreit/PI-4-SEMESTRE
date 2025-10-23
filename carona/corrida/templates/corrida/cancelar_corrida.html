@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="corrida-container">
+    <section class="corrida-card">
+        {% if corrida.status == 'ativa' %}
+            <h3>Cancelar Corrida 🚨</h3>
+            <p>Deseja cancelar a corrida de <strong>{{ corrida.origem }}</strong> para <strong>{{ corrida.destino }}</strong> no dia <strong>{{ corrida.data }}</strong>?</p>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="action-btn btn-danger">Cancelar Corrida</button>
+                <a href="{% url 'corrida:lista_corridas' %}" class="action-btn btn-secondary">Voltar</a>
+            </form>
+        {% else %}
+            <h3>Reativar Corrida 🔄</h3>
+            <p>Deseja reativar a corrida de <strong>{{ corrida.origem }}</strong> para <strong>{{ corrida.destino }}</strong> no dia <strong>{{ corrida.data }}</strong>?</p>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" class="action-btn btn-success">Reativar Corrida</button>
+                <a href="{% url 'corrida:lista_corridas' %}" class="action-btn btn-secondary">Voltar</a>
+            </form>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+<!-- form_corrida_fields.html -->
+<div class="form-group">
+    <label for="{{ form.origem.id_for_label }}">Origem</label>
+    {{ form.origem }}
+    {{ form.bairro_origem }}
+    {{ form.cidade_origem }}
+    {{ form.estado_origem }}
+    {{ form.cep_origem }}
+</div>
+
+<div class="form-group">
+    <label for="{{ form.destino.id_for_label }}">Destino</label>
+    {{ form.destino }}
+    {{ form.bairro_destino }}
+    {{ form.cidade_destino }}
+    {{ form.estado_destino }}
+    {{ form.cep_destino }}
+</div>
+
+<div class="form-row">
+    <div class="form-group">
+        <label for="{{ form.data.id_for_label }}">Data</label>
+        {{ form.data }}
+    </div>
+    <div class="form-group">
+        <label for="{{ form.horario_saida.id_for_label }}">Horário de Saída</label>
+        {{ form.horario_saida }}
+    </div>
+    <div class="form-group">
+        <label for="{{ form.horario_chegada.id_for_label }}">Horário de Chegada</label>
+        {{ form.horario_chegada }}
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="form-group">
+        <label for="{{ form.vagas_disponiveis.id_for_label }}">Vagas Disponíveis</label>
+        {{ form.vagas_disponiveis }}
+    </div>
+    <div class="form-group">
+        <label for="{{ form.valor.id_for_label }}">Valor</label>
+        {{ form.valor }}
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="{{ form.observacoes.id_for_label }}">Observações</label>
+    {{ form.observacoes }}
+</div>

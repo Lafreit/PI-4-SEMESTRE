@@ -121,13 +121,6 @@
         <p style="text-align: center;">Entre em contato conosco para mais informações. Estamos ansiosos para ouvir de você!</p>
     </section>
 
-    <section id="user-status" class="container">
-        {% if user.is_authenticated %}
-            <p>Você está logado como <strong>{{ user.nome }}</strong></p>
-        {% else %}
-            <p>Faça login para continuar.</p>
-        {% endif %}
-    </section>
 </main>
 
 <footer>

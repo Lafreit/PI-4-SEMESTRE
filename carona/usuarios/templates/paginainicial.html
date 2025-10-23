@@ -19,7 +19,7 @@
 
     <nav class="menu">
       <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">👤 Meu Perfil</a>
-      <a href="#" class="menu-item">🕓 Minhas Viagens</a>
+      <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">🕓 Minhas Viagens</a>
       
       {% if user.tipo_usuario == 'motorista' %}
         <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">📝 Cadastrar Corrida</a>

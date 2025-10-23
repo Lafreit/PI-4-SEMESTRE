@@ -8,7 +8,7 @@
 {% block content %}
 <div class="corrida-container">
     <section class="corrida-card">
-        <h3>Cadastrar Corrida 🚗</h3>
+        <h3>Editar Corrida 🚗</h3>
 
         <form method="POST" class="form-corrida">
             {% csrf_token %}
@@ -27,10 +27,18 @@
             </div>
             {% endif %}
 
+
             <!-- Inclui os campos via template parcial -->
             {% include "corrida/form_corrida_fields.html" %}
 
-            <button type="submit" class="action-btn">Cadastrar Corrida</button>
+            
+            <!-- Status (apenas no editar) -->
+            <div class="form-group">
+                <label for="{{ form.status.id_for_label }}">Status da Corrida</label>
+                {{ form.status }}
+            </div>
+
+            <button type="submit" class="action-btn">Atualizar Corrida</button>
         </form>
     </section>
 </div>

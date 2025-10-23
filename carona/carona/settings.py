@@ -137,9 +137,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 AUTH_USER_MODEL = 'usuarios.Usuario'  
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'pagina_inicial'
-LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'usuarios:login'
+LOGIN_REDIRECT_URL = 'usuarios:pagina_inicial'
+LOGOUT_REDIRECT_URL = 'usuarios:login'
 
 # Fazer a sessão expirar ao fechar o navegador
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True

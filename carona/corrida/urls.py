@@ -11,4 +11,5 @@ urlpatterns = [
     path('historico/', views.historico_corridas, name='historico_corridas'),
     path('detalhes/<int:corrida_id>/', views.detalhes_corrida, name='detalhes_corrida'),
     path('cancelar/<int:corrida_id>/', views.cancelar_corrida, name='cancelar_corrida'),
-]   
+    path('editar/<int:corrida_id>/', views.editar_corrida, name='editar_corrida'),
+]
