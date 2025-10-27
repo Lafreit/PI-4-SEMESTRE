@@ -11,34 +11,34 @@
 <div class="dashboard-container">
   <aside class="sidebar">
     <div class="user-info">
-      {# Removido o user-avatar para um estilo mais clean como a landing page #}
-      <img src="{% static 'img/user.png' %}" alt="Usuário" class="user-avatar-small"> {# Um ícone menor e mais discreto, se quiser manter #}
-      <h3>Olá, {{ user.nome }}!</h3> {# A saudação principal agora fica no main #}
+      <img src="{% static 'img/user.png' %}" alt="Usuário" class="user-avatar-small">
+      <h3>Olá, {{ user.nome }}!</h3>
       <p class="user-type">{{ user.get_tipo_display }}</p>
     </div>
 
     <nav class="menu">
-      <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">👤 Meu Perfil</a>
-      <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">🕓 Minhas Viagens</a>
-      
+      <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
+      <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
+
       {% if user.tipo_usuario == 'motorista' %}
-        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">📝 Cadastrar Corrida</a>
-        <a href="#" class="menu-item">🚗 Corridas Ativas</a>
-        <a href="#" class="menu-item">💰 Meus Ganhos</a>
+        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Corrida</a>
+        <a href="#" class="menu-item">Corridas Ativas</a>
+        <a href="#" class="menu-item">Meus Ganhos</a>
       {% else %}
-        <a href="#" class="menu-item">🧭 Procurar Motorista</a>
-        <a href="#" class="menu-item">⭐ Motoristas Favoritos</a>
+        <a href="#" class="menu-item">Procurar Motorista</a>
+        <a href="#" class="menu-item">Motoristas Favoritos</a>
       {% endif %}
       <a href="{% url 'usuarios:logout' %}" class="menu-item logout">🚪 Sair</a>
     </nav>
   </aside>
 
-  <main class="main-content"> {# Renomeado para main-content para melhor semântica #}
+  <main class="main-content">
     <div class="header-banner">
-      <h1 id="greeting-message"></h1> {# Saudação dinâmica será injetada aqui #}
+      <h1 id="greeting-message"></h1>
       <p>Pronto para sua próxima viagem?</p>
-      {# Você pode adicionar uma imagem de fundo aqui via CSS para um estilo de capa #}
     </div>
+
+    <button onclick="toggleDarkMode()" class="action-btn" style="position:absolute;top:15px;right:15px;">🌙</button>
 
     <div class="map-and-actions">
         <div id="map"></div>
@@ -55,7 +55,7 @@
         </div>
     </div>
 
-    <section class="safety-tips card"> {# Adicionado classe 'card' para estilo #}
+    <section class="safety-tips card">
       <h3>Dicas de Segurança <span class="icon">🛡️</span></h3>
       <ul>
         <li>Verifique o nome e a placa do motorista antes de entrar no carro.</li>
@@ -69,66 +69,160 @@
 </div>
 
 <script>
+// ====================== SAUDAÇÃO COM EMOJI ======================
 function getGreeting() {
   const hour = new Date().getHours();
-  let greeting;
-  if (hour < 12) {
-    greeting = "Bom dia";
-  } else if (hour < 18) {
-    greeting = "Boa tarde";
-  } else {
-    greeting = "Boa noite";
-  }
-  document.getElementById('greeting-message').textContent = `${greeting}, {{ user.nome }}!`;
+  let greeting, emoji;
+  if (hour < 12) { greeting = "Bom dia"; emoji = "☀️"; }
+  else if (hour < 18) { greeting = "Boa tarde"; emoji = "🌤️"; }
+  else { greeting = "Boa noite"; emoji = "🌙"; }
+  document.getElementById('greeting-message').textContent = `${emoji} ${greeting}, {{ user.nome }}!`;
 }
 
+// ====================== RELOGIO AO LADO DA SAUDAÇÃO ======================
+function updateClock() {
+  const now = new Date();
+  const time = now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+  const greetingEl = document.getElementById('greeting-message');
+  if (!greetingEl.querySelector("span")) {
+    const span = document.createElement("span");
+    span.style.fontSize = "16px";
+    span.textContent = ` 🕒 ${time}`;
+    greetingEl.appendChild(span);
+  } else {
+    greetingEl.querySelector("span").textContent = ` 🕒 ${time}`;
+  }
+}
+setInterval(updateClock, 60000);
+
+// ====================== MAPA E LOCALIZAÇÃO ======================
 function initMap() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      const userLocation = [
-        position.coords.latitude,
-        position.coords.longitude
-      ];
-
-      const map = L.map('map').setView(userLocation, 14); 
+    navigator.geolocation.getCurrentPosition(async function(position) {
+      const userLocation = [position.coords.latitude, position.coords.longitude];
+      const map = L.map('map').setView(userLocation, 14);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
 
-      L.marker(userLocation)
-        .addTo(map)
-        .bindPopup("Você está aqui!")
-        .openPopup();
-        
+      L.marker(userLocation).addTo(map).bindPopup("Você está aqui!").openPopup();
+
+      showWeather(userLocation[0], userLocation[1]);
+      showAddress(userLocation[0], userLocation[1]);
     }, function(error) {
-        console.error("Erro de geolocalização: ", error); // Para depuração
-        alert("Não foi possível obter sua localização. Verifique as permissões do navegador.");
-        
-        // Exibe um mapa padrão caso a geolocalização falhe
-        const defaultLocation = [-23.5505, -46.6333]; // Ex: São Paulo
-        const map = L.map('map').setView(defaultLocation, 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-        L.marker(defaultLocation).addTo(map).bindPopup("Localização padrão");
+      console.error("Erro de geolocalização: ", error);
+      alert("Não foi possível obter sua localização. Verifique as permissões do navegador.");
+      const defaultLocation = [-23.5505, -46.6333];
+      const map = L.map('map').setView(defaultLocation, 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      L.marker(defaultLocation).addTo(map).bindPopup("Localização padrão");
     });
   } else {
     alert("Geolocalização não suportada pelo seu navegador.");
-    // Exibe um mapa padrão se a geolocalização não for suportada
-    const defaultLocation = [-23.5505, -46.6333]; 
-    const map = L.map('map').setView(defaultLocation, 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-    L.marker(defaultLocation).addTo(map).bindPopup("Localização padrão");
   }
 }
 
-// Chamar ambas as funções no carregamento
+// ====================== CLIMA ATUAL ======================
+async function showWeather(lat, lon) {
+  try {
+    const apiKey = "SUA_API_KEY_AQUI"; // Pegue uma chave gratuita em openweathermap.org
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${apiKey}`);
+    const data = await res.json();
+    const temp = Math.round(data.main.temp);
+    const desc = data.weather[0].description;
+    const el = document.createElement("div");
+    el.className = "weather-info";
+    el.innerHTML = `🌤️ ${temp}°C - ${desc}`;
+    document.querySelector(".header-banner").appendChild(el);
+  } catch (err) {
+    console.log("Erro ao obter clima:", err);
+  }
+}
+
+// ====================== ENDEREÇO APROXIMADO ======================
+async function showAddress(lat, lon) {
+  const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+  const data = await res.json();
+  const city = data.address.city || data.address.town || data.address.village || "local desconhecido";
+  const el = document.createElement("p");
+  el.textContent = `📍 Localização aproximada: ${city}`;
+  document.querySelector(".header-banner").appendChild(el);
+}
+
+// ====================== MODO ESCURO ======================
+function toggleDarkMode() {
+  document.body.classList.toggle("dark-mode");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+}
+
+// ====================== NOTIFICAÇÃO DE NOVAS CORRIDAS ======================
+function showNotification(msg) {
+  const box = document.createElement("div");
+  box.className = "popup-notification";
+  box.textContent = msg;
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 4000);
+}
+
+// ====================== CHAMADA PRINCIPAL ======================
 window.onload = function() {
   getGreeting();
+  updateClock();
   initMap();
+
+  if (localStorage.getItem("darkMode") === "true") {
+    document.body.classList.add("dark-mode");
+  }
+
+  setTimeout(() => showNotification("🚗 Há novas corridas disponíveis na sua área!"), 5000);
 };
 </script>
+
+<style>
+/* ============ ANIMAÇÃO HEADER ============ */
+.header-banner h1, .header-banner p {
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeInMove 1s forwards;
+}
+@keyframes fadeInMove {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ MODO ESCURO ============ */
+body.dark-mode {
+  background: #121212;
+  color: #eee;
+}
+body.dark-mode .sidebar, body.dark-mode .main-content {
+  background: #1e1e1e !important;
+}
+
+/* ============ NOTIFICAÇÃO ============ */
+.popup-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #007bff;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  animation: slideIn 0.4s ease;
+}
+@keyframes slideIn {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ============ CLIMA E LOCALIZAÇÃO ============ */
+.weather-info {
+  font-weight: 500;
+  margin-top: 8px;
+}
+</style>
+
 {% endblock %}
