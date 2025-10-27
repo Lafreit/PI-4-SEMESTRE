@@ -1,0 +1,273 @@
+/* ========================================================= */
+/* VARIÁVEIS DE ESTILO (PADRÃO MODERNO) */
+/* ========================================================= */
+:root {
+    --primary-blue: #3A8DFF;        /* Azul principal vibrante (Botões e Destaques) */
+    --secondary-blue: #0056b3;      /* Azul escuro (Para títulos e texto principal) */
+    --light-bg: #f5f7fa;            /* Fundo leve do body */
+    --card-bg: #ffffff;             /* Fundo do card */
+    --text-color: #333;             /* Cor do texto geral */
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra suave */
+    --border-color: #e0e0e0;        /* Cor da borda suave */
+    --status-approved: #28a745;     /* Verde de aprovação (Status Ativo) */
+    --status-upgrade: #ffc107;      /* Amarelo de Upgrade */
+    --card-header-blue: #4d94ff;    /* Azul claro para borda do card de dados pessoais */
+    --card-header-purple: #8A2BE2;  /* Roxo para borda do card de planos */
+}
+
+/* 1. Reset Básico e Container Principal */
+body {
+    background-color: var(--light-bg);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+}
+
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 2. Navbar (Limpa e Moderna) */
+.navbar {
+    background-color: var(--card-bg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--primary-blue) !important;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-item, .nav-logout {
+    color: var(--secondary-blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.nav-item:hover, .nav-logout:hover {
+    color: var(--primary-blue);
+}
+
+/* 3. Header/Banner do Perfil */
+.header-banner {
+    background: linear-gradient(135deg, var(--primary-blue), #2e71d8);
+    color: white;
+    padding: 20px 40px; 
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 30px;
+}
+
+.header-banner h1 {
+    font-size: 2.2em;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.header-banner p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+/* 4. Layout e Estilo dos Cards (Visualização) */
+.profile-cards-grid {
+    display: grid;
+    /* Grid de ajuste automático, resolvendo problemas de desalinhamento */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+/* Estilo Básico de Todo Card */
+.card {
+    background-color: var(--card-bg);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+    border-top: 5px solid var(--border-color); 
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+}
+
+.card h3 {
+    color: var(--secondary-blue);
+    font-size: 1.3em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card p { margin: 8px 0; font-size: 1em; }
+.card strong { font-weight: 600; color: var(--text-color); }
+
+/* Destaque da Borda Superior dos Cards */
+.profile-info-card { border-top-color: var(--card-header-blue); }
+.plans-card { border-top-color: var(--card-header-purple); }
+.trips-card { border-top-color: #5cb85c; }
+.payment-info-card { border-top-color: #f0ad4e; }
+.favorites-card { border-top-color: #ff99cc; }
+.help-center-card { border-top-color: #00bcd4; }
+.vehicle-info-card { border-top-color: var(--status-approved); }
+.documents-card { border-top-color: #4CAF50; }
+
+
+/* Estilos de Botões de Ação dentro dos Cards */
+.action-btn {
+    padding: 12px 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    margin-top: auto; /* Empurra o botão para baixo, alinhando-os */
+    display: block; 
+}
+
+.edit-btn, .primary-btn { background-color: var(--primary-blue); color: white; }
+.edit-btn:hover, .primary-btn:hover { background-color: var(--secondary-blue); }
+
+.secondary-btn { background-color: var(--border-color); color: var(--text-color); }
+.secondary-btn:hover { background-color: #ccc; }
+
+/* Estilos de Status e Plano */
+.status { padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
+.active { background-color: rgba(40, 167, 69, 0.1); color: var(--status-approved); }
+.upgrade { background-color: rgba(255, 193, 7, 0.1); color: var(--status-upgrade); }
+.plan-item { display: flex; justify-content: space-between; margin: 5px 0; padding: 5px 0; }
+.link-details { color: var(--primary-blue); text-decoration: none; font-weight: 600; transition: color 0.2s; margin-top: 10px; }
+
+
+/* 5. Estilos de Notificação (Posicionamento dentro do Main) */
+.notification-banner {
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.05em;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+
+/* 6. Estilos de Edição/Formulário (Para o editar_perfil.html) */
+
+.form-container {
+    max-width: 700px;
+    margin: 40px auto;
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+    border-top: 5px solid var(--primary-blue);
+}
+.form-section-title {
+    margin-top: 30px;
+    margin-bottom: 20px;
+    color: var(--primary-blue);
+    font-size: 1.3em;
+    font-weight: 600;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+.form-field { margin-bottom: 18px; }
+.form-field label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--text-color); font-size: 0.95em; }
+.form-field input, .form-field select {
+    width: 100%; padding: 12px 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.form-field input:focus, .form-field select:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(58, 141, 255, 0.2); outline: none; }
+.form-actions { display: flex; justify-content: flex-end; margin-top: 30px; gap: 15px; }
+
+.submit-btn { background-color: var(--primary-blue); color: white; border: none; border-radius: 10px; padding: 12px 25px; font-weight: 600; font-size: 1em; cursor: pointer; }
+.cancel-btn { background-color: #6c757d; color: #fff; border: none; border-radius: 10px; padding: 12px 25px; font-weight: 600; font-size: 1em; cursor: pointer; text-decoration: none; display: inline-block; }
+
+
+/* Media Queries para Responsividade */
+@media (max-width: 992px) {
+    .profile-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .profile-cards-grid { grid-template-columns: 1fr; }
+    .navbar { flex-direction: column; gap: 10px; }
+    .nav-links { justify-content: center; }
+}
+/* ========================================================= */
+/* MODO ESCURO (Dark Mode) */
+/* ========================================================= */
+
+body.dark-mode {
+    background-color: #121212; /* Fundo escuro */
+    color: #eee; /* Texto claro */
+}
+
+body.dark-mode .navbar {
+    background-color: #1e1e1e;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .nav-item, body.dark-mode .nav-logout {
+    color: #bbb;
+}
+
+body.dark-mode .card, body.dark-mode .form-container {
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* Sombra mais escura */
+}
+
+body.dark-mode .card h3 {
+    color: var(--primary-blue); /* Mantém o azul vibrante */
+}
+
+body.dark-mode .header-banner {
+    /* Mantém o gradiente, se possível, ou usa um fundo escuro */
+    background: linear-gradient(135deg, #1f4f8f, #002b66); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .action-btn.secondary-btn {
+    background-color: #333;
+    color: #eee;
+}
+
+/* Campos de Formulário no modo escuro */
+body.dark-mode .form-field input, body.dark-mode .form-field select {
+    background-color: #2b2b2b;
+    border: 1px solid #444;
+    color: #eee;
+}
+body.dark-mode .form-field input:focus, body.dark-mode .form-field select:focus { 
+    border-color: var(--primary-blue); 
+    box-shadow: 0 0 0 3px rgba(58, 141, 255, 0.4);
+}
