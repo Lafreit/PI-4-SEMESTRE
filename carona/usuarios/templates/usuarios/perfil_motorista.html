@@ -2,27 +2,50 @@
 {% load static %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'paginainicial.css' %}">
-    {% endblock %}
+<link rel="stylesheet" href="{% static 'perfil.css' %}">
+{% endblock %}
 
 {% block content %}
 <nav class="navbar">
     <a href="{% url 'home' %}" class="logo">CaronaApp</a>
     <div class="nav-links">
-        <a href="{% url 'pagina_inicial' %}" class="nav-item">Início</a>
-        <a href="{% url 'meu_perfil' %}" class="nav-item">Meu Perfil</a>
+        <a href="{% url 'usuarios:pagina_inicial' %}" class="nav-item">Início</a>
+        <a href="{% url 'usuarios:meu_perfil' %}" class="nav-item">Meu Perfil</a>
         <a href="#" class="nav-item">Minhas Viagens</a>
         <a href="#" class="nav-item">Central de Ajuda</a>
     </div>
-    <a href="{% url 'logout' %}" class="nav-logout">Sair</a>
+    <a href="{% url 'usuarios:logout' %}" class="nav-logout">Sair</a>
 </nav>
 
 <main class="profile-container">
+    
+    {# --- Botão de Modo Escuro (Posicionado) --- #}
+    <button onclick="toggleDarkMode()" class="action-btn" style="position:absolute;top:20px;right:20px;z-index:100; font-size: 1.2em; padding: 10px;">
+        🌙
+    </button>
+    
+    {# --- 1. Header/Banner do Perfil --- #}
     <div class="header-banner">
         <h1>Meu Perfil 🚗</h1>
         <p>Gerencie sua conta, veículo, desempenho e vantagens exclusivas.</p>
     </div>
 
+    {# --- 2. Bloco de Mensagens/Notificações (Posição Correta) --- #}
+    {% if messages %}
+        <div class="message-container" style="margin-bottom: 20px;">
+            {% for message in messages %}
+                <div class="notification-banner {% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}"
+                    role="alert">
+                    <span style="margin-right: 10px; font-size: 1.2em;">
+                        {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% endif %}
+                    </span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {# --- 3. Grid de Cards --- #}
     <div class="profile-cards-grid">
         
         <section class="card profile-info-card">
@@ -31,7 +54,7 @@
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p><strong>Tipo de Usuário:</strong> {{ user.tipo_usuario|capfirst }}</p>
             
-            <a href="{% url 'editar_perfil' %}" class="action-btn edit-btn" style="text-align: center; margin-top: auto; display: block;">
+            <a href="{% url 'usuarios:editar_perfil' %}" class="action-btn edit-btn">
                 Editar Dados
             </a>
         </section>
@@ -43,7 +66,7 @@
             <p><strong>CPF Cadastrado:</strong> {{ user.profile_data.cpf|default:"N/A" }}</p>
             <p><strong>Status de Aprovação:</strong> <span class="status approved">Aprovado</span></p>
             
-            <a href="{% url 'editar_perfil' %}" class="action-btn secondary-btn" style="text-align: center; margin-top: 15px; display: block;">
+            <a href="{% url 'usuarios:editar_perfil' %}" class="action-btn secondary-btn">
                 Atualizar Veículo
             </a>
         </section>
@@ -86,4 +109,37 @@
 
     </div>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // ====================== MODO ESCURO ======================
+    function toggleDarkMode() {
+        // Alterna a classe dark-mode no body
+        document.body.classList.toggle("dark-mode");
+        
+        // Salva a preferência do usuário no armazenamento local
+        localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+        
+        // Opcional: Altera o ícone do botão
+        const btn = document.querySelector('button[onclick="toggleDarkMode()"]');
+        if (btn) {
+            btn.textContent = document.body.classList.contains("dark-mode") ? '☀️' : '🌙';
+        }
+    }
+
+    // ====================== CHAMADA PRINCIPAL (Inicialização) ======================
+    window.onload = function() {
+        // Verifica a preferência salva ao carregar a página
+        if (localStorage.getItem("darkMode") === "true") {
+            document.body.classList.add("dark-mode");
+        }
+        
+        // Define o ícone inicial correto
+        const btn = document.querySelector('button[onclick="toggleDarkMode()"]');
+        if (btn) {
+            btn.textContent = document.body.classList.contains("dark-mode") ? '☀️' : '🌙';
+        }
+    };
+</script>
 {% endblock %}
