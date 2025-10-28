@@ -1,506 +1,358 @@
-/* Core Layout & Background */
-body {
-  background: #f0f2f5; /* Um cinza bem claro para o fundo */
-  font-family: 'Poppins', sans-serif; /* Mantendo a fonte */
-  margin: 0;
-  padding: 0;
-  color: #333; /* Cor de texto padrão */
+/* paginainicial.css — Estilo moderno e harmonizado com a landing page */
+
+/* 1) Fonte */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root{
+  --bg: #f6f8fc;
+  --card: #ffffff;
+  --primary: #3366ff;        /* cor forte principal */
+  --primary-2: #5ea0ff;      /* tom mais claro */
+  --muted: #6b7280;
+  --text: #0f1724;
+  --shadow: rgba(17,24,39,0.08);
+  --accent: #ffb86b;
+  --danger: #ef4444;
+  --glass: rgba(255,255,255,0.7);
 }
 
-.dashboard-container {
-  display: flex;
-  min-height: 100vh; /* Garante que o container ocupe toda a altura */
+/* Reset minimal */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  min-height:100%;
+  background:linear-gradient(180deg,#f8fbff 0%, var(--bg) 100%);
+  font-family:'Poppins',system-ui,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
-/* Sidebar Styling */
-.sidebar {
-  width: 280px; /* Um pouco mais largo para melhor leitura */
-  background-color: #ffffff; /* Fundo branco para a sidebar */
-  color: #333; /* Texto escuro na sidebar */
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05); /* Sombra mais sutil */
-  border-right: 1px solid #e0e0e0; /* Linha sutil na borda */
+/* Layout container */
+.dashboard-container{
+  display:flex;
+  min-height:100vh;
+  width:100%;
 }
 
-.user-info {
-  text-align: center;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #eee; /* Separador */
-  margin-bottom: 20px;
+/* SIDEBAR */
+.sidebar{
+  width:270px;
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  background:linear-gradient(180deg,var(--card),#fbfdff);
+  padding:28px 20px;
+  border-right:1px solid rgba(15,23,36,0.04);
+  box-shadow: 6px 0 30px rgba(17,24,39,0.03);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  z-index:50;
+  transition:width .3s ease;
 }
 
-.user-avatar-small { /* Novo estilo para um avatar menor */
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-bottom: 10px;
-  border: 2px solid #1d4ed8; /* Borda azul para destaque */
+/* logo / avatar area */
+.user-avatar-small{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid rgba(81,144,255,0.16);
+  box-shadow:0 6px 18px rgba(51,102,255,0.08);
+  background:linear-gradient(135deg,#eff7ff,#f7fbff);
 }
 
-.user-info h3 {
-  color: #1d4ed8; /* Nome do usuário em azul */
-  margin: 5px 0 0;
-  font-size: 1.2em;
+.user-info{
+  text-align:center;
+  margin-top:2px;
+  margin-bottom:6px;
+}
+.user-info h3{
+  color:var(--primary);
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:0.2px;
+}
+.user-type{
+  font-size:13px;
+  color:var(--muted);
+  margin-top:6px;
 }
 
-.user-type {
-  font-size: 0.9em;
-  color: #666;
-  margin-top: 5px;
+/* menu */
+.menu{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:12px;
+  padding-bottom:12px;
+}
+.menu-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  text-decoration:none;
+  color:var(--text);
+  background:transparent;
+  padding:11px 14px;
+  border-radius:12px;
+  font-weight:600;
+  font-size:14px;
+  transition: all .18s ease;
+  justify-content:flex-start;
+}
+.menu-item svg{opacity:.9}
+.menu-item:hover{
+  transform:translateX(6px);
+  background:linear-gradient(90deg, rgba(94,160,255,0.12), rgba(51,102,255,0.06));
+  color:var(--primary);
+  box-shadow: 0 6px 18px rgba(51,102,255,0.06);
+}
+.menu-item.active{
+  background:linear-gradient(90deg,var(--primary-2),var(--primary));
+  color:#fff;
+  box-shadow: 0 8px 28px rgba(51,102,255,0.2);
 }
 
-.menu {
-  flex-grow: 1; /* Ocupa o espaço restante */
-  display: flex;
-  flex-direction: column;
-  gap: 8px; /* Espaçamento menor entre itens */
+/* logout placed at bottom */
+.menu .logout{
+  margin-top:auto;
+  background:linear-gradient(90deg,#ffecec,#ffd6d6);
+  color:var(--danger);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  border-radius:10px;
+  padding:10px;
+  width:100%;
+  transition:all .16s;
+}
+.menu .logout:hover{
+  background:var(--danger);
+  color:#fff;
+  transform:translateY(-2px);
+  box-shadow:0 8px 18px rgba(239,68,68,0.18);
 }
 
-.menu-item {
-  color: #555; /* Cor de texto padrão dos itens */
-  text-decoration: none;
-  font-weight: 500;
-  padding: 12px 15px;
-  border-radius: 8px;
-  transition: background 0.3s, color 0.3s;
-  display: flex; /* Para alinhar ícone e texto */
-  align-items: center;
-  gap: 10px; /* Espaço entre ícone e texto */
+/* MAIN content */
+.main-content{
+  margin-left:270px; /* space for fixed sidebar */
+  width:calc(100% - 270px);
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+  padding:26px 36px;
 }
 
-.menu-item:hover {
-  background-color: #e6f0ff; /* Fundo azul claro ao passar o mouse */
-  color: #1d4ed8; /* Texto azul ao passar o mouse */
+/* HEADER BANNER — grande e arredondado conforme landing */
+.header-banner{
+  background:linear-gradient(90deg,var(--primary-2), var(--primary));
+  color:#fff;
+  padding:36px 34px;
+  border-radius:18px;
+  border-bottom-left-radius:42px;
+  border-bottom-right-radius:42px;
+  box-shadow: 0 16px 40px rgba(51,102,255,0.12);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  position:relative;
+  overflow:visible;
 }
 
-.menu-item.active { /* Para o item ativo no menu */
-  background-color: #1d4ed8;
-  color: #fff;
-  font-weight: 600;
+/* header content layout */
+.header-banner .top-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.header-banner h1{
+  font-size:30px;
+  font-weight:800;
+  margin:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  letter-spacing:-0.4px;
+}
+.header-banner p{
+  margin:0;
+  color:rgba(255,255,255,0.92);
+  font-weight:500;
+  opacity:0.95;
 }
 
-.menu-item.active:hover {
-  background-color: #2563eb; /* Azul um pouco mais escuro no hover do ativo */
-  color: #fff;
+/* weather and time styling appended to header by JS */
+.header-banner .weather-info{
+  margin-top:10px;
+  font-weight:600;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:rgba(255,255,255,0.95);
 }
 
-.logout {
-  background-color: #fca5a5; /* Um vermelho mais suave */
-  color: #b91c1c; /* Texto vermelho mais escuro */
-  margin-top: 30px; /* Mais espaço antes do botão de sair */
-  font-weight: 600;
+/* small pill for time in header (JS inject) */
+.header-banner .time-pill{
+  background: rgba(255,255,255,0.12);
+  padding:5px 10px;
+  border-radius:999px;
+  font-weight:600;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  color:#fff;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06);
 }
 
-.logout:hover {
-  background-color: #ef4444; /* Vermelho mais forte no hover */
-  color: #fff;
+/* MAIN body area with map and cards */
+.map-and-actions{
+  display:flex;
+  gap:28px;
+  margin-top:20px;
+  align-items:flex-start;
+  flex-wrap:wrap;
 }
 
-/* Main Content Styling */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 0; /* Remove padding do container principal */
+/* Map card */
+#map{
+  flex: 1 1 65%;
+  min-height:460px;
+  height:60vh;
+  background:var(--card);
+  border-radius:18px;
+  padding:12px;
+  box-shadow: 0 10px 30px var(--shadow);
+  border: 1px solid rgba(15,23,36,0.04);
+  overflow:hidden;
 }
 
-.header-banner {
-  background: linear-gradient(90deg, #1d4ed8, #2563eb); /* Gradiente azul como sua landing page */
-  color: #fff;
-  padding: 40px 30px; /* Mais padding para dar espaço */
-  text-align: center;
-  border-bottom-left-radius: 20px; /* Bordas arredondadas para um toque moderno */
-  border-bottom-right-radius: 20px;
-  margin-bottom: 30px; /* Espaço abaixo do banner */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  /* Para adicionar uma imagem de fundo sutil: */
-  /* background-image: url('{% static "img/map-background-pattern.png" %}'); */
-  /* background-size: cover; */
-  /* background-position: center; */
+/* Ensure leaflet map tiles rounded */
+#map .leaflet-container{
+  border-radius:14px;
+  height:100%;
 }
 
-.header-banner h1 {
-  margin: 0 0 10px;
-  font-size: 2.5em;
-  font-weight: 700;
+/* Action card (right column) */
+.action-card{
+  flex: 1 1 30%;
+  min-width:300px;
+  background:linear-gradient(180deg,var(--card),#fcfeff);
+  border-radius:18px;
+  padding:28px;
+  box-shadow: 0 10px 30px rgba(9,30,66,0.04);
+  border-top:4px solid rgba(81,144,255,0.08);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  justify-content:space-between;
 }
 
-.header-banner p {
-  font-size: 1.1em;
-  opacity: 0.9;
+/* Titles inside cards */
+.action-card h2{
+  color:var(--primary);
+  margin:0;
+  font-size:20px;
+  font-weight:700;
+}
+.action-card p{ color:var(--muted); margin:0 0 12px 0; line-height:1.5; }
+
+/* Buttons */
+.action-btn{
+  background:linear-gradient(90deg,var(--primary-2),var(--primary));
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:12px 18px;
+  font-weight:700;
+  font-size:15px;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(51,102,255,0.18);
+  transition:transform .16s ease, box-shadow .16s ease;
+}
+.action-btn:hover{ transform:translateY(-3px); box-shadow:0 14px 30px rgba(51,102,255,0.22); }
+
+/* Safety tips card — full width below */
+.safety-tips.card{
+  margin-top:28px;
+  padding:22px;
+  border-radius:16px;
+  background:linear-gradient(180deg,var(--card),#ffffff);
+  box-shadow:0 10px 30px rgba(17,24,39,0.03);
+  border-left:4px solid #f7b267;
 }
 
-.map-and-actions {
-  display: flex;
-  gap: 30px; /* Espaço entre o mapa e o card de ações */
-  margin: 0 30px 30px 30px; /* Padding nas laterais e inferior */
-  flex-wrap: wrap; /* Permite que os itens quebrem linha em telas menores */
+/* safety list */
+.safety-tips h3{ color:var(--primary); margin:0 0 10px 0; font-size:18px; font-weight:700; }
+.safety-tips ul{ list-style:none; padding-left:0; margin:0; display:grid; gap:8px; }
+.safety-tips li{ padding:10px 8px; background:linear-gradient(90deg, rgba(81,144,255,0.03), transparent); border-radius:8px; color:var(--muted); }
+
+/* popup-notification (from JS) */
+.popup-notification{
+  position:fixed;
+  bottom:22px;
+  right:22px;
+  background:linear-gradient(90deg,#4f8cff,#2f6eff);
+  color:#fff;
+  padding:12px 16px;
+  border-radius:12px;
+  box-shadow:0 12px 30px rgba(47,110,255,0.16);
+  z-index:9999;
+  font-weight:700;
 }
 
-#map {
-  flex: 3; /* Ocupa 3 partes do espaço disponível */
-  min-height: 400px; /* Altura mínima para o mapa */
-  height: 55vh; /* Ocupa uma boa porção da viewport */
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Garante que os cantos arredondados funcionem */
+/* weather-info small style used inside header (JS append) */
+.weather-info{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  color:rgba(255,255,255,0.95);
 }
 
-.action-card {
-  flex: 1; /* Ocupa 1 parte do espaço, ao lado do mapa */
-  min-width: 280px; /* Garante que o card não fique muito estreito */
-  background: #fff;
-  padding: 25px;
-  border-radius: 15px;
-  text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Centraliza o conteúdo verticalmente */
+/* RESPONSIVENESS */
+@media (max-width:1100px){
+  #map{ min-height:420px; height:52vh; }
+  .action-card{ min-width:320px; }
 }
 
-.action-card h2 {
-  color: #1d4ed8;
-  margin-top: 0;
-  font-size: 1.5em;
+@media (max-width:850px){
+  .sidebar{ position:relative; width:100%; height:auto; flex-direction:row; padding:12px 16px; align-items:center; gap:12px; border-right:none; box-shadow:none }
+  .user-info{ display:flex; gap:10px; align-items:center; text-align:left }
+  .menu{ flex-direction:row; gap:10px; overflow:auto; padding:8px 0; width:auto; margin-left:8px }
+  .menu-item{ padding:8px 10px; font-size:13px; white-space:nowrap }
+  .main-content{ margin-left:0; width:100%; padding:16px; }
+  .header-banner{ border-radius:12px; padding:20px; }
+  .map-and-actions{ flex-direction:column; gap:18px; }
+  #map{ width:100%; height:56vh; min-height:360px }
+  .action-card{ width:100%; min-width:0; }
 }
 
-.action-card p {
-  color: #555;
-  margin-bottom: 20px;
+/* SMALLER PHONES */
+@media (max-width:420px){
+  .header-banner h1{ font-size:20px }
+  .header-banner p{ font-size:13px }
+  .menu-item{ font-size:13px; padding:8px 10px }
 }
 
-.action-btn {
-  background-color: #1d4ed8;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 25px;
-  font-weight: bold;
-  font-size: 1.1em;
-  cursor: pointer;
-  margin-top: auto; /* Empurra o botão para baixo se houver espaço */
-  transition: background-color 0.3s ease;
+/* ANIMATIONS */
+.header-banner h1, .header-banner p{ transform:translateY(-6px); opacity:0; animation:bannerIn .8s ease forwards; }
+@keyframes bannerIn{ to { transform:none; opacity:1 } }
+
+/* small helpers for dark-mode (if JS toggles body.dark-mode) */
+body.dark-mode{
+  background: linear-gradient(180deg,#0b1220,#071021);
+  color:#e6eef8;
 }
-
-.action-btn:hover {
-  background-color: #2563eb;
-  transform: translateY(-2px); /* Efeito sutil ao passar o mouse */
+body.dark-mode .header-banner{
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
 }
-
-/* Safety Tips Section */
-.safety-tips {
-  margin: 0 30px 30px 30px; /* Padding igual aos outros blocos */
-}
-
-.card { /* Estilo geral para cards */
-  background: #fff;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-}
-
-.safety-tips h3 {
-  color: #1d4ed8;
-  margin-bottom: 15px;
-  font-size: 1.4em;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.safety-tips ul {
-  list-style: none;
-  padding: 0;
-}
-
-.safety-tips li {
-  padding: 8px 0;
-  color: #555;
-  border-bottom: 1px dashed #eee; /* Linha tracejada suave */
-}
-
-.safety-tips li:last-child {
-  border-bottom: none; /* Remove a linha do último item */
-}
-
-/* Responsividade */
-@media (max-width: 1024px) {
-  .sidebar {
-    width: 220px;
-    padding: 15px;
-  }
-  .map-and-actions {
-    flex-direction: column; /* Em telas menores, mapa e ações empilham */
-    margin: 0 20px 20px 20px;
-    gap: 20px;
-  }
-  #map {
-    height: 45vh; /* Mapa um pouco menor em telas menores */
-    min-height: 300px;
-  }
-  .action-card, .safety-tips {
-    margin: 0 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard-container {
-    flex-direction: column; /* Sidebar em cima em telas muito pequenas */
-  }
-  .sidebar {
-    width: 100%;
-    height: auto;
-    flex-direction: row; /* Itens da sidebar em linha */
-    justify-content: space-around;
-    align-items: center;
-    padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  }
-  .user-info {
-    border-bottom: none;
-    padding-bottom: 0;
-    margin-bottom: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .user-info h3, .user-type {
-    margin: 0;
-  }
-  .menu {
-    flex-direction: row;
-    flex-wrap: wrap; /* Itens do menu podem quebrar linha */
-    justify-content: center;
-    gap: 10px;
-  }
-  .menu-item {
-    padding: 8px 12px;
-  }
-  .logout {
-    margin-top: 0;
-  }
-  .main-content {
-    padding-top: 20px; /* Espaço para o menu que agora está em cima */
-  }
-  .header-banner {
-    padding: 30px 20px;
-    margin-bottom: 20px;
-  }
-  .header-banner h1 {
-    font-size: 2em;
-  }
-  .map-and-actions, .safety-tips {
-    margin-left: 15px;
-    margin-right: 15px;
-  }
-}
-/* ======================================= */
-/* VARIÁVEIS DE CORES E ESTILOS CORE */
-/* ======================================= */
-
-:root {
-    /* Paleta de Cores (Foco em Azul) */
-    --color-primary-dark: #1d4ed8;      /* Azul Profundo (Linhas, Títulos, Hover da Navbar) */
-    --color-primary-light: #6495ed;     /* AZUL CLARO (Navbar, Header, Botões de Ação) */
-    
-    /* Cores Secundárias */
-    --color-background: #f0f2f5;        /* Fundo geral (cinza claro) */
-    --color-card-bg: #ffffff;           /* Fundo dos cards (branco puro) */
-    --color-text: #333;
-    --color-text-subtle: #666;
-    --color-shadow: rgba(0, 0, 0, 0.1);
-}
-
-body {
-  background: var(--color-background);
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  color: var(--color-text);
-}
-
-/* Remove o display flex vertical que era da sidebar */
-.dashboard-container {
-    min-height: 100vh;
-}
-
-/* ======================================= */
-/* NAVBAR HORIZONTAL (AZUL CLARO) */
-/* ======================================= */
-
-.navbar {
-    background-color: var(--color-primary-light); /* Fundo AZUL CLARO */
-    color: #fff;
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 10px var(--color-shadow);
-}
-
-.logo {
-    font-size: 1.5em;
-    font-weight: 700;
-    color: #fff;
-    text-decoration: none;
-    margin-right: 30px;
-}
-
-.nav-links {
-    display: flex;
-    gap: 20px;
-}
-
-.nav-item {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.2s ease;
-}
-
-.nav-item:hover {
-    background-color: var(--color-primary-dark); /* Hover para AZUL ESCURO */
-}
-
-/* Botão Sair dentro da Navbar */
-.nav-logout {
-    background-color: #ef4444; 
-    color: #fff;
-    padding: 8px 15px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
-}
-
-.nav-logout:hover {
-    background-color: #dc2626;
-}
-
-/* ======================================= */
-/* MAIN CONTENT E HEADER */
-/* ======================================= */
-
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-}
-
-/* Header Banner (Em AZUL CLARO, para combinar com a Navbar) */
-.header-banner {
-  background: var(--color-primary-light); 
-  color: #fff;
-  padding: 40px 30px;
-  text-align: left;
-  border-bottom-left-radius: 25px;
-  border-bottom-right-radius: 25px;
-  margin-bottom: 30px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-  position: relative; /* Necessário para posicionar o botão Voltar, se for usar */
-}
-
-.header-banner h1 { margin: 0 0 5px; font-size: 2.5em; font-weight: 700; letter-spacing: -0.5px; }
-.header-banner p { font-size: 1.1em; opacity: 0.9; }
-
-/* ======================================= */
-/* CARDS (BRANCOS com Destaque Azul) */
-/* ======================================= */
-
-.profile-container { padding: 30px; max-width: 1200px; margin: 0 auto; }
-
-.profile-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 25px;
-}
-
-.card {
-  background: var(--color-card-bg); /* Fundo BRANCO PURO */
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px var(--color-shadow);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease;
-  border-top: 5px solid var(--color-primary-dark); /* Destaque superior em AZUL ESCURO */
-}
-.card:hover { transform: translateY(-5px); }
-
-.card h3 {
-  color: var(--color-primary-dark); /* Títulos em AZUL ESCURO */
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 1.4em;
-  padding-bottom: 10px;
-  position: relative;
-}
-.card h3::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 50px; 
-    height: 2px;
-    background-color: var(--color-primary-dark);
-}
-
-.card p { color: var(--color-text-subtle); line-height: 1.6; }
-.card strong { font-weight: 600; color: var(--color-text); }
-
-
-/* Action Button (Em AZUL CLARO) */
-.action-btn {
-  background-color: var(--color-primary-light); /* BOTÃO AGORA EM AZUL CLARO */
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 14px 30px;
-  font-weight: 600;
-  font-size: 1.1em;
-  cursor: pointer;
-  margin-top: auto;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-  letter-spacing: 0.5px;
-}
-.action-btn:hover {
-  background-color: var(--color-primary-dark); /* Hover com o AZUL ESCURO */
-  transform: translateY(-2px);
-  box-shadow: 0 5px 10px rgba(100, 149, 237, 0.4);
-}
-
-/* Estilos de Detalhes dos Cards */
-.rating-value { font-size: 3em; font-weight: 700; color: #f59e0b; margin-bottom: 5px; }
-.status.approved { color: #10b981; font-weight: bold; }
-.status.pending { color: #f59e0b; font-weight: bold; }
-.link-details { color: var(--color-primary-dark); text-decoration: none; font-weight: 500; transition: color 0.3s; margin-top: 15px; }
-.link-details:hover { color: var(--color-primary-light); text-decoration: underline; }
-
-/* Planos */
-.plan-item { padding: 10px 0; border-bottom: 1px dashed #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
-.plan-status.active { color: #10b981; font-weight: 600; }
-.plan-status.upgrade { color: #f59e0b; font-weight: 600; cursor: pointer; }
-.plan-status.upgrade:hover { text-decoration: underline; }
-
-
-/* ======================================= */
-/* RESPONSIVIDADE */
-/* ======================================= */
-@media (max-width: 768px) {
-  .navbar { padding: 10px 15px; flex-wrap: wrap; }
-  .logo { flex-basis: 100%; text-align: center; margin-bottom: 10px; }
-  .nav-links { gap: 10px; justify-content: center; flex-grow: 1; }
-  .nav-item { padding: 5px 8px; font-size: 0.9em; }
-  .nav-logout { margin-top: 10px; flex-basis: 100%; text-align: center; padding: 8px 0; }
-  
-  .profile-container { margin: 20px 15px; padding: 0; }
-  .header-banner { border-radius: 0; margin-bottom: 20px; padding: 30px 15px; }
-  .profile-cards-grid { grid-template-columns: 1fr; }
-}
+body.dark-mode .sidebar{ background: linear-gradient(180deg,#071224,#081627); border-right:1px solid rgba(255,255,255,0.04) }
+body.dark-mode .menu-item{ color:#dbeafe }
+body.dark-mode .menu-item.active{ box-shadow:0 8px 28px rgba(81,144,255,0.22) }
