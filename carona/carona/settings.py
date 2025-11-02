@@ -144,4 +144,6 @@ LOGOUT_REDIRECT_URL = 'usuarios:login'
 # Fazer a sessão expirar ao fechar o navegador
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+# Configuração da API do OpenRouteService
+ORS_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjlmZjcxZGFiMTFiYjQ5MGQ5MDczOWI2MjBjYTA0MzUzIiwiaCI6Im11cm11cjY0In0='
 

@@ -19,18 +19,17 @@ class CorridaForm(forms.ModelForm):
             'origem', 'destino', 'data', 'vagas_disponiveis',
             'horario_saida', 'horario_chegada', 'valor', 'observacoes',
             'bairro_origem', 'cidade_origem', 'estado_origem', 'cep_origem',
-            'bairro_destino', 'cidade_destino', 'estado_destino', 'cep_destino', 'status',
+            'bairro_destino', 'cidade_destino', 'estado_destino', 'cep_destino',
         ]
         widgets = {
-            'origem': forms.TextInput(attrs={'class': 'form-control', 'id': 'origem', 'maxlength': '100'}),
-            'destino': forms.TextInput(attrs={'class': 'form-control', 'id': 'destino', 'maxlength': '100'}),
+            'origem': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '100'}),
+            'destino': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '100'}),
             'data': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'horario_saida': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'horario_chegada': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'vagas_disponiveis': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
             'valor': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
             'observacoes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'status': forms.Select(attrs={'class': 'form-control', 'initial': 'ativa'}),
         }
 
     def clean(self):

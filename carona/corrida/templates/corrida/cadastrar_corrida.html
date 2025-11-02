@@ -3,6 +3,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'corrida/css/cadastrar_corrida.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
 
 {% block content %}
@@ -27,14 +28,16 @@
             </div>
             {% endif %}
 
-            <!-- Inclui os campos via template parcial -->
             {% include "corrida/form_corrida_fields.html" %}
 
             <button type="submit" class="action-btn">Cadastrar Corrida</button>
         </form>
     </section>
+
+    <!-- Mapa interativo -->
+    <div id="map"></div>
 </div>
 
-<!-- JS para autocomplete -->
-<script src="{% static 'corrida/js/autocomplete.js' %}"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'corrida/js/cadastrar_corrida_map.js' %}"></script>
 {% endblock %}

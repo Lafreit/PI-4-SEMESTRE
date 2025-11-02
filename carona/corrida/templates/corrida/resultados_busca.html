@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Corridas próximas de "{{ endereco }}"</h2>
+
+{% if corridas %}
+    <ul>
+    {% for corrida in corridas %}
+        <li>
+            <strong>{{ corrida.origem }} → {{ corrida.destino }}</strong><br>
+            Distância até rota: {{ corrida.distancia_ao_passageiro }} metros<br>
+            Saída: {{ corrida.data }} {{ corrida.horario_saida }}<br>
+            Vagas: {{ corrida.vagas_disponiveis }}<br>
+            Valor: R$ {{ corrida.valor }}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhuma corrida próxima encontrada.</p>
+{% endif %}
+{% endblock %}

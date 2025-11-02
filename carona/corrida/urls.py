@@ -4,8 +4,11 @@ from . import views
 app_name = 'corrida'
 
 urlpatterns = [
-    path('cadastrar/', views.cadastrar_corrida, name='cadastrar_corrida'),
+    path("cadastrar/", views.cadastrar_corrida, name="cadastrar_corrida"),
+    path("geocode_ajax/", views.geocode_ajax, name="geocode_ajax"),
+    path("rota_ajax/", views.rota_ajax, name="rota_ajax"),
     path('dashboard/', views.dashboard_motorista, name='dashboard_motorista'),
+    path("buscar/", views.buscar_corridas, name="buscar_corridas"),
     path('lista/', views.lista_corridas, name='lista_corridas'),    
     path('solicitar/', views.solicitar_corrida, name='solicitar_corrida'),
     path('historico/', views.historico_corridas, name='historico_corridas'),

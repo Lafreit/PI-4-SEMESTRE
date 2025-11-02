@@ -126,3 +126,11 @@ textarea.form-control {
 .form-group {
     position: relative;
 }
+
+#map {
+    height: 400px;
+    margin-top: 30px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+}
+
