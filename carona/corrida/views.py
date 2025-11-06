@@ -6,9 +6,10 @@ from .models import Corrida
 from .utils import geocode_endereco, gerar_rota, nearest_point_on_route
 from django.http import JsonResponse
 from django.db.models import Q
+import json
 
 
-TOLERANCIA_METROS = 600  # distância máxima para considerar "próximo"
+TOLERANCIA_METROS = 60000  # 50 km
 
 def is_motorista(user):
     return bool(user and user.is_authenticated and getattr(user, "tipo_usuario", "") == "motorista")
@@ -145,34 +146,95 @@ def geocode_ajax(request):
         return JsonResponse({"lat": lat, "lon": lon})
     else:
         return JsonResponse({"erro": "Não foi possível geocodificar"}, status=404)
-    
 
 def buscar_corridas(request):
-    endereco_passageiro = request.GET.get("endereco")
+    endereco_passageiro = request.GET.get("endereco", "").strip()
+    # ler parâmetro de tolerância enviado pelo usuário (query param "tolerancia")
+    tolerancia_param = request.GET.get("tolerancia", None)
+    try:
+        # tentativa de interpretar como inteiro (metros)
+        tolerancia_metros = int(float(tolerancia_param)) if tolerancia_param is not None else TOLERANCIA_METROS
+    except (ValueError, TypeError):
+        tolerancia_metros = TOLERANCIA_METROS
+
+    # sanitizar / limitar tolerância para evitar valores absurdos
+    if tolerancia_metros < 100:
+        tolerancia_metros = 100
+    if tolerancia_metros > 200000:  # 200 km como teto razoável
+        tolerancia_metros = 200000
+
     corridas_encontradas = []
+    coords = {'lat': 0.0, 'lon': 0.0}
 
     if endereco_passageiro:
         lat, lon = geocode_endereco(endereco_passageiro)
         if lat is not None and lon is not None:
-            # Filtro inicial por bounding box
-            corridas_bbox = Corrida.objects.filter(
-                bbox_min_lat__lte=lat,
-                bbox_max_lat__gte=lat,
-                bbox_min_lon__lte=lon,
-                bbox_max_lon__gte=lon,
-                status='ativa'
-            )
+            coords['lat'] = float(lat)
+            coords['lon'] = float(lon)
 
-            # Verificação real de proximidade
-            for corrida in corridas_bbox:
-                distancia = nearest_point_on_route((lat, lon), corrida.rota)
-                if distancia <= TOLERANCIA_METROS:
+            # temporariamente busca todas ativas e depois filtra pela distância real
+            corridas_candidato = Corrida.objects.filter(status='ativa')
+
+            for corrida in corridas_candidato:
+                try:
+                    distancia = nearest_point_on_route((lat, lon), corrida.rota)
+                except Exception:
+                    distancia = None
+
+                if distancia is not None and distancia <= tolerancia_metros:
                     corrida.distancia_ao_passageiro = round(distancia, 1)
                     corridas_encontradas.append(corrida)
 
+    # Serializa corridas para JSON-friendly (mesmo formato que você já tinha)
+    corridas_serializadas = []
+    for corrida in corridas_encontradas:
+        rota_serializada = []
+        try:
+            if isinstance(corrida.rota, (list, tuple)) and corrida.rota:
+                for pair in corrida.rota:
+                    if isinstance(pair, (list, tuple)) and len(pair) >= 2:
+                        lat_p = float(pair[0])
+                        lon_p = float(pair[1])
+                        rota_serializada.append([lat_p, lon_p])
+        except Exception:
+            rota_serializada = []
+
+        origem_lat = corrida.origem_lat if corrida.origem_lat is not None else (rota_serializada[0][0] if rota_serializada else 0.0)
+        origem_lon = corrida.origem_lon if corrida.origem_lon is not None else (rota_serializada[0][1] if rota_serializada else 0.0)
+        destino_lat = corrida.destino_lat if corrida.destino_lat is not None else (rota_serializada[-1][0] if rota_serializada else 0.0)
+        destino_lon = corrida.destino_lon if corrida.destino_lon is not None else (rota_serializada[-1][1] if rota_serializada else 0.0)
+
+        horario_saida_str = corrida.horario_saida.strftime("%H:%M") if getattr(corrida, "horario_saida", None) else None
+        horario_chegada_str = corrida.horario_chegada.strftime("%H:%M") if getattr(corrida, "horario_chegada", None) else None
+
+        corrida_dict = {
+            "id": corrida.id,
+            "origem": str(corrida.origem),
+            "destino": str(corrida.destino),
+            "origem_lat": float(origem_lat),
+            "origem_lon": float(origem_lon),
+            "destino_lat": float(destino_lat),
+            "destino_lon": float(destino_lon),
+            "rota": rota_serializada,
+            "horario_saida": horario_saida_str,
+            "horario_chegada": horario_chegada_str,
+            "valor": float(corrida.valor) if corrida.valor is not None else 0.0,
+            "vagas_disponiveis": int(corrida.vagas_disponiveis or 0),
+            "distancia_m": float(getattr(corrida, "distancia_ao_passageiro", 0.0)),
+        }
+        corridas_serializadas.append(corrida_dict)
+
+    corridas_json = json.dumps(corridas_serializadas, ensure_ascii=False)
+    coords_json = json.dumps(coords, ensure_ascii=False)
+
+    # Passa também a tolerância atual para exibir no template/controle
     return render(request, "corrida/resultados_busca.html", {
-        "corridas": corridas_encontradas,
-        "endereco": endereco_passageiro
+        "corridas": corridas_serializadas,
+        "coords": coords,
+        "corridas_json": corridas_json,
+        "coords_json": coords_json,
+        "endereco": endereco_passageiro,
+        "tolerancia_metros": tolerancia_metros,  # valor usado (m)
     })
 
 
@@ -184,7 +246,8 @@ def rota_ajax(request):
         lon2 = float(request.GET.get("lon_destino"))
 
         rota, _, _ = gerar_rota(lat1, lon1, lat2, lon2)
-        rota_serializada = [[lat, lon] for lat, lon in rota]  # <- ESSA LINHA É ESSENCIAL
+        # garante floats e formato [lat, lon]
+        rota_serializada = [[float(lat), float(lon)] for lat, lon in rota]
 
         return JsonResponse({"rota": rota_serializada})
     except Exception as e:

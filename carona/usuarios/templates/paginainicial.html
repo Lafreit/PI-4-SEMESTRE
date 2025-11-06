@@ -25,7 +25,7 @@
         <a href="#" class="menu-item">Corridas Ativas</a>
         <a href="#" class="menu-item">Meus Ganhos</a>
       {% else %}
-        <a href="#" class="menu-item">Procurar Motorista</a>
+        <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Corridas</a>
         <a href="#" class="menu-item">Motoristas Favoritos</a>
       {% endif %}
       <a href="{% url 'usuarios:logout' %}" class="menu-item logout">🚪 Sair</a>
@@ -128,7 +128,7 @@ function initMap() {
 // ====================== CLIMA ATUAL ======================
 async function showWeather(lat, lon) {
   try {
-    const apiKey = "SUA_API_KEY_AQUI"; // Pegue uma chave gratuita em openweathermap.org
+    const apiKey = ORS_API_KEY; // Pegue uma chave gratuita em openweathermap.org
     const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${apiKey}`);
     const data = await res.json();
     const temp = Math.round(data.main.temp);

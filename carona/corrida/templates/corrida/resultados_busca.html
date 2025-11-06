@@ -1,20 +1,50 @@
 {% extends "base.html" %}
-{% block content %}
-<h2>Corridas próximas de "{{ endereco }}"</h2>
+{% load static %}
 
-{% if corridas %}
-    <ul>
-    {% for corrida in corridas %}
-        <li>
-            <strong>{{ corrida.origem }} → {{ corrida.destino }}</strong><br>
-            Distância até rota: {{ corrida.distancia_ao_passageiro }} metros<br>
-            Saída: {{ corrida.data }} {{ corrida.horario_saida }}<br>
-            Vagas: {{ corrida.vagas_disponiveis }}<br>
-            Valor: R$ {{ corrida.valor }}
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>Nenhuma corrida próxima encontrada.</p>
-{% endif %}
+{% block content %}
+<div class="page-container">
+
+    <!-- Painel superior de busca -->
+    <div class="search-panel">
+        <h2>Encontre sua carona</h2>
+
+        <div class="inputs-row">
+            <input type="text" id="origemInput" placeholder="Origem (ex: Santo André)">
+            <input type="text" id="destinoInput" placeholder="Destino (ex: Nova Odessa)">
+        </div>
+
+        <div class="tolerancia-container">
+            <label for="toleranciaRange">Tolerância (metros):</label>
+            <input type="range" id="toleranciaRange" min="100" max="5000" step="100" value="600">
+            <span id="toleranciaValor">600</span> m
+        </div>
+
+        <button id="buscarBtn">Buscar corridas</button>
+    </div>
+
+    <!-- Container do mapa -->
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+
+    <!-- Resultados das corridas -->
+    <div id="corridasContainer"></div>
+</div>
+
+<!-- ====== ESTILOS ====== -->
+<!-- CSS do Leaflet -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<!-- Seu CSS -->
+<link rel="stylesheet" href="{% static 'corrida/css/resultados_busca.css' %}">
+
+<!-- ====== SCRIPTS ====== -->
+<!-- JS do Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Seu JS -->
+<script src="{% static 'corrida/js/resultados_busca.js' %}" defer></script>
+
 {% endblock %}
