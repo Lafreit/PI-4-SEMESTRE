@@ -76,3 +76,20 @@ class Corrida(models.Model):
         self.bbox_max_lat = max(lats)
         self.bbox_min_lon = min(lons)
         self.bbox_max_lon = max(lons)
+
+
+class SolicitacaoCarona(models.Model):
+    STATUS_CHOICES = [
+        ('PENDENTE', 'Pendente'),
+        ('ACEITA', 'Aceita'),
+        ('RECUSADA', 'Recusada'),
+        ('CANCELADA', 'Cancelada'),
+    ]
+
+    corrida = models.ForeignKey('Corrida', on_delete=models.CASCADE, related_name='solicitacoes')
+    passageiro = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='solicitacoes')
+    data_solicitacao = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDENTE')
+
+    def __str__(self):
+        return f"{self.passageiro} → {self.corrida} ({self.status})"

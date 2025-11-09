@@ -2,8 +2,9 @@
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'corrida/css/cadastrar_corrida.css' %}">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{% static 'corrida/css/cadastrar_corrida.css' %}">
+    <link rel="stylesheet" href="{% static 'corrida/css/autocomplete.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
 
 {% block content %}
@@ -15,17 +16,17 @@
             {% csrf_token %}
 
             {% if messages %}
-            <div>
-                {% for message in messages %}
-                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
-                {% endfor %}
-            </div>
+                <div>
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+                    {% endfor %}
+                </div>
             {% endif %}
 
             {% if form.non_field_errors %}
-            <div class="alert-danger">
-                {{ form.non_field_errors }}
-            </div>
+                <div class="alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
             {% endif %}
 
             {% include "corrida/form_corrida_fields.html" %}
@@ -38,6 +39,10 @@
     <div id="map"></div>
 </div>
 
+<!-- autocomplete (DEVE vir antes do mapa e antes de qualquer script que use as funções) -->
+<script src="{% static 'corrida/js/autocomplete.js' %}"></script>
+
+<!-- Scripts do Leaflet e mapa -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{% static 'corrida/js/cadastrar_corrida_map.js' %}"></script>
 {% endblock %}

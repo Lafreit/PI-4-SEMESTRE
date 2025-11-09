@@ -1,0 +1,24 @@
+.autocomplete-dropdown {
+  position: absolute;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  max-height: 220px;
+  overflow-y: auto;
+  width: 100%;
+  margin-top: 4px;
+  border-radius: 6px;
+  padding: 4px 0;
+}
+
+.autocomplete-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+}
+
+.autocomplete-option.selected,
+.autocomplete-option:hover {
+  background: #f5f7fa;
+}

@@ -1,22 +1,38 @@
-<!-- form_corrida_fields.html -->
-<div class="form-group">
-    <label for="{{ form.origem.id_for_label }}">Origem</label>
+{# form_corrida_fields.html - adaptado para autocomplete Photon #}
+
+{# ---------- ORIGEM (wrapper relativo para posicionamento do dropdown) ---------- #}
+<div class="form-group autocomplete-wrapper" style="position: relative;">
+    <label for="origem">Origem</label>
+
+    {# campo principal de texto (id "origem" definido no widget do forms.py) #}
     {{ form.origem }}
+
+    {# Campos hidden para lat/lon e campos opcionais preenchidos pelo autocomplete #}
+    {{ form.origem_lat }}
+    {{ form.origem_lon }}
+
     {{ form.bairro_origem }}
     {{ form.cidade_origem }}
     {{ form.estado_origem }}
     {{ form.cep_origem }}
 </div>
 
-<div class="form-group">
-    <label for="{{ form.destino.id_for_label }}">Destino</label>
+{# ---------- DESTINO ---------- #}
+<div class="form-group autocomplete-wrapper" style="position: relative;">
+    <label for="destino">Destino</label>
+
     {{ form.destino }}
+
+    {{ form.destino_lat }}
+    {{ form.destino_lon }}
+
     {{ form.bairro_destino }}
     {{ form.cidade_destino }}
     {{ form.estado_destino }}
     {{ form.cep_destino }}
 </div>
 
+{# ---------- RESTO DO FORMULÁRIO (mantive seu layout original) ---------- #}
 <div class="form-row">
     <div class="form-group">
         <label for="{{ form.data.id_for_label }}">Data</label>
