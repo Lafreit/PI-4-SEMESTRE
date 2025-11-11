@@ -17,12 +17,25 @@ from django.conf import settings
 PHOTON_BASE = "https://photon.komoot.io/api/"
 TOLERANCIA_METROS = 60000  # 50 km
 
+
 def is_motorista(user):
-    return bool(user and user.is_authenticated and (user.is_superuser or getattr(user, "tipo_usuario", "") == "motorista"))
+    return (
+        user.is_authenticated
+        and getattr(user, "tipo_usuario", "") == "motorista"
+    )
 
 def is_passageiro(user):
-    return bool(user and user.is_authenticated and (user.is_superuser or getattr(user, "tipo_usuario", "") == "passageiro"))
+    return (
+        user.is_authenticated
+        and getattr(user, "tipo_usuario", "") == "passageiro"
+    )
 
+def is_admin(user):
+    return (
+        user.is_authenticated
+        and getattr(user, "tipo_usuario", "") == "admin"
+    )
+ 
 
 def gerar_rota_e_apurar(origem_lat, origem_lon, destino_lat, destino_lon, profile='driving-car', timeout=8):
     """
@@ -91,7 +104,8 @@ def gerar_rota_e_apurar(origem_lat, origem_lon, destino_lat, destino_lon, profil
     return rota, distancia_m, pontos_count
 
 @login_required(login_url='usuarios:login')
-@user_passes_test(is_motorista, login_url='usuarios:login')
+@user_passes_test(is_motorista)
+@user_passes_test(is_admin)
 def cadastrar_corrida(request):
     """
     View para cadastrar uma corrida.
@@ -161,12 +175,15 @@ def cadastrar_corrida(request):
 
 @login_required
 @user_passes_test(is_motorista)
+@user_passes_test(is_admin)
 def dashboard_motorista(request):
     # Lógica para o dashboard do motorista
     return render(request, 'corrida/dashboard_motorista.html')  
 
 @login_required
 @user_passes_test(is_motorista)
+@user_passes_test(is_passageiro)
+@user_passes_test(is_admin)
 def lista_corridas(request):
     # Lógica para listar corridas
     corridas = Corrida.objects.filter(motorista=request.user).order_by('-data','horario_saida')
@@ -179,6 +196,7 @@ def lista_corridas(request):
 
 @login_required
 @user_passes_test(is_motorista)
+@user_passes_test(is_admin)
 def editar_corrida(request, corrida_id):
     corrida = get_object_or_404(Corrida, id=corrida_id, motorista=request.user)
 
@@ -201,11 +219,6 @@ def editar_corrida(request, corrida_id):
 
 
 @login_required
-def solicitar_corrida(request):
-    # Lógica para solicitar uma corrida
-    return render(request, 'corrida/solicitar_corrida.html')
-
-@login_required
 def historico_corridas(request):
     # Lógica para mostrar o histórico de corridas
     return render(request, 'corrida/historico_corridas.html')
@@ -217,6 +230,7 @@ def detalhes_corrida(request, corrida_id):
 
 @login_required
 @user_passes_test(is_motorista)
+@user_passes_test(is_admin)
 def cancelar_corrida(request, corrida_id):
     # Lógica para cancelar uma corrida
         corrida = get_object_or_404(Corrida, id=corrida_id, motorista=request.user)
@@ -247,6 +261,7 @@ def geocode_ajax(request):
     else:
         return JsonResponse({"erro": "Não foi possível geocodificar"}, status=404)
 
+@login_required
 def buscar_corridas(request):
     endereco_passageiro = request.GET.get("endereco", "").strip()
     # ler parâmetro de tolerância enviado pelo usuário (query param "tolerancia")
@@ -428,7 +443,7 @@ def buscar_corridas_api(request):
     if not origem_text or not destino_text:
         return JsonResponse({'ok': False, 'erro': 'Parâmetros "origem" e "destino" são obrigatórios.'}, status=400)
 
-    # tolerância: se foi informada no request, usa; caso contrário usa padrão
+   
     try:
         tolerancia = int(tol_param) if tol_param is not None else TOLERANCIA_METROS
     except (ValueError, TypeError):

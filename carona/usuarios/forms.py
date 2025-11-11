@@ -36,12 +36,17 @@ class RegistroForm(forms.ModelForm):
         self.fields['nome'].label = 'Nome Completo'
         self.fields['email'].label = 'E-mail'
         self.fields['telefone'].label = 'Telefone'
-        self.fields['tipo_usuario'].label = 'Tipo de Conta'
+        self.fields['tipo_usuario'].choices = [
+            (key, label)
+            for key, label in Usuario.TIPO_CHOICES
+            if key != Usuario.ADMIN
+        ]
 
         # Aplica a classe Bootstrap a todos os campos
         for field_name, field in self.fields.items():
             field.widget.attrs.update({'class': 'form-control'})
-
+        
+        
     def clean_password2(self):
         password = self.cleaned_data.get("password")
         password2 = self.cleaned_data.get("password2")

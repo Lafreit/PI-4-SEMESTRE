@@ -24,11 +24,22 @@
         <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Corrida</a>
         <a href="#" class="menu-item">Corridas Ativas</a>
         <a href="#" class="menu-item">Meus Ganhos</a>
+      {% elif user.tipo_usuario == 'passageiro'%}
+        <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Corridas</a>
+        <a href="#" class="menu-item">Motoristas Favoritos</a>
+
       {% else %}
+        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Corrida</a>
+        <a href="#" class="menu-item">Corridas Ativas</a>
+        <a href="#" class="menu-item">Meus Ganhos</a>
         <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Corridas</a>
         <a href="#" class="menu-item">Motoristas Favoritos</a>
       {% endif %}
-      <a href="{% url 'usuarios:logout' %}" class="menu-item logout">🚪 Sair</a>
+
+      {% if user.tipo_usuario == 'admin' %}
+        <a href="{% url 'admin:index' %}" class="menu-item">Painel Admin</a>
+      {% endif %}
+      <a href="{% url 'usuarios:logout' %}" class="menu-item logout">Sair</a>
     </nav>
   </aside>
 
@@ -43,11 +54,11 @@
     <div class="map-and-actions">
         <div id="map"></div>
         <div class="action-card">
-            {% if user.tipo_usuario == 'motorista' %}
+            {% if user.tipo_usuario == 'motorista' or user.tipo_usuario == 'admin' %}
             <h2>Você está online?</h2>
             <p>Altere seu status para aceitar novas corridas.</p>
             <button class="action-btn start">Ficar Online</button>
-            {% else %}
+            {% elif user.tipo_usuario == 'passageiro' or user.tipo_usuario == 'admin'  %}
             <h2>Encontre seu motorista</h2>
             <p>Inicie sua busca agora e encontre a melhor carona!</p>
             <button class="action-btn search">Procurar Carona</button>
