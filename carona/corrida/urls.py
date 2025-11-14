@@ -17,5 +17,6 @@ urlpatterns = [
     path('cancelar/<int:corrida_id>/', views.cancelar_corrida, name='cancelar_corrida'),
     path('editar/<int:corrida_id>/', views.editar_corrida, name='editar_corrida'),
     path('corrida/<int:corrida_id>/solicitar/', views.solicitar_carona, name='solicitar_carona'),
+    path('deletar/<int:corrida_id>/', views.deletar_corrida, name='deletar_corrida'),
     path('api/buscar_corridas/', views.buscar_corridas_api, name='buscar_corridas_api'),
 ]

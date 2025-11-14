@@ -1,9 +1,6 @@
 # Ambiente virtual
 venv/
 
-# Banco de dados SQLite (local)
-db.sqlite3
-
 # Arquivos de ambiente (chaves, configs locais)
 .env
 *.env

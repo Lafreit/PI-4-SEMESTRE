@@ -433,6 +433,30 @@ def cadastrar_corrida(request):
 
     return render(request, 'corrida/cadastrar_corrida.html', {'form': form})
 
+@login_required
+def deletar_corrida(request, corrida_id):
+    corrida = get_object_or_404(Corrida, id=corrida_id)
+
+    # verificação: dono (motorista) ou staff
+    usuario_e_dono = getattr(corrida, "motorista", None) == request.user
+    if not (usuario_e_dono or request.user.is_staff):
+        # se for AJAX, retorna 403 JSON
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"error": "Sem permissão"}, status=403)
+        messages.error(request, "Você não tem permissão para deletar esta corrida.")
+        return redirect(reverse("corrida:lista_corridas"))
+
+    if request.method == "POST":
+        corrida.delete()
+        # se requisição AJAX: responde JSON (frontend removerá a linha)
+        if request.headers.get("x-requested-with") == "XMLHttpRequest":
+            return JsonResponse({"ok": True})
+        # caso normal: redireciona para lista (PRG)
+        messages.success(request, "Corrida removida com sucesso.")
+        return redirect(reverse("corrida:lista_corridas"))
+
+    # Se chegar por GET (não esperado), redireciona para lista
+    return redirect(reverse("corrida:lista_corridas"))
 
 
 @login_required
@@ -445,6 +469,8 @@ def dashboard_motorista(request):
 @user_passes_test(is_motorista_ou_admin)
 def lista_corridas(request):
     # Lógica para listar corridas
+    print(">>> view lista_corridas chamada <<<")
+    logger.error("view lista_corridas chamada")
     corridas = Corrida.objects.filter(motorista=request.user).order_by('-data','horario_saida')
 
     context = {
