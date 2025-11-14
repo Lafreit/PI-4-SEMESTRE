@@ -18,25 +18,21 @@
 
     <nav class="menu">
       <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
-      <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
+      <a href="#" class="menu-item">Minha Carteira</a>
 
       {% if user.tipo_usuario == 'motorista' %}
-        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Corrida</a>
-        <a href="#" class="menu-item">Corridas Ativas</a>
-        <a href="#" class="menu-item">Meus Ganhos</a>
+        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Carona</a>
+        <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Caronas</a>
+        <a href="#" class="menu-item">Meus Veiculos</a>
       {% elif user.tipo_usuario == 'passageiro'%}
-        <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Corridas</a>
-        <a href="#" class="menu-item">Motoristas Favoritos</a>
-
-      {% else %}
-        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Corrida</a>
-        <a href="#" class="menu-item">Corridas Ativas</a>
-        <a href="#" class="menu-item">Meus Ganhos</a>
-        <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Corridas</a>
-        <a href="#" class="menu-item">Motoristas Favoritos</a>
+        <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Carona</a>
       {% endif %}
 
       {% if user.tipo_usuario == 'admin' %}
+        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Carona</a>
+        <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Caronas</a>
+        <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Carona</a>
+        <a href="#" class="menu-item">Meus Veiculos</a>
         <a href="{% url 'admin:index' %}" class="menu-item">Painel Admin</a>
       {% endif %}
       <a href="{% url 'usuarios:logout' %}" class="menu-item logout">Sair</a>

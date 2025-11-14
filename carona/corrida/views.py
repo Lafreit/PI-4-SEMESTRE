@@ -7,14 +7,14 @@ from .models import Corrida, SolicitacaoCarona
 from .utils import geocode_endereco, gerar_rota, nearest_point_on_route
 from django.views.decorators.http import require_POST, require_GET
 from django.http import JsonResponse, HttpResponseBadRequest
-import json
-import unicodedata
-import requests
+import json, unicodedata, requests, logging, math
+from datetime import datetime, timedelta, date, time
+
 from django.views.decorators.cache import cache_page
 from decimal import Decimal, InvalidOperation
 from django.conf import settings
-import logging
-import math
+from django.db import IntegrityError, transaction
+
 
 
 PHOTON_BASE = "https://photon.komoot.io/api/"
@@ -24,6 +24,8 @@ TOLERANCIA_ESTADO = 50000
 TOLERANCIA_PAIS = 100000
 TOLERANCIA_MIN = 100
 TOLERANCIA_MAX = 200000
+
+VELOCIDADE_MEDIA_KMH = 50
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +50,110 @@ def is_admin(user):
 
 def is_motorista_ou_admin(user):
     return user.is_authenticated and user.tipo_usuario in ["motorista", "admin"]
+
+
+def geocode(request):
+    query = request.GET.get("q", "")
+    if not query:
+        return JsonResponse({"error": "Parâmetro 'q' obrigatório"}, status=400)
+
+    url = "https://api.openrouteservice.org/geocode/search"
+
+    params = {
+        "api_key": settings.ORS_API_KEY,
+        "text": query,
+        "boundary.country": "BR"
+    }
+
+    try:
+        r = requests.get(url, params=params, timeout=5)
+        data = r.json()
+
+        # Extrair features de forma segura
+        features = data.get("features", [])
+        resultados = []
+
+        for f in features:
+            props = f.get("properties", {})
+            geometry = f.get("geometry", {})
+
+            # Pular se não tiver coords
+            if "coordinates" not in geometry:
+                continue
+
+            lon, lat = geometry["coordinates"]
+
+            resultados.append({
+                "label": props.get("label", ""),
+                "lat": lat,
+                "lon": lon,
+                "city": props.get("locality") or props.get("city"),
+                "state": props.get("region"),
+                "postcode": props.get("postalcode"),
+            })
+
+        return JsonResponse({"results": resultados})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+# 🛣 Geração de rota via ORS
+def api_rota(request):
+    # 1️⃣ Obter e validar coordenadas
+    try:
+        lat1 = float(request.GET.get("lat1"))
+        lon1 = float(request.GET.get("lon1"))
+        lat2 = float(request.GET.get("lat2"))
+        lon2 = float(request.GET.get("lon2"))
+    except (TypeError, ValueError) as e:
+        logger.error(f"Coordenadas inválidas: {e}, GET params: {request.GET}")
+        return JsonResponse({"error": "Coordenadas inválidas"}, status=400)
+
+    # 2️⃣ Montar payload para ORS
+    url = "https://api.openrouteservice.org/v2/directions/driving-car"
+    body = {
+        "coordinates": [
+            [lon1, lat1],
+            [lon2, lat2]
+        ]
+    }
+
+    headers = {
+        "Authorization": getattr(settings, "ORS_API_KEY", ""),
+        "Content-Type": "application/json"
+    }
+
+    if not headers["Authorization"]:
+        logger.error("Chave ORS_API_KEY não configurada no settings")
+        return JsonResponse({"error": "Chave ORS não configurada"}, status=500)
+
+    # 3️⃣ Chamada à API externa
+    try:
+        r = requests.post(url, json=body, headers=headers, timeout=10)
+        r.raise_for_status()  # dispara HTTPError para status >= 400
+    except requests.exceptions.Timeout:
+        logger.error("Timeout ao chamar ORS API")
+        return JsonResponse({"error": "Timeout ao chamar API externa"}, status=504)
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"Erro HTTP na ORS API: {e}, resposta: {r.text}")
+        return JsonResponse({"error": f"Erro HTTP na ORS API: {r.status_code}"}, status=r.status_code)
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Erro de requisição na ORS API: {e}")
+        return JsonResponse({"error": "Erro na API externa"}, status=500)
+
+    # 4️⃣ Validar resposta JSON
+    try:
+        data = r.json()
+        if "features" not in data or not data["features"]:
+            logger.error(f"Resposta ORS sem features: {data}")
+            return JsonResponse({"error": "Não foi possível gerar rota"}, status=500)
+    except ValueError as e:
+        logger.error(f"JSON inválido da ORS API: {e}, resposta: {r.text}")
+        return JsonResponse({"error": "Resposta inválida da API externa"}, status=500)
+
+    # 5️⃣ Retornar rota para o frontend
+    return JsonResponse(data, safe=False)
+
 
 
 def _haversine_m(lat1, lon1, lat2, lon2):
@@ -167,13 +273,7 @@ def serialize_corrida(corrida, distancia_m=None):
 
 
 def find_corridas_near(lat, lon, tolerancia_metros):
-    """
-    Versão robusta:
-    - expande bbox com margem derivada da tolerância
-    - tenta nearest_point_on_route quando rota presente
-    - fallback para distância origem/destino quando rota ausente
-    - ordena por distância e sempre retorna lista (possivelmente vazia)
-    """
+    
     resultados = []
     try:
         if lat is None or lon is None:
@@ -276,6 +376,7 @@ def cadastrar_corrida(request):
             # exige coordenadas
             if not all([corrida.origem_lat, corrida.origem_lon, corrida.destino_lat, corrida.destino_lon]):
                 form.add_error(None, "Origem e destino precisam ter coordenadas (selecione uma sugestão).")
+            
             else:
                 try:
                     rota, distancia_m, pontos_count = gerar_rota_e_apurar(
@@ -290,19 +391,41 @@ def cadastrar_corrida(request):
                     try:
                         corrida.set_bbox_from_rota()
                     except Exception:
-                        # não deixa quebrar por erro no cálculo do bbox
+                            # não deixa quebrar por erro no cálculo do bbox
                         pass
+
+                    # ---------- CALCULAR HORÁRIO DE CHEGADA ----------
+                    # Só faz sentido se o motorista informou horario_saida
+                    if corrida.horario_saida:
+                        try:
+                            # distancia_m em metros -> km:
+                            distancia_km = (distancia_m or 0) / 1000.0
+                            # tempo em horas = distancia_km / velocidade_kmh
+                            horas = distancia_km / VELOCIDADE_MEDIA_KMH if VELOCIDADE_MEDIA_KMH > 0 else 0
+                            duracao = timedelta(seconds=int(round(horas * 3600)))
+
+                            # precisamos somar TimeField + duracao -> use datetime temporário
+                            # usamos a data informada ou hoje se não houver data
+                            data_base = corrida.data if corrida.data else date.today()
+                            dt_saida = datetime.combine(data_base, corrida.horario_saida)
+                            dt_chegada = dt_saida + duracao
+                            # salva apenas o time na TimeField
+                            corrida.horario_chegada = dt_chegada.time()
+                        except Exception:
+                            # não falha todo o processo por cálculo de tempo; apenas não define horario_chegada
+                            pass
 
                     corrida.save()
                     messages.success(request, "Corrida cadastrada com sucesso.")
-                    return redirect('corrida:lista')
+                    return redirect('usuarios:pagina_inicial')
 
                 except requests.RequestException:
                     form.add_error(None, "Não foi possível gerar a rota agora (erro de comunicação). Tente novamente mais tarde.")
                 except ValueError as e:
                     form.add_error(None, f"Erro ao gerar rota: {str(e)}")
                 except Exception:
-                    form.add_error(None, "Erro inesperado ao gerar rota. Contate o administrador.")
+                        form.add_error(None, "Erro inesperado ao gerar rota. Contate o administrador.")
+
         else:
             messages.error(request, "Por favor, corrija os erros no formulário.")
     else:
@@ -381,19 +504,44 @@ def cancelar_corrida(request, corrida_id):
     return render(request, 'corrida/cancelar_corrida.html', {'corrida': corrida})
 
 
+@require_GET
+@cache_page(30)  # opcional: remova/ajuste para debug
 def geocode_ajax(request):
-    """
-    Endpoint AJAX para geocodificar um endereço e retornar lat/lon.
-    """
-    endereco = request.GET.get("endereco")
+    endereco = request.GET.get("endereco", "").strip()
     if not endereco:
-        return JsonResponse({"erro": "Endereço não fornecido"}, status=400)
+        return JsonResponse({"error": "endereco vazio"}, status=400)
 
-    lat, lon = geocode_endereco(endereco)
-    if lat is not None and lon is not None:
-        return JsonResponse({"lat": lat, "lon": lon})
-    else:
-        return JsonResponse({"erro": "Não foi possível geocodificar"}, status=404)
+    url = f"https://photon.komoot.io/api/?q={endereco}&lang=pt"
+    resp = requests.get(url)
+
+    if resp.status_code != 200:
+        return JsonResponse({"error": "erro na API externa"}, status=500)
+
+    data = resp.json()
+    features = data.get("features", [])
+
+    if not features:
+        return JsonResponse({"error": "nenhum resultado"}, status=404)
+
+    f = features[0]  # PEGAR APENAS O PRIMEIRO RESULTADO
+
+    props = f.get("properties", {})
+    geometry = f.get("geometry", {}).get("coordinates", [])
+
+    if len(geometry) != 2:
+        return JsonResponse({"error": "sem coordenadas"}, status=500)
+
+    lon, lat = geometry  # atenção: Photon = [lon, lat]
+
+    return JsonResponse({
+        "lat": lat,
+        "lon": lon,
+        "bairro": props.get("district") or props.get("suburb"),
+        "cidade": props.get("city"),
+        "estado": props.get("state"),
+        "cep": props.get("postcode"),
+        "display_name": props.get("name")
+    })
 
 #------------------------------------------------------------------------------------#
 #                               normalizando para a busca                            #
@@ -529,63 +677,47 @@ def rota_ajax(request):
     except Exception as e:
         return JsonResponse({"erro": str(e)}, status=400)
 
-
 @login_required
 @require_POST
 def solicitar_carona(request, corrida_id):
     """
     Endpoint AJAX (POST) para o passageiro solicitar uma vaga na corrida.
-    Retorna JSON: { ok: True, id: <id>, status: <status> } ou { erro: <mensagem> }.
+    Retorna JSON: { ok: True, id: <id>, status: <status>, data_solicitacao: ... }
+    ou { erro: <mensagem> } com status apropriado.
     """
     user = request.user
-    # busca corrida ativa
     corrida = get_object_or_404(Corrida, id=corrida_id, status='ativa')
 
     # não permitir que o motorista solicite a própria corrida
     if corrida.motorista_id == user.id:
         return JsonResponse({'erro': 'Você não pode solicitar sua própria carona.'}, status=400)
 
-    # evitar solicitações duplicadas (pendente/aceita/recusada exceto cancelada)
-    existente = SolicitacaoCarona.objects.filter(
-        corrida=corrida,
-        passageiro=user
-    ).exclude(status='CANCELADA').exists()
+    # evita duplicação com atomic + get_or_create (mais robusto a condições de corrida)
+    try:
+        with transaction.atomic():
+            solicit, created = SolicitacaoCarona.objects.get_or_create(
+                corrida=corrida,
+                passageiro=user,
+                defaults={'status': 'Pendente'}
+            )
+            # Se já existia, mas foi cancelada antes, você pode reativar dependendo da regra:
+            if not created:
+                # se existente mas estava CANCELADA, podemos reativar (opcional)
+                if solicit.status == 'CANCELADA':
+                    solicit.status = 'Pendente'
+                    solicit.save()
+                    created = True
+                else:
+                    return JsonResponse({'erro': 'Você já solicitou esta carona.'}, status=400)
+    except IntegrityError:
+        return JsonResponse({'erro': 'Erro ao criar solicitação. Tente novamente.'}, status=500)
 
-    if existente:
-        return JsonResponse({'erro': 'Você já solicitou esta carona.'}, status=400)
-
-    # criar solicitação
-    solicit = SolicitacaoCarona.objects.create(corrida=corrida, passageiro=user)
     return JsonResponse({
         'ok': True,
         'id': solicit.id,
         'status': solicit.status,
-        'data_solicitacao': solicit.data_solicitacao.isoformat()
-    })
-
-
-@login_required
-def solicitar_corrida(request, corrida_id):
-    """
-    Cria uma solicitação de carona para a corrida informada.
-    """
-    if request.method == "POST":
-        corrida = get_object_or_404(Corrida, id=corrida_id)
-        passageiro = request.user
-
-        # Verifica se já existe solicitação pendente
-        if SolicitacaoCarona.objects.filter(corrida=corrida, passageiro=passageiro).exists():
-            return JsonResponse({"status": "erro", "message": "Você já solicitou esta corrida."}, status=400)
-
-        SolicitacaoCarona.objects.create(
-            corrida=corrida,
-            passageiro=passageiro,
-            status="Pendente"
-        )
-
-        return JsonResponse({"status": "ok", "message": "Solicitação enviada com sucesso!"})
-
-    return JsonResponse({"status": "erro", "message": "Método não permitido."}, status=405)
+        'data_solicitacao': solicit.data_solicitacao.isoformat() if hasattr(solicit, 'data_solicitacao') else None
+    }, status=201 if created else 200)
 
 
 @require_GET
@@ -615,11 +747,12 @@ def buscar_corridas_api(request):
     return JsonResponse({'ok': True, 'coords': {'lat': float(lat), 'lon': float(lon)}, 'corridas': corridas_encontradas}, json_dumps_params={'ensure_ascii': False})
 
 
-
 @require_GET
-@cache_page(30)  # cache simples: 30s (ajuste conforme necessidade)
+@cache_page(30)
 def geocode_photon(request):
-    q = request.GET.get('q', '').strip()
+    # aceita q (seu código) ou endereco (frontend antigo)
+    q = request.GET.get('q') or request.GET.get('endereco') or ''
+    q = q.strip()
     if not q:
         return HttpResponseBadRequest("missing q")
 
@@ -627,37 +760,54 @@ def geocode_photon(request):
         'q': q,
         'limit': int(request.GET.get('limit', 6)),
     }
-    # opcional: bias por lat/lon para priorizar resultados próximos ao usuário
     lat = request.GET.get('lat')
     lon = request.GET.get('lon')
     if lat and lon:
         params['lat'] = lat
         params['lon'] = lon
 
-    # opcional: forçar idioma (ex: 'pt' ou 'en')
     lang = request.GET.get('lang')
     if lang:
         params['lang'] = lang
 
     try:
         headers = {'User-Agent': 'MeuAppCarona/1.0 (contato@seudominio.com)'}
-        resp = requests.get(PHOTON_BASE, params=params, timeout=5, headers=headers)
+        resp = requests.get(PHOTON_BASE, params=params, timeout=6, headers=headers)
         resp.raise_for_status()
         js = resp.json()
         features = []
         for f in js.get('features', []):
             coords = f.get('geometry', {}).get('coordinates', [None, None])
-            props = f.get('properties', {})
-            display = props.get('name') or props.get('street') or props.get('city') or props.get('country')
-            # fallback para display_name do Photon (se tiver)
-            display = display or props.get('osm_value') or props.get('display_name') or props.get('label')
+            props = f.get('properties', {}) or {}
+
+            # monta display_name com mais cuidado
+            parts = [
+                props.get('name'),
+                props.get('street'),
+                props.get('suburb'),
+                props.get('neighbourhood'),
+                props.get('city') or props.get('town') or props.get('village'),
+                props.get('state'),
+                props.get('postcode'),
+                props.get('country')
+            ]
+            display_name = ', '.join([p for p in parts if p])
+
             features.append({
-                'display_name': props.get('name') or props.get('label') or f.get('properties'),
+                'display_name': display_name or props.get('label') or props.get('osm_value') or '',
                 'lat': coords[1],
                 'lon': coords[0],
+                'address': {
+                    'suburb': props.get('suburb'),
+                    'neighbourhood': props.get('neighbourhood'),
+                    'city': props.get('city') or props.get('town') or props.get('village'),
+                    'state': props.get('state'),
+                    'postcode': props.get('postcode'),
+                },
                 'properties': props,
             })
         return JsonResponse(features, safe=False)
-    except Exception:
-        # degrade graciosamente: retornar lista vazia (ou logar o erro)
+    except Exception as e:
+        logger.exception("geocode_photon error")
+        # retorna lista vazia (cliente continua funcional), mas logamos o erro
         return JsonResponse([], safe=False, status=200)

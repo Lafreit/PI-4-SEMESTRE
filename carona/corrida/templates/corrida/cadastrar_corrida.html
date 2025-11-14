@@ -32,8 +32,9 @@
             {% include "corrida/form_corrida_fields.html" %}
 
             <button type="submit" class="action-btn" style= "border: none; padding: 10px 20px; border-radius: 15px;">Cadastrar Corrida</button>
-            <button type="button" onclick="history.back()" style="background-color: red; color: white; border: none; padding: 12px 343px; border-radius: 15px;">Cancelar</button>
-
+            
+                
+            <a href="{% url 'usuarios:pagina_inicial' %}">Cancelar</a>
 
         </form>
     </section>
