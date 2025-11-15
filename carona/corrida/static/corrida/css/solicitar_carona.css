@@ -1,0 +1,77 @@
+/* static/corrida/css/solicitar_carona.css */
+
+/* Container do item (pequeno ajuste visual) */
+.corrida-item {
+  border: 1px solid #e6e6e6;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.corrida-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.corrida-origem-destino {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.corrida-meta {
+  font-size: 13px;
+  color: #666;
+}
+
+/* Ações (botões) */
+.corrida-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.btn-solicitar,
+.btn-cancelar {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* estilo principal */
+.btn-solicitar {
+  background: linear-gradient(180deg,#2d9cdb,#2385c9);
+  color: #fff;
+}
+
+/* botão cancelar em tom mais suave / outline */
+.btn-cancelar {
+  background: transparent;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+/* disabled state */
+.btn-solicitar[disabled],
+.btn-cancelar[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Feedback text */
+.solicitar-feedback {
+  font-size: 13px;
+  color: #2b7a2b;
+  margin-left: 8px;
+}
+
+/* erro */
+.solicitar-feedback.feedback-error {
+  color: #c92b2b;
+}

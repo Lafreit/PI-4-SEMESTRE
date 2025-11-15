@@ -8,13 +8,6 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    {% if messages %}
-        <ul>
-            {% for m in messages %}
-                <li>{{ m }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
 
     {% block content %}{% endblock %}
     

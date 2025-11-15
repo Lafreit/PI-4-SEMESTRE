@@ -9,11 +9,12 @@ from django.views.decorators.http import require_POST, require_GET
 from django.http import JsonResponse, HttpResponseBadRequest
 import json, unicodedata, requests, logging, math
 from datetime import datetime, timedelta, date, time
-
+from django.urls import reverse
 from django.views.decorators.cache import cache_page
 from decimal import Decimal, InvalidOperation
 from django.conf import settings
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, models as dj_models
+from django.db.models import Prefetch
 
 
 
@@ -465,19 +466,39 @@ def dashboard_motorista(request):
     # Lógica para o dashboard do motorista
     return render(request, 'corrida/dashboard_motorista.html')  
 
+
 @login_required
 @user_passes_test(is_motorista_ou_admin)
 def lista_corridas(request):
-    # Lógica para listar corridas
     print(">>> view lista_corridas chamada <<<")
     logger.error("view lista_corridas chamada")
-    corridas = Corrida.objects.filter(motorista=request.user).order_by('-data','horario_saida')
 
-    context = {
+    qs = Corrida.objects.filter(
+        motorista=request.user
+    ).order_by('-data', 'horario_saida').select_related('motorista')
+
+    # Integração minha_solicitacao (apenas para saber se existe solicitação do usuário logado)
+    if request.user.is_authenticated:
+        solicit_qs = SolicitacaoCarona.objects.filter(passageiro=request.user)
+        qs = qs.prefetch_related(
+            Prefetch('solicitacoes', queryset=solicit_qs, to_attr='minha_solicitacoes')
+        )
+
+    corridas = list(qs)
+
+    # Marca corrida.minha_solicitacao
+    if request.user.is_authenticated:
+        for corrida in corridas:
+            lista = getattr(corrida, 'minha_solicitacoes', None)
+            corrida.minha_solicitacao = lista[0] if lista else None
+    else:
+        for corrida in corridas:
+            corrida.minha_solicitacao = None
+
+    return render(request, 'corrida/lista_corridas.html', {
         'corridas': corridas
-    }
+    })
 
-    return render(request, 'corrida/lista_corridas.html', context)
 
 @login_required
 @user_passes_test(is_motorista_ou_admin)
@@ -585,11 +606,11 @@ def normalizar_texto(txt):
     return remover_acentos(txt).strip().lower()
 
 
-#------------------------------------------------------------------------------------#
 @login_required
 def buscar_corridas(request):
     endereco_passageiro = request.GET.get("endereco", "").strip()
     tolerancia_param = request.GET.get("tolerancia")
+
     try:
         tolerancia_metros = int(float(tolerancia_param)) if tolerancia_param else None
     except (ValueError, TypeError):
@@ -598,8 +619,8 @@ def buscar_corridas(request):
     coords = {"lat": 0.0, "lon": 0.0}
     corridas_serializadas = []
 
+    # Se não informou endereço → página vazia
     if not endereco_passageiro:
-        # nada a buscar
         return render(request, "corrida/resultados_busca.html", {
             "corridas": corridas_serializadas,
             "coords": coords,
@@ -610,29 +631,31 @@ def buscar_corridas(request):
     termo_busca = normalizar_texto(endereco_passageiro)
     cache_key = f"geo:{termo_busca}"
 
-    # tenta obter lat/lon do cache ou geocoding, com tratamento de erro
     lat = lon = None
+
+    # Tenta pegar do cache / geocode
     try:
         latlon_cache = cache.get(cache_key)
         if latlon_cache:
             lat, lon = latlon_cache
         else:
             lat, lon = geocode_endereco(endereco_passageiro)
-            # só cacheia se vierem valores válidos
             if lat is not None and lon is not None:
                 cache.set(cache_key, (lat, lon), timeout=60 * 60)
     except Exception as e:
-        # loga a exceção completa — evita 500 retornando fallback textual
         logger.exception("Erro durante geocoding para '%s': %s", endereco_passageiro, e)
         lat = lon = None
 
+    # ================================================================
+    # 1) GEOCODE OK → BUSCA POR DISTÂNCIA
+    # ================================================================
     if lat is not None and lon is not None:
         try:
             coords["lat"], coords["lon"] = float(lat), float(lon)
         except Exception:
             coords["lat"], coords["lon"] = 0.0, 0.0
 
-        # tolerância dinâmica quando não informada
+        # tolerância dinâmica
         if tolerancia_metros is None:
             if "sp" in termo_busca or "sao paulo" in termo_busca or "são paulo" in termo_busca:
                 tolerancia_metros = TOLERANCIA_CIDADE
@@ -643,29 +666,45 @@ def buscar_corridas(request):
 
         tolerancia_metros = max(TOLERANCIA_MIN, min(tolerancia_metros, TOLERANCIA_MAX))
 
+        # → Busca corridas pelo algoritmo de proximidade
         corridas_encontradas = []
-        # find_corridas_near já faz bbox + nearest_point; deixamos try/except extra por segurança
         try:
             for corrida, distancia in find_corridas_near(lat, lon, tolerancia_metros):
                 corrida.distancia_ao_passageiro = distancia
                 corridas_encontradas.append(corrida)
         except Exception as e:
             logger.exception("Erro ao filtrar corridas por distância: %s", e)
-            corridas_encontradas = []
 
-        # serializa em segurança
+        # Buscar solicitações do usuário (uma única query)
+        solicitacoes_map = {}
         try:
-            corridas_serializadas = [
-                serialize_corrida(c, distancia_m=getattr(c, "distancia_ao_passageiro", None))
-                for c in corridas_encontradas
-            ]
+            corrida_ids = [c.id for c in corridas_encontradas]
+            qs_solic = SolicitacaoCarona.objects.filter(
+                corrida_id__in=corrida_ids,
+                passageiro=request.user
+            )
+            for s in qs_solic:
+                solicitacoes_map[s.corrida_id] = s
         except Exception as e:
-            logger.exception("Erro ao serializar corridas: %s", e)
-            corridas_serializadas = []
+            logger.exception("Erro ao buscar solicitações: %s", e)
 
+        # Serialização final
+        corridas_serializadas = []
+        for c in corridas_encontradas:
+            ser = serialize_corrida(c, distancia_m=c.distancia_ao_passageiro)
+
+            solic = solicitacoes_map.get(c.id)
+            ser["minha_solicitacao"] = {
+                "id": solic.id,
+                "status": solic.status,
+            } if solic else None
+
+            corridas_serializadas.append(ser)
+
+    # ================================================================
+    # 2) GEOCODE FALHOU → FALLBACK DE BUSCA POR TEXTO
+    # ================================================================
     else:
-        # fallback: geocode falhou -> busca aproximada por texto (origem/destino),
-        # sem filtro de distância (mostra candidatos por correspondência textual)
         try:
             palavras = termo_busca.split()
             candidatos = []
@@ -674,17 +713,42 @@ def buscar_corridas(request):
                 destino_n = normalizar_texto(str(corrida.destino))
                 if any(p in origem_n or p in destino_n for p in palavras):
                     candidatos.append(corrida)
-            corridas_serializadas = [serialize_corrida(c) for c in candidatos]
+
+            solicitacoes_map = {}
+            corrida_ids = [c.id for c in candidatos]
+            qs_solic = SolicitacaoCarona.objects.filter(
+                corrida_id__in=corrida_ids,
+                passageiro=request.user
+            )
+            for s in qs_solic:
+                solicitacoes_map[s.corrida_id] = s
+
+            corridas_serializadas = []
+            for c in candidatos:
+                ser = serialize_corrida(c)
+
+                solic = solicitacoes_map.get(c.id)
+                ser["minha_solicitacao"] = {
+                    "id": solic.id,
+                    "status": solic.status,
+                } if solic else None
+
+                corridas_serializadas.append(ser)
+
         except Exception as e:
-            logger.exception("Erro em fallback textual na busca: %s", e)
+            logger.exception("Erro em fallback textual: %s", e)
             corridas_serializadas = []
 
+    # ================================================================
+    # RENDER FINAL
+    # ================================================================
     return render(request, "corrida/resultados_busca.html", {
         "corridas": corridas_serializadas,
         "coords": coords,
         "endereco": endereco_passageiro,
         "tolerancia_metros": tolerancia_metros,
     })
+
 
 
 
@@ -703,14 +767,11 @@ def rota_ajax(request):
     except Exception as e:
         return JsonResponse({"erro": str(e)}, status=400)
 
+
+
 @login_required
 @require_POST
 def solicitar_carona(request, corrida_id):
-    """
-    Endpoint AJAX (POST) para o passageiro solicitar uma vaga na corrida.
-    Retorna JSON: { ok: True, id: <id>, status: <status>, data_solicitacao: ... }
-    ou { erro: <mensagem> } com status apropriado.
-    """
     user = request.user
     corrida = get_object_or_404(Corrida, id=corrida_id, status='ativa')
 
@@ -718,20 +779,18 @@ def solicitar_carona(request, corrida_id):
     if corrida.motorista_id == user.id:
         return JsonResponse({'erro': 'Você não pode solicitar sua própria carona.'}, status=400)
 
-    # evita duplicação com atomic + get_or_create (mais robusto a condições de corrida)
     try:
         with transaction.atomic():
             solicit, created = SolicitacaoCarona.objects.get_or_create(
                 corrida=corrida,
                 passageiro=user,
-                defaults={'status': 'Pendente'}
+                defaults={'status': SolicitacaoCarona.STATUS_PENDENTE}
             )
-            # Se já existia, mas foi cancelada antes, você pode reativar dependendo da regra:
             if not created:
-                # se existente mas estava CANCELADA, podemos reativar (opcional)
-                if solicit.status == 'CANCELADA':
-                    solicit.status = 'Pendente'
-                    solicit.save()
+                # Se já existia mas estava CANCELADA, reativar (opcional)
+                if solicit.status == SolicitacaoCarona.STATUS_CANCELADA:
+                    solicit.status = SolicitacaoCarona.STATUS_PENDENTE
+                    solicit.save(update_fields=['status'])
                     created = True
                 else:
                     return JsonResponse({'erro': 'Você já solicitou esta carona.'}, status=400)
@@ -742,8 +801,60 @@ def solicitar_carona(request, corrida_id):
         'ok': True,
         'id': solicit.id,
         'status': solicit.status,
-        'data_solicitacao': solicit.data_solicitacao.isoformat() if hasattr(solicit, 'data_solicitacao') else None
+        'data_solicitacao': solicit.data_solicitacao.isoformat()
     }, status=201 if created else 200)
+
+
+@login_required
+@require_POST
+def cancelar_solicitacao(request, solicitacao_id):
+    solicit = get_object_or_404(SolicitacaoCarona, id=solicitacao_id, passageiro=request.user)
+    if solicit.status != SolicitacaoCarona.STATUS_PENDENTE:
+        return JsonResponse({'erro': 'Não é possível cancelar esta solicitação.'}, status=400)
+
+    solicit.status = SolicitacaoCarona.STATUS_CANCELADA
+    solicit.save(update_fields=['status'])
+    return JsonResponse({'ok': True})
+
+
+@login_required
+@require_POST
+def responder_solicitacao(request, solicitacao_id):
+    """
+    Motorista aceita/rejeita solicitação.
+    POST params: action=aceitar|rejeitar
+    """
+    action = request.POST.get('action')
+    if action not in ('aceitar', 'rejeitar'):
+        return JsonResponse({'erro': 'Ação inválida.'}, status=400)
+
+    solicit = get_object_or_404(SolicitacaoCarona, id=solicitacao_id)
+    corrida = solicit.corrida
+
+    # só o motorista pode responder
+    if corrida.motorista_id != request.user.id:
+        return JsonResponse({'erro': 'Sem permissão.'}, status=403)
+
+    try:
+        with transaction.atomic():
+            # lock na corrida para evitar overbooking
+            corrida_locked = Corrida.objects.select_for_update().get(id=corrida.id)
+            if action == 'aceitar':
+                # verifica vagas
+                if corrida_locked.vagas_disponiveis <= 0:
+                    return JsonResponse({'erro': 'Não há vagas disponíveis.'}, status=400)
+                # atualiza status e decrementa vagas com F() para segurança
+                solicit.status = SolicitacaoCarona.STATUS_ACEITA
+                solicit.save(update_fields=['status'])
+                Corrida.objects.filter(id=corrida.id).update(vagas_disponiveis=dj_models.F('vagas_disponiveis') - 1)
+            else:
+                solicit.status = SolicitacaoCarona.STATUS_RECUSADA
+                solicit.save(update_fields=['status'])
+    except Exception:
+        return JsonResponse({'erro': 'Erro interno ao processar a solicitação.'}, status=500)
+
+    return JsonResponse({'ok': True, 'status': solicit.status})
+
 
 
 @require_GET
@@ -837,3 +948,20 @@ def geocode_photon(request):
         logger.exception("geocode_photon error")
         # retorna lista vazia (cliente continua funcional), mas logamos o erro
         return JsonResponse([], safe=False, status=200)
+
+
+@login_required
+@require_GET
+def minha_solicitacao_api(request, corrida_id):
+    
+    solicit = SolicitacaoCarona.objects.filter(corrida_id=corrida_id, passageiro=request.user).first()
+    if not solicit:
+        return JsonResponse({'ok': True, 'solicitacao': None})
+    return JsonResponse({
+        'ok': True,
+        'solicitacao': {
+            'id': solicit.id,
+            'status': solicit.status,
+            'data_solicitacao': solicit.data_solicitacao.isoformat() if solicit.data_solicitacao else None,
+        }
+    })

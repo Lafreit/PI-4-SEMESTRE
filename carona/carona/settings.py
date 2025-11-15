@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'passageiros',
     'pagamentos',
     'corrida',
+    'notificacao', 
 ]
 
 MIDDLEWARE = [

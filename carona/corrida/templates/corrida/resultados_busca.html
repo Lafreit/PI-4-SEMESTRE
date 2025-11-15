@@ -20,6 +20,7 @@
         </div>
 
         <button id="buscarBtn">Buscar corridas</button>
+        <a href="{% url 'usuarios:pagina_inicial' %}" class="btn voltar">Voltar</a>
     </div>
 
     <!-- Container do mapa -->
@@ -28,23 +29,88 @@
     </div>
 
     <!-- Resultados das corridas -->
-    <div id="corridasContainer"></div>
+    <div id="corridasContainer">
+    
+
+        {% for corrida in corridas %}
+        <div class="corrida-item"
+             id="corrida-{{ corrida.id }}"
+             data-corrida-id="{{ corrida.id }}"
+             data-motorista-id="{{ corrida.motorista.id }}">
+
+          <div class="corrida-info">
+            <div class="corrida-origem-destino">
+              <strong>{{ corrida.origem }}</strong> → <strong>{{ corrida.destino }}</strong>
+            </div>
+            <div class="corrida-meta">
+              <span class="corrida-vagas">Vagas: <span class="vagas-count">{{ corrida.vagas_disponiveis }}</span></span>
+              {% if corrida.valor %}
+                <span class="corrida-valor">R$ {{ corrida.valor }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- CONTROLES: solicitar / cancelar / feedback -->
+          <div class="corrida-actions">
+            {# só mostrar botão solicitar se usuário logado e NÃO for o motorista. #}
+            {% if user.is_authenticated and user.id != corrida.motorista.id %}
+              {# se o backend preencheu corrida.minha_solicitacao, usamos ele para definir visibilidade e id #}
+              {% if corrida.minha_solicitacao %}
+                <!-- usuário já solicitou: esconder solicitar, mostrar cancelar com id -->
+                <button class="btn-solicitar" data-corrida-id="{{ corrida.id }}" style="display:none;">
+                  Solicitar vaga
+                </button>
+
+                <button class="btn-cancelar"
+                        data-corrida-id="{{ corrida.id }}"
+                        data-solicitacao-id="{{ corrida.minha_solicitacao.id }}"
+                        style="display:inline-block;">
+                  Cancelar solicitação
+                </button>
+              {% else %}
+                <!-- usuário não solicitou ainda -->
+                <button
+                    class="btn-solicitar"
+                    data-corrida-id="{{ corrida.id }}"
+                    data-solicitar-url="{% url 'corrida:solicitar_carona' corrida.id %}">
+                    Solicitar vaga
+                    </button>
+
+                <button class="btn-cancelar"
+                        data-corrida-id="{{ corrida.id }}"
+                        data-solicitacao-id=""
+                        style="display:none;">
+                  Cancelar solicitação
+                </button>
+              {% endif %}
+            {% endif %}
+
+            <span class="solicitar-feedback" id="feedback-{{ corrida.id }}"></span>
+          </div>
+        </div>
+        {% empty %}
+          <p>Nenhuma corrida encontrada.</p>
+        {% endfor %}
+    </div>
 </div>
 
 <!-- ====== ESTILOS ====== -->
 <!-- CSS do Leaflet -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-<!-- Seu CSS -->
+<!-- CSS da página de resultados -->
 <link rel="stylesheet" href="{% static 'corrida/css/resultados_busca.css' %}">
+<!-- CSS específico de solicitar/cancelar -->
+<link rel="stylesheet" href="{% static 'corrida/css/solicitar_carona.css' %}">
 
 <!-- ====== SCRIPTS ====== -->
 <!-- JS do Leaflet -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- Seu JS -->
+
+<!-- JS principal que você já possui (mapa, busca, renderização dos itens, etc) -->
 <script src="{% static 'corrida/js/resultados_busca.js' %}" defer></script>
+
+<!-- JS responsável por solicitar/cancelar (usa event delegation em #corridasContainer) -->
+<script src="{% static 'corrida/js/solicitar_carona.js' %}" defer></script>
 
 {% endblock %}

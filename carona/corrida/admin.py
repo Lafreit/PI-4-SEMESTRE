@@ -1,6 +1,13 @@
 from django.contrib import admin
 from .models import Corrida, SolicitacaoCarona
 
+
+@admin.register(SolicitacaoCarona)
+class SolicitacaoCaronaAdmin(admin.ModelAdmin):
+    list_display = ('id','passageiro','corrida','status','data_solicitacao')
+    list_filter = ('status','corrida')
+    search_fields = ('passageiro__email','passageiro__nome','corrida__origem','corrida__destino')
+
 class SolicitacaoInline(admin.TabularInline):
     model = SolicitacaoCarona
     extra = 0
@@ -39,9 +46,3 @@ class CorridaAdmin(admin.ModelAdmin):
         self.message_user(request, f"{count} corrida(s) selecionadas — exportação fictícia executada.")
     exportar_selecionadas_json.short_description = "Exportar corridas selecionadas (exemplo)"
 
-@admin.register(SolicitacaoCarona)
-class SolicitacaoCaronaAdmin(admin.ModelAdmin):
-    list_display = ("id", "corrida", "passageiro", "status", "data_solicitacao")
-    list_filter = ("status", "data_solicitacao")
-    search_fields = ("passageiro__username", "corrida__origem", "corrida__destino")
-    readonly_fields = ("data_solicitacao",)

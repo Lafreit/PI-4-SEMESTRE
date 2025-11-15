@@ -16,7 +16,11 @@ urlpatterns = [
     path('detalhes/<int:corrida_id>/', views.detalhes_corrida, name='detalhes_corrida'),
     path('cancelar/<int:corrida_id>/', views.cancelar_corrida, name='cancelar_corrida'),
     path('editar/<int:corrida_id>/', views.editar_corrida, name='editar_corrida'),
-    path('corrida/<int:corrida_id>/solicitar/', views.solicitar_carona, name='solicitar_carona'),
     path('deletar/<int:corrida_id>/', views.deletar_corrida, name='deletar_corrida'),
     path('api/buscar_corridas/', views.buscar_corridas_api, name='buscar_corridas_api'),
+    path('solicitacao/<int:solicitacao_id>/cancelar/', views.cancelar_solicitacao, name='cancelar_solicitacao'),
+    path('solicitacao/<int:solicitacao_id>/responder/', views.responder_solicitacao, name='responder_solicitacao'),
+    path('corrida/<int:corrida_id>/minha_solicitacao/', views.minha_solicitacao_api, name='minha_solicitacao_api'),
+    path('<int:corrida_id>/solicitar/', views.solicitar_carona, name='solicitar_carona'),
+
 ]

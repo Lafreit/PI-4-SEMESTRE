@@ -139,3 +139,26 @@
         font-size: 0.9rem;
     }
 }
+
+
+.voltar-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.btn-voltar {
+    background-color: #4a90e2;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.btn-voltar:hover {
+    background-color: #357ABD;
+}

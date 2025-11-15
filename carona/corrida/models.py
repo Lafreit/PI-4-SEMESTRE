@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from decimal import Decimal
+from django.utils import timezone
 
 class Corrida(models.Model):
     STATUS_CHOICES = [
@@ -78,18 +78,31 @@ class Corrida(models.Model):
         self.bbox_max_lon = max(lons)
 
 
+
 class SolicitacaoCarona(models.Model):
+    # constantes de status para evitar typos
+    STATUS_PENDENTE = 'PENDENTE'
+    STATUS_ACEITA = 'ACEITA'
+    STATUS_RECUSADA = 'RECUSADA'
+    STATUS_CANCELADA = 'CANCELADA'
+
     STATUS_CHOICES = [
-        ('PENDENTE', 'Pendente'),
-        ('ACEITA', 'Aceita'),
-        ('RECUSADA', 'Recusada'),
-        ('CANCELADA', 'Cancelada'),
+        (STATUS_PENDENTE, 'Pendente'),
+        (STATUS_ACEITA, 'Aceita'),
+        (STATUS_RECUSADA, 'Recusada'),
+        (STATUS_CANCELADA, 'Cancelada'),
     ]
 
     corrida = models.ForeignKey('Corrida', on_delete=models.CASCADE, related_name='solicitacoes')
     passageiro = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='solicitacoes')
     data_solicitacao = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDENTE')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_PENDENTE)
+
+    class Meta:
+        unique_together = ('corrida', 'passageiro')
+        indexes = [
+            models.Index(fields=['corrida', 'status']),
+        ]
 
     def __str__(self):
         return f"{self.passageiro} → {self.corrida} ({self.status})"
