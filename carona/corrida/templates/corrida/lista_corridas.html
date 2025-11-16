@@ -27,7 +27,9 @@
                     <th>Vagas</th>
                     <th>Valor</th>
                     <th>Status</th>
+                    <th>Motorista</th>
                     <th>Ações</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -41,6 +43,7 @@
                         <td>{{ corrida.vagas_disponiveis }}</td>
                         <td>R$ {{ corrida.valor }}</td>
                         <td>{{ corrida.get_status_display }}</td>
+                        <td>{{ corrida.motorista.nome }}</td>
                         <td>
                             <a href="{% url 'corrida:editar_corrida' corrida.id %}" class="btn editar">Editar</a>
 

@@ -15,6 +15,7 @@ from decimal import Decimal, InvalidOperation
 from django.conf import settings
 from django.db import IntegrityError, transaction, models as dj_models
 from django.db.models import Prefetch
+from notificacao.models import Notificacao
 
 
 
@@ -768,14 +769,13 @@ def rota_ajax(request):
         return JsonResponse({"erro": str(e)}, status=400)
 
 
-
 @login_required
 @require_POST
 def solicitar_carona(request, corrida_id):
     user = request.user
     corrida = get_object_or_404(Corrida, id=corrida_id, status='ativa')
 
-    # não permitir que o motorista solicite a própria corrida
+    # Não permitir solicitar a própria corrida
     if corrida.motorista_id == user.id:
         return JsonResponse({'erro': 'Você não pode solicitar sua própria carona.'}, status=400)
 
@@ -786,16 +786,34 @@ def solicitar_carona(request, corrida_id):
                 passageiro=user,
                 defaults={'status': SolicitacaoCarona.STATUS_PENDENTE}
             )
+
             if not created:
-                # Se já existia mas estava CANCELADA, reativar (opcional)
                 if solicit.status == SolicitacaoCarona.STATUS_CANCELADA:
                     solicit.status = SolicitacaoCarona.STATUS_PENDENTE
                     solicit.save(update_fields=['status'])
                     created = True
                 else:
                     return JsonResponse({'erro': 'Você já solicitou esta carona.'}, status=400)
+
+            # 🔔 Criar notificação para o motorista (usando o campo `dados` para metadados)
+            Notificacao.objects.create(
+                usuario=corrida.motorista,
+                titulo="Nova solicitação de vaga",
+                mensagem=f"{user.nome} solicitou uma vaga na sua corrida de {corrida.origem} → {corrida.destino}.",
+                tipo=Notificacao.TIPO_SOLICITACAO_RECEBIDA,
+                dados={
+                    "link": f"/corrida/detalhes/{corrida.id}/",
+                    "corrida_id": corrida.id,
+                    "solicitacao_id": solicit.id,
+                },
+            )
+
     except IntegrityError:
+        logger.exception("IntegrityError ao criar solicitação de carona")
         return JsonResponse({'erro': 'Erro ao criar solicitação. Tente novamente.'}, status=500)
+    except Exception:
+        logger.exception("Erro inesperado em solicitar_carona")
+        return JsonResponse({'erro': 'Erro interno. Tente novamente.'}, status=500)
 
     return JsonResponse({
         'ok': True,
@@ -808,22 +826,32 @@ def solicitar_carona(request, corrida_id):
 @login_required
 @require_POST
 def cancelar_solicitacao(request, solicitacao_id):
-    solicit = get_object_or_404(SolicitacaoCarona, id=solicitacao_id, passageiro=request.user)
+    solicit = get_object_or_404(
+        SolicitacaoCarona,
+        id=solicitacao_id,
+        passageiro=request.user
+    )
+
     if solicit.status != SolicitacaoCarona.STATUS_PENDENTE:
         return JsonResponse({'erro': 'Não é possível cancelar esta solicitação.'}, status=400)
 
     solicit.status = SolicitacaoCarona.STATUS_CANCELADA
     solicit.save(update_fields=['status'])
+
+    # 🔔 Criar notificação para o motorista
+    Notificacao.objects.create(
+        usuario=solicit.corrida.motorista,
+        mensagem=f"{request.user.first_name} cancelou a solicitação da corrida {solicit.corrida.origem} → {solicit.corrida.destino}.",
+        link=f"/corrida/detalhes/{solicit.corrida.id}/",
+    )
+
     return JsonResponse({'ok': True})
+
 
 
 @login_required
 @require_POST
 def responder_solicitacao(request, solicitacao_id):
-    """
-    Motorista aceita/rejeita solicitação.
-    POST params: action=aceitar|rejeitar
-    """
     action = request.POST.get('action')
     if action not in ('aceitar', 'rejeitar'):
         return JsonResponse({'erro': 'Ação inválida.'}, status=400)
@@ -831,29 +859,53 @@ def responder_solicitacao(request, solicitacao_id):
     solicit = get_object_or_404(SolicitacaoCarona, id=solicitacao_id)
     corrida = solicit.corrida
 
-    # só o motorista pode responder
+    # Apenas o motorista pode responder
     if corrida.motorista_id != request.user.id:
         return JsonResponse({'erro': 'Sem permissão.'}, status=403)
 
     try:
         with transaction.atomic():
-            # lock na corrida para evitar overbooking
             corrida_locked = Corrida.objects.select_for_update().get(id=corrida.id)
+
+            from notificacao.models import Notificacao
+
             if action == 'aceitar':
-                # verifica vagas
+
+                # Sem vagas → não pode aceitar
                 if corrida_locked.vagas_disponiveis <= 0:
                     return JsonResponse({'erro': 'Não há vagas disponíveis.'}, status=400)
-                # atualiza status e decrementa vagas com F() para segurança
+
                 solicit.status = SolicitacaoCarona.STATUS_ACEITA
                 solicit.save(update_fields=['status'])
-                Corrida.objects.filter(id=corrida.id).update(vagas_disponiveis=dj_models.F('vagas_disponiveis') - 1)
-            else:
+
+                # decrementa vagas
+                Corrida.objects.filter(id=corrida.id).update(
+                    vagas_disponiveis=dj_models.F('vagas_disponiveis') - 1
+                )
+
+                # 🔔 Notifica passageiro
+                Notificacao.objects.create(
+                    usuario=solicit.passageiro,
+                    mensagem=f"Sua solicitação para a corrida {corrida.origem} → {corrida.destino} foi ACEITA!",
+                    link=f"/corrida/detalhes/{corrida.id}/",
+                )
+
+            else:  # rejeitar
                 solicit.status = SolicitacaoCarona.STATUS_RECUSADA
                 solicit.save(update_fields=['status'])
+
+                # 🔔 Notifica o passageiro
+                Notificacao.objects.create(
+                    usuario=solicit.passageiro,
+                    mensagem=f"Sua solicitação para a corrida {corrida.origem} → {corrida.destino} foi RECUSADA.",
+                    link=f"/corrida/detalhes/{corrida.id}/",
+                )
+
     except Exception:
         return JsonResponse({'erro': 'Erro interno ao processar a solicitação.'}, status=500)
 
     return JsonResponse({'ok': True, 'status': solicit.status})
+
 
 
 

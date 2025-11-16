@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="notif-page">
+  <div class="notif-header">
+    <h2>Notificações</h2>
+    <div id="notif-badge" class="notif-badge"></div>
+  </div>
+
+  <div id="notif-list" class="notif-list">
+    {% for n in notificacoes %}
+      <div class="notif-item {% if not n.lida %}nao-lida{% endif %}" data-id="{{ n.id }}">
+        <div class="notif-main">
+          <div class="notif-title">{{ n.titulo }}</div>
+          <div class="notif-msg">{{ n.mensagem }}</div>
+        </div>
+        <div class="notif-meta">
+          <div class="notif-time">{{ n.criada_em|date:"d/m/Y H:i" }}</div>
+          {% if not n.lida %}
+            <button class="btn-marcar-lida" data-id="{{ n.id }}">Marcar como lida</button>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <p>Você não possui notificações.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<link rel="stylesheet" href="{% static 'notificacao/css/notificacoes.css' %}">
+<script src="{% static 'notificacao/js/notificacoes.js' %}" defer></script>
+{% endblock %}

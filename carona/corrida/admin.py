@@ -14,10 +14,12 @@ class SolicitacaoInline(admin.TabularInline):
     readonly_fields = ("passageiro", "data_solicitacao", "status")
     can_delete = False
 
+ 
 @admin.register(Corrida)
 class CorridaAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "motorista_nome",   # <<< ADICIONADO
         "origem",
         "destino",
         "data",
@@ -27,13 +29,35 @@ class CorridaAdmin(admin.ModelAdmin):
         "status",
         "criado_em",
     )
+
     list_filter = ("data", "status", "cidade_origem", "cidade_destino")
-    search_fields = ("origem", "destino", "bairro_origem", "cidade_origem", "bairro_destino", "cidade_destino", "motorista__username")
+
+    search_fields = (
+        "origem", "destino",
+        "bairro_origem", "cidade_origem",
+        "bairro_destino", "cidade_destino",
+        "motorista__nome",  # <<< ALTERADO porque seu usuário usa 'nome'
+        "motorista__email",
+    )
+
     readonly_fields = ("criado_em", "atualizado_em")
     date_hierarchy = "data"
     ordering = ("-data", "-horario_saida")
     inlines = [SolicitacaoInline]
     actions = ["marcar_cancelada", "exportar_selecionadas_json"]
+
+    # -- Mostrar o nome correto do motorista (do seu modelo de usuário)
+    def motorista_nome(self, obj):
+        return obj.motorista.nome
+
+    motorista_nome.short_description = "Motorista"
+
+
+    # MÉTODO PARA MOSTRAR O NOME DO MOTORISTA
+    def motorista_nome(self, obj):
+        return obj.motorista.nome
+
+    motorista_nome.short_description = "Motorista"
 
     def marcar_cancelada(self, request, queryset):
         updated = queryset.update(status="cancelada")
