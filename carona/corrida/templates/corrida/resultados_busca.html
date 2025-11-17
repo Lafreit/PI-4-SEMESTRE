@@ -29,13 +29,12 @@
     </div>
 
     <!-- Resultados das corridas -->
-    <div id="corridasContainer">
-    
-
+    <div id="corridasContainer" class="corridas-container">
         {% for corrida in corridas %}
         <div class="corrida-item"
              id="corrida-{{ corrida.id }}"
              data-corrida-id="{{ corrida.id }}"
+             data-id="{{ corrida.id }}"
              data-motorista-id="{{ corrida.motorista.id }}">
 
           <div class="corrida-info">
@@ -50,42 +49,56 @@
             </div>
           </div>
 
-          <!-- CONTROLES: solicitar / cancelar / feedback -->
+          <!-- CONTROLES -->
           <div class="corrida-actions">
-            {# só mostrar botão solicitar se usuário logado e NÃO for o motorista. #}
             {% if user.is_authenticated and user.id != corrida.motorista.id %}
-              {# se o backend preencheu corrida.minha_solicitacao, usamos ele para definir visibilidade e id #}
+
               {% if corrida.minha_solicitacao %}
-                <!-- usuário já solicitou: esconder solicitar, mostrar cancelar com id -->
-                <button class="btn-solicitar" data-corrida-id="{{ corrida.id }}" style="display:none;">
-                  Solicitar vaga
-                </button>
-
-                <button class="btn-cancelar"
-                        data-corrida-id="{{ corrida.id }}"
-                        data-solicitacao-id="{{ corrida.minha_solicitacao.id }}"
-                        style="display:inline-block;">
-                  Cancelar solicitação
-                </button>
-              {% else %}
-                <!-- usuário não solicitou ainda -->
+                <!-- Já existe solicitação — mostrar Cancelar -->
                 <button
-                    class="btn-solicitar"
+                    type="button"
+                    class="btn btn-solicitar"
                     data-corrida-id="{{ corrida.id }}"
-                    data-solicitar-url="{% url 'corrida:solicitar_carona' corrida.id %}">
+                    data-id="{{ corrida.id }}"
+                    style="display:none;">
                     Solicitar vaga
-                    </button>
-
-                <button class="btn-cancelar"
-                        data-corrida-id="{{ corrida.id }}"
-                        data-solicitacao-id=""
-                        style="display:none;">
-                  Cancelar solicitação
                 </button>
+
+                <button
+                    type="button"
+                    class="btn btn-cancelar"
+                    data-corrida-id="{{ corrida.id }}"
+                    data-id="{{ corrida.id }}"
+                    data-solicitacao-id="{{ corrida.minha_solicitacao.id }}"
+                    style="display:inline-block; background:#c0392b; color:#fff;">
+                    Cancelar solicitação
+                </button>
+
+              {% else %}
+                <!-- Ainda não existe — só solicitar -->
+                
+                <button
+                    type="button"
+                    class="btn btn-solicitar"
+                    data-corrida-id="{{ corrida.id }}"
+                    data-id="{{ corrida.id }}">
+                    Solicitar vaga
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-cancelar"
+                    data-corrida-id="{{ corrida.id }}"
+                    data-id="{{ corrida.id }}"
+                    data-solicitacao-id=""
+                    style="display:none; background:#c0392b; color:#fff;">
+                    Cancelar solicitação
+                </button>
+
               {% endif %}
             {% endif %}
 
-            <span class="solicitar-feedback" id="feedback-{{ corrida.id }}"></span>
+            <span class="solicitar-feedback" id="feedback-{{ corrida.id }}" aria-live="polite"></span>
           </div>
         </div>
         {% empty %}
@@ -95,22 +108,13 @@
 </div>
 
 <!-- ====== ESTILOS ====== -->
-<!-- CSS do Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
-<!-- CSS da página de resultados -->
 <link rel="stylesheet" href="{% static 'corrida/css/resultados_busca.css' %}">
-<!-- CSS específico de solicitar/cancelar -->
 <link rel="stylesheet" href="{% static 'corrida/css/solicitar_carona.css' %}">
 
 <!-- ====== SCRIPTS ====== -->
-<!-- JS do Leaflet -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- JS principal que você já possui (mapa, busca, renderização dos itens, etc) -->
 <script src="{% static 'corrida/js/resultados_busca.js' %}" defer></script>
-
-<!-- JS responsável por solicitar/cancelar (usa event delegation em #corridasContainer) -->
 <script src="{% static 'corrida/js/solicitar_carona.js' %}" defer></script>
 
 {% endblock %}

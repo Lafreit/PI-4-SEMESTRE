@@ -770,6 +770,33 @@ def rota_ajax(request):
 
 
 @login_required
+def minhas_solicitacoes_api(request):
+    """
+    Retorna um mapeamento {corrida_id: solicitacao_id} para as corridas cujos ids
+    foram passados via querystring ?ids=1,2,3.
+    Só retorna solicitações pendentes do usuário (ou adapte o filtro).
+    """
+    ids_raw = request.GET.get('ids', '')
+    if not ids_raw:
+        return JsonResponse({'solicitacoes': {}})
+
+    # limpar e converter para inteiros
+    try:
+        ids_list = [int(x) for x in ids_raw.split(',') if x.strip().isdigit()]
+    except ValueError:
+        return JsonResponse({'solicitacoes': {}}, status=400)
+
+    qs = SolicitacaoCarona.objects.filter(
+        passageiro=request.user,
+        corrida_id__in=ids_list,
+        status=SolicitacaoCarona.STATUS_PENDENTE
+    ).only('id', 'corrida_id')
+
+    mapping = {s.corrida_id: s.id for s in qs}
+    return JsonResponse({'solicitacoes': mapping})
+
+
+@login_required
 @require_POST
 def solicitar_carona(request, corrida_id):
     user = request.user
@@ -823,6 +850,7 @@ def solicitar_carona(request, corrida_id):
     }, status=201 if created else 200)
 
 
+
 @login_required
 @require_POST
 def cancelar_solicitacao(request, solicitacao_id):
@@ -838,11 +866,16 @@ def cancelar_solicitacao(request, solicitacao_id):
     solicit.status = SolicitacaoCarona.STATUS_CANCELADA
     solicit.save(update_fields=['status'])
 
-    # 🔔 Criar notificação para o motorista
+    # 🔔 Criar notificação correta
     Notificacao.objects.create(
         usuario=solicit.corrida.motorista,
-        mensagem=f"{request.user.first_name} cancelou a solicitação da corrida {solicit.corrida.origem} → {solicit.corrida.destino}.",
-        link=f"/corrida/detalhes/{solicit.corrida.id}/",
+        titulo="Solicitação cancelada",
+        mensagem=f"{request.user.nome} cancelou a solicitação da corrida {solicit.corrida.origem} → {solicit.corrida.destino}.",
+        tipo=Notificacao.TIPO_SOLICITACAO_RESPONDIDA,
+        dados={
+            "corrida_id": solicit.corrida.id,
+            "solicitacao_id": solicit.id
+        }
     )
 
     return JsonResponse({'ok': True})
