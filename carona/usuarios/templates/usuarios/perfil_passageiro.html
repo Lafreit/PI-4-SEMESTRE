@@ -9,19 +9,27 @@
 <div class="dashboard-container">
 
   <nav class="top-navbar" id="mainNavbar">
-    <div class="logo-area">Carona Fácil</div>
+
+    <!-- LOGO AQUI -->
+    <div class="logo-area">
+      <a href="{% url 'usuarios:pagina_inicial' %}">
+        <img src="{% static 'img/logo.png' %}" alt="Carona Fácil" class="logo-img">
+      </a>
+    </div>
+
     <div class="menu">
       <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
       <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
       <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
       <a href="#" class="menu-item">Central de Ajuda</a>
     </div>
+
     <div class="user-and-logout">
       <div class="user-info-navbar">
         <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
         <span>{{ user.nome }}</span>
       </div>
-      <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger" >Sair</a>
+      <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
     </div>
   </nav>
 
@@ -102,18 +110,15 @@ function toggleDarkMode() {
 }
 
 window.onload = function() {
-  // Modo escuro
   if (localStorage.getItem("darkMode") === "true") {
     document.body.classList.add("dark-mode");
   }
 
-  // Botão modo escuro
   const btn = document.querySelector('.mode-toggle-btn');
   if (btn) {
     btn.textContent = document.body.classList.contains("dark-mode") ? '☀️' : '🌙';
   }
 
-  // 🔹 Adiciona imagem de fundo com escurecimento via JS
   const header = document.querySelector('.header-banner');
   if (header) {
     header.style.height = "250px";
@@ -128,7 +133,6 @@ window.onload = function() {
     header.style.position = "relative";
     header.style.overflow = "hidden";
 
-    // Fundo com degradê escuro
     header.style.backgroundImage = `
       linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
       url('{% static 'img/perfilp.png' %}')
