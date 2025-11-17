@@ -11,7 +11,9 @@
 <header>
     <div class="container">
         <nav>
-            <div class="logo">Carona</div>
+            <div class="logo">
+                <img src="{% static 'img/logo.png' %}" alt="Carona" class="logo-img">
+            </div>
             <ul class="nav-links">
                 <li><a href="{% url 'home' %}">Início</a></li> 
                 <li><a href="{% url 'home' %}#about">Sobre</a></li>
