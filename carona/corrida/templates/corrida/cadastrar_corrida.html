@@ -11,7 +11,9 @@
 <div class="dashboard-container">
 
     <nav class="top-navbar" id="mainNavbar">
-        <div class="logo-area">Carona Fácil</div>
+       <div class="logo-area">
+    <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo-img">
+</div>
         <div class="menu">
             <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
             <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
