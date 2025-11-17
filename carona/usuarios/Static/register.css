@@ -178,3 +178,8 @@
         width: 100%; /* Ocupa toda a largura no mobile */
     }
 }
+.logo img.logo-img {
+    height: 75px;
+    width: auto;
+    display: block;
+}
