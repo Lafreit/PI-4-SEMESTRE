@@ -1,0 +1,309 @@
+/* ========================================================================= */
+/* VARIAVEIS DE COR E TAMANHO (UNIFICADAS)           */
+/* ========================================================================= */
+:root {
+    --primary-blue: #2a5298;
+    --primary-darker-blue: #22437B;
+    --accent-green: #28C76F;
+    --red-danger: #E74C3C;
+    --red-danger-darker: #C0392B;
+    --text-color: #333333;
+    --text-secondary: #707070;
+    --background-light: #f0f4f8; /* Fundo mais suave */
+    --card-background: #ffffff;
+    --border-color: #d4d8dc;
+    --white: #FFFFFF;
+    --border-radius-lg: 16px;
+    --border-radius-sm: 8px;
+    --shadow-soft: 0 6px 25px rgba(0, 0, 0, 0.1);
+    --navbar-height: 64px;
+}
+
+/* ========================================================================= */
+/* ESTILOS BASE E ESTRUTURA (DASHBOARD)             */
+/* ========================================================================= */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--background-light);
+    margin: 0;
+    padding: 0;
+    color: var(--text-color);
+    line-height: 1.6;
+    transition: background-color 0.3s;
+}
+
+.dashboard-container {
+    display: block;
+    min-height: 100vh;
+}
+
+/* ======== NAVBAR (MANTIDA) ======== */
+.top-navbar {
+    background: var(--white);
+    padding: 0 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--navbar-height);
+    box-sizing: border-box;
+}
+
+.logo-area { font-size: 1.8rem; font-weight: 800; color: var(--primary-blue); text-transform: uppercase; letter-spacing: -0.5px; }
+.menu { display: flex; gap: 20px; }
+.menu-item { color: var(--text-secondary); text-decoration: none; padding: 0.5rem 0; font-weight: 500; transition: color 0.3s; }
+.menu-item:hover { color: var(--primary-blue); }
+.menu-item.active { color: var(--primary-blue); font-weight: 600; border-bottom: 3px solid var(--primary-blue); padding-bottom: 21px; }
+.user-and-logout { display: flex; align-items: center; gap: 20px; }
+.user-info-navbar { display: flex; align-items: center; gap: 10px; color: var(--text-color); font-weight: 600; }
+.user-avatar-small { width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--primary-blue); }
+
+/* ======== MAIN CONTENT (AJUSTADO APÓS REMOÇÃO DO BANNER) ======== */
+.main-content {
+    padding: 3rem 2.5rem;
+    margin-top: calc(var(--navbar-height) + 1rem); /* Espaço correto abaixo da navbar */
+}
+
+/* ======== HEADER (BANNER) - REMOVIDO NO CSS ======== */
+.header-banner {
+    display: none; /* Garante que não apareça */
+    height: 0;
+    margin: 0;
+    padding: 0;
+} 
+
+/* ========================================================================= */
+/* ESTRUTURA DE DUAS COLUNAS (COPIADA/ADAPTADA DO REGISTER.CSS) */
+/* ========================================================================= */
+
+.register-single-wrapper {
+    display: flex;
+    justify-content: center; 
+    align-items: flex-start;
+    padding: 0;
+    width: 100%;
+}
+
+.register-container {
+    display: flex;
+    background: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-soft); 
+    width: 100%;
+    max-width: 950px; 
+    overflow: hidden; 
+    min-height: 500px;
+}
+
+/* ===== Coluna do Formulário (Esquerda) ===== */
+.register-box {
+    padding: 40px 50px; 
+    width: 60%; 
+    box-sizing: border-box;
+    flex-grow: 1; 
+}
+
+/* Campos do formulário */
+.register-box h1 { 
+    color: var(--primary-blue); 
+    margin-bottom: 10px; 
+    font-weight: 700; 
+    text-align: left; 
+    font-size: 2rem; /* Mantém o h1 do card com destaque */
+}
+.register-box form p { margin-bottom: 18px; text-align: left; }
+.register-box label { font-weight: 600; color: var(--text-color); margin-bottom: 8px; display: block; font-size: 1rem; }
+.register-box input, .register-box select, .register-box textarea { width: 100%; padding: 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1.05rem; color: var(--text-color); box-sizing: border-box; transition: all 0.3s ease; }
+.register-box input:focus, .register-box select:focus, .register-box textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1); outline: none; }
+.register-box .error-message { color: var(--red-danger); font-size: 0.85rem; margin-top: 5px; display: block; }
+
+
+/* ===== Coluna de Conteúdo Lateral (Direita) ===== */
+.side-content {
+    width: 40%; 
+    background-color: #e7eef4; /* Fundo lateral */
+    padding: 30px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    align-items: center;
+    box-sizing: border-box;
+    flex-shrink: 0; 
+}
+
+/* --- ESTILOS DO CONTEÚDO LATERAL --- */
+.side-top-group { width: 100%; text-align: center; padding-top: 15px; }
+.side-top-group img { max-width: 90%; height: auto; object-fit: contain; margin-bottom: 25px; }
+.side-top-group h2 { color: var(--primary-blue); font-size: 1.3rem; margin-top: 0; margin-bottom: 10px; }
+.side-top-group ul { list-style: disc inside; padding-left: 0; text-align: left; color: var(--text-color); font-size: 0.95rem; margin-bottom: 20px; }
+
+/* Grupo de Botões (Ações no Fundo da Coluna Direita) */
+.side-actions {
+    width: 100%;
+    text-align: center;
+    padding-bottom: 15px; 
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+}
+
+/* Botões laterais (Usados também para Salvar/Cancelar no form-actions) */
+.btn-help, .btn-back {
+    display: block;
+    width: 90%; 
+    margin-left: auto; 
+    margin-right: auto;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s, border-color 0.3s;
+    font-size: 1rem;
+}
+
+/* Botão Azul/Submit (Usado para Salvar) */
+.btn-help {
+    background-color: var(--primary-blue);
+    color: #fff;
+    border: 1px solid var(--primary-blue);
+}
+
+.btn-help:hover {
+    background-color: var(--primary-darker-blue);
+    border-color: var(--primary-darker-blue);
+}
+
+/* Botão de Cor Secundária/Cancel (Usado para Cancelar/Voltar) */
+.btn-back {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.btn-back:hover {
+    background-color: #e0e4eb;
+    border-color: #c9d2db;
+}
+
+/* 🔴 Sobrescreve estilo do botão Sair/Danger (Para o Sair na coluna lateral) */
+.btn-help[style*="--red-danger"] {
+    background-color: var(--red-danger) !important;
+    border-color: var(--red-danger) !important;
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+}
+
+.btn-help[style*="--red-danger"]:hover {
+    background-color: var(--red-danger-darker) !important;
+    border-color: var(--red-danger-darker) !important;
+    transform: translateY(-1px);
+}
+
+/* 🔴 Estilo do Botão Sair da NAVBAR (MANTIDO) */
+.action-btn.logout-btn.btn-danger {
+    background-color: #e63946 !important;
+    color: #fff !important;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.action-btn.logout-btn.btn-danger:hover {
+    background-color: #b92d39 !important;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(185, 45, 57, 0.4);
+}
+
+/* ======== MENSAGENS/NOTIFICAÇÕES ======== */
+
+.message-container {
+    max-width: 950px;
+    margin: 0 auto 20px auto;
+}
+
+.notification-banner {
+    padding: 15px 20px;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.notification-banner span {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+.success-message { background-color: #e5f6e9; color: var(--accent-green); border: 1px solid var(--accent-green); }
+.error-message { background-color: #ffe6e6; color: var(--red-danger); border: 1px solid var(--red-danger); }
+
+
+/* ======== RESPONSIVIDADE ======== */
+@media (max-width: 950px) {
+    /* Navbar e Main Content */
+    .top-navbar { flex-wrap: wrap; padding: 0.8rem 1rem; height: auto; }
+    .menu { justify-content: center; width: 100%; order: 2; margin-top: 10px; }
+    .user-and-logout { width: 100%; justify-content: center; order: 3; margin-top: 10px; padding-top: 10px; }
+    .main-content { margin-top: 120px; padding: 1rem; }
+
+    /* Estrutura de Duas Colunas (Torna-se uma Coluna Única no Mobile) */
+    .register-container {
+        flex-direction: column; 
+        max-width: 480px; 
+        min-height: auto;
+    }
+    .register-box,
+    .side-content {
+        width: 100%;
+        min-width: auto;
+    }
+    .register-box {
+        padding: 30px 20px;
+        order: 2; 
+    }
+    .side-content {
+        padding: 30px 20px;
+        order: 1; 
+    }
+    .side-actions {
+        margin-top: 20px;
+        border-top: none; 
+        padding-top: 0;
+    }
+    .btn-help, .btn-back {
+        width: 100%; 
+    }
+}
+.logo-area {
+    display: flex;
+    align-items: center;
+    height: var(--navbar-height);
+}
+
+.logo-img {
+    height: 75px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+ .side-content .tip-section h2 {
+        margin-bottom: 5px; /* Reduz espaço abaixo do título H2 */
+    }
+
+    .side-content .tip-section ul {
+        margin-top: 5px; /* Reduz espaço acima da lista UL */
+        margin-bottom: 10px; /* Reduz espaço abaixo da lista UL */
+        padding-left: 20px; /* Mantém um pequeno recuo para as bolinhas */
+    }
+
+    .side-content .tip-section ul li {
+        margin-bottom: 5px; /* Reduz o espaço entre os itens da lista (LI) */
+    }
