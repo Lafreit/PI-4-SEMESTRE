@@ -1,117 +1,398 @@
-.page-container {
+/* ========================================================================= */
+/* VARIÁVEIS DE CORES E ESTILOS */
+/* ========================================================================= */
+:root {
+    --primary-blue: #2a5298; /* Azul principal (Carona Fácil) */
+    --secondary-blue: #007bff; /* Azul de destaque/ação */
+    --hover-blue: #0056b3; 
+    --background-light: #f4f6f9; /* Fundo suave da página */
+    --card-background: #ffffff; /* Fundo dos cards */
+    --text-color-primary: #343a40; 
+    --border-color-light: #e9ecef; 
+    --shadow-light: 0 4px 12px rgba(0,0,0,0.08); 
+    --font-family-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --border-radius-lg: 16px;
+    --border-radius-md: 8px;
+    --navbar-height: 70px; /* Altura padrão da navbar */
+    --accent-red: #dc3545; 
+    --card-padding: 25px;
+}
+
+/* ========================================================================= */
+/* ESTRUTURA GERAL E LAYOUT DO DASHBOARD (COM NAVBAR) */
+/* ========================================================================= */
+body {
+    font-family: var(--font-family-sans);
+    background-color: var(--background-light);
+    color: var(--text-color-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Main Content: Adiciona margem para desviar da navbar fixa */
+.main-content {
+    margin-top: var(--navbar-height); 
+    padding: 30px 0;
+    min-height: calc(100vh - var(--navbar-height));
+}
+
+.container-centralizado {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 25px;
+}
+
+/* --- LAYOUT PRINCIPAL DE DUAS COLUNAS --- */
+.results-layout {
+    display: flex;
+    gap: 30px; 
+    align-items: flex-start; /* Alinha as colunas pelo topo */
+}
+
+/* Coluna de Busca e Resultados (Maior) */
+.search-and-list-column {
+    flex: 1.3; 
+    min-width: 450px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 20px;
     gap: 20px;
 }
 
+/* Coluna do Mapa e Dicas (Menor) */
+.map-and-tips-column {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* Faz a coluna ficar fixa na tela quando rolar o conteúdo esquerdo */
+    position: sticky; 
+    top: calc(var(--navbar-height) + 30px); /* Fica fixo abaixo da navbar */
+}
+
+
+/* ========================================================================= */
+/* ESTILOS DA NAVBAR (REFINADA) */
+/* ========================================================================= */
+.top-navbar {
+    background: var(--card-background);
+    padding: 0 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    z-index: 1000;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--navbar-height);
+}
+
+.logo-area { 
+    font-size: 1.5rem; /* Ajustado para caber melhor */
+    font-weight: 900; 
+    color: var(--primary-blue); 
+    letter-spacing: 0.5px; 
+    white-space: nowrap; /* CRUCIAL: Impede que o logo quebre */
+    line-height: 1;
+}
+
+.menu { 
+    display: flex; 
+    gap: 30px; 
+}
+.menu-item { 
+    color: var(--text-color-primary); 
+    text-decoration: none; 
+    padding: 0.5rem 0; 
+    font-weight: 500; 
+    transition: color 0.3s; 
+}
+.menu-item:hover, .menu-item.active { 
+    color: var(--primary-blue); 
+    border-bottom: 3px solid var(--primary-blue);
+}
+
+.user-and-logout { 
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+    white-space: nowrap;
+}
+.user-info-navbar { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    color: var(--text-color-primary); 
+    font-weight: 600; 
+}
+.user-avatar-small { 
+    width: 35px; 
+    height: 35px; 
+    border-radius: 50%; 
+    border: 2px solid var(--primary-blue); 
+    object-fit: cover;
+}
+.action-btn.logout-btn.btn-danger {
+    background-color: var(--accent-red);
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+.action-btn.logout-btn.btn-danger:hover {
+    background-color: #a02834;
+}
+
+/* ========================================================================= */
+/* PAINEL DE BUSCA E FORMULÁRIO */
+/* ========================================================================= */
 .search-panel {
-    width: 100%;
-    max-width: 900px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    background: var(--card-background);
+    padding: var(--card-padding);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-light);
 }
 
 .search-panel h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 15px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 20px;
 }
 
 .inputs-row {
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 15px;
+    margin-bottom: 20px;
 }
-
 .inputs-row input {
     flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color-light);
+    border-radius: var(--border-radius-md);
+}
+.inputs-row input:focus {
+    outline: none;
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .tolerancia-container {
     display: flex;
     align-items: center;
     gap: 10px;
-    justify-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
+    padding: 10px 0;
+    /* Estilos para o slider de tolerância */
+}
+.tolerancia-container label {
+    font-weight: 600;
+    white-space: nowrap;
+}
+.tolerancia-container input[type="range"] {
+    flex-grow: 1;
+    cursor: pointer;
+}
+#toleranciaValor {
+    font-weight: 700;
+    color: var(--secondary-blue);
+    width: 50px; 
+    text-align: right;
 }
 
-#buscarBtn {
-    display: block;
-    margin: 0 auto;
-    background: #007bff;
+.action-btn.primary-btn {
+    background: var(--primary-blue);
     color: white;
     border: none;
-    padding: 10px 30px;
-    border-radius: 8px;
+    padding: 12px 30px;
+    border-radius: var(--border-radius-md);
     cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    display: block;
     transition: background 0.2s;
+    text-transform: uppercase;
+}
+.action-btn:hover {
+    background: var(--hover-blue);
 }
 
-#buscarBtn:hover {
-    background: #0056b3;
-}
-
+/* ========================================================================= */
+/* MAPA */
+/* ========================================================================= */
 #map-container {
     width: 100%;
-    max-width: 1200px;
-    height: 400px;
-    position: relative;
+    /* Altura definida explicitamente para garantir que o mapa apareça */
+    height: 450px; 
+    border-radius: var(--border-radius-lg);
+    overflow: hidden; 
+    box-shadow: var(--shadow-light);
 }
-
 #map {
     width: 100%;
     height: 100%;
-    border-radius: 12px;
-    z-index: 1;
+}
+
+/* ========================================================================= */
+/* RESULTADOS (Corridas Container) */
+/* ========================================================================= */
+.results-heading {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    padding-left: 10px;
+    color: var(--primary-blue);
 }
 
 #corridasContainer {
     width: 100%;
-    max-width: 1000px;
-    margin-top: 20px;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 15px;
 }
 
 .corrida-card {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
+    background: var(--card-background);
+    padding: var(--card-padding);
+    border-radius: var(--border-radius-md);
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-color-light);
+    transition: transform 0.1s, box-shadow 0.2s;
 }
 
 .corrida-card:hover {
-    background: #f0f8ff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(42, 82, 152, 0.15);
     cursor: pointer;
+}
+
+.corrida-card h4 {
+    font-size: 1.15rem;
+    color: var(--primary-blue);
+    margin-bottom: 8px;
+}
+.details-meta {
+    font-weight: 600;
+    color: var(--text-color-primary);
+    margin-top: 5px;
+}
+
+.solicitar-btn.secondary-btn {
+    background-color: var(--secondary-blue);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 15px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    float: right;
+}
+.solicitar-btn.secondary-btn:hover {
+    background-color: var(--hover-blue);
+}
+
+/* ========================================================================= */
+/* SEÇÃO DE DICAS (Tips) */
+/* ========================================================================= */
+.tips-section {
+    background-color: var(--card-background);
+    padding: var(--card-padding);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-light);
+}
+.tips-section h4 {
+    color: var(--primary-blue);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+.tips-list {
+    list-style: none; 
+    padding: 0;
+}
+.tips-list li {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    border-left: 3px solid var(--secondary-blue);
+    padding-left: 10px;
+}
+
+
+/* ========================================================================= */
+/* RESPONSIVIDADE (Mobile e Tablets) */
+/* ========================================================================= */
+
+@media (max-width: 1000px) {
+    /* Navbar Responsiveness */
+    .top-navbar {
+        flex-direction: column; 
+        align-items: flex-start;
+        height: auto; 
+        padding: 15px 1rem;
+    }
+    .logo-area { 
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .menu { 
+        justify-content: space-around; 
+        width: 100%; 
+        gap: 15px;
+        flex-wrap: wrap;
+        padding: 10px 0;
+        border-top: 1px solid var(--border-color-light);
+        border-bottom: 1px solid var(--border-color-light);
+    }
+    .user-and-logout { 
+        width: 100%; 
+        justify-content: space-between; 
+        margin-top: 10px; 
+    }
+    
+    /* Ajuste da Margem Principal */
+    .main-content { 
+        /* Calcula a margem para a navbar expandida em mobile */
+        margin-top: 180px; 
+        padding: 1rem; 
+    }
+    
+    /* Layout de Colunas em Coluna Única */
+    .results-layout {
+        flex-direction: column;
+    }
+    .search-and-list-column {
+        min-width: 100%;
+    }
+    
+    /* O mapa deixa de ser sticky em mobile */
+    .map-and-tips-column {
+        position: static;
+        width: 100%;
+    }
+    #map-container {
+        height: 350px; /* Reduz a altura do mapa em telas menores */
+    }
 }
 
 @media (max-width: 768px) {
     .inputs-row {
         flex-direction: column;
     }
-    #map-container {
-        height: 300px;
+    .main-content {
+        margin-top: 210px; /* Ajuste para navbar em telas bem pequenas */
     }
 }
-
-.solicitar-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    margin-top: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.solicitar-btn:hover {
-    background-color: #0056b3;
+.logo-img {
+    height: 75px;
+    width: auto;
 }
