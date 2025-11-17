@@ -1,152 +1,427 @@
-/* ---------- Container principal ---------- */
+/* ========================================================================= */
+/* VARIÁVEIS DE CORES E FONTES */
+/* ========================================================================= */
+:root {
+    /* Cores Primárias */
+    --primary-blue: #007bff; /* Principal cor de ação */
+    --primary-dark: #0056b3; /* Hover do botão */
+    --accent-green: #28a745; /* Cor para sucesso */
+    --accent-red: #dc3545;   /* Cor para erros/perigo */
+    --main-logo-color: #2a5298; /* Cor para logo/destaque da navbar */
+    --navbar-height: 64px; 
+
+    /* Cores Neutras */
+    --background-light: #f8f9fa; /* Fundo geral da página */
+    --card-background: #ffffff; /* Fundo do card */
+    --text-color-primary: #343a40; /* Texto principal */
+    --text-color-secondary: #6c757d; /* Labels, textos de ajuda */
+    --border-color-light: #e9ecef; /* Bordas suaves */
+    --border-color-focus: #adb5bd; /* Borda de foco padrão */
+
+    /* Tipografia e Estilos */
+    --font-family-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --border-radius-lg: 16px;
+    --border-radius-md: 8px;
+    --card-padding: 30px; /* Variável para padding padrão */
+}
+
+/* ========================================================================= */
+/* ESTRUTURA GERAL E LAYOUT DO DASHBOARD */
+/* ========================================================================= */
+body {
+    background-color: var(--background-light);
+    font-family: var(--font-family-sans);
+    color: var(--text-color-primary);
+    min-height: 100vh;
+}
+
+.dashboard-container {
+    display: block;
+    min-height: 100vh;
+}
+
+/* Main Content e Padding para desviar da Navbar fixa */
+.main-content {
+    padding: 3rem 2.5rem;
+    margin-top: calc(var(--navbar-height) + 1rem); 
+    min-height: calc(100vh - var(--navbar-height) - 4rem); 
+}
+
+/* CONTAINER PRINCIPAL (Configurações do contêiner central) */
 .corrida-container {
-    max-width: 800px;
+    max-width: 1200px; 
     margin: 40px auto;
-    padding: 20px;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
-/* ---------- Card ---------- */
-.corrida-card {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-}
-
-/* ---------- Título ---------- */
-.corrida-card h3 {
-    text-align: center;
-    margin-bottom: 25px;
-    font-weight: 600;
-    color: #333;
-}
-
-/* ---------- Form Rows ---------- */
-.form-row {
+/* --- LAYOUT DE DUAS COLUNAS PRINCIPAL --- */
+.two-column-layout {
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-bottom: 15px;
+    gap: 30px; /* Espaço entre as colunas */
+    align-items: flex-start; /* Alinha o conteúdo ao topo de cada coluna */
 }
 
-/* ---------- Form Group ---------- */
-.form-group {
-    flex: 1 1 200px;
+/* ========================================================================= */
+/* COLUNA DA DIREITA (Contêiner Único para Mapa e Dicas) */
+/* ========================================================================= */
+.right-column-sidebar {
+    flex: 1; /* Ocupa a outra metade da largura */
+    /* Estilos de Card aplicados diretamente à coluna da direita */
+    background-color: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-color-light);
+    padding: var(--card-padding); /* Padding geral do Card */
+    /* Usamos flex-direction column para empilhar o conteúdo dentro do card */
     display: flex;
     flex-direction: column;
-    margin-bottom: 15px;
+}
+
+/* Contêiner interno para gerenciar o espaçamento entre o mapa e as dicas */
+.map-and-tips-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px; /* Espaçamento entre o mapa e a seção de dicas */
+}
+
+/* ========================================================================= */
+/* ESTILOS DA NAVBAR PADRÃO */
+/* ========================================================================= */
+.top-navbar {
+    background: var(--card-background);
+    padding: 0 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--navbar-height);
+    box-sizing: border-box;
+}
+.logo-area { 
+    font-size: 1.8rem; 
+    font-weight: 800; 
+    color: var(--main-logo-color); 
+    text-transform: uppercase; 
+    letter-spacing: -0.5px; 
+}
+.menu { 
+    display: flex; 
+    gap: 20px; 
+}
+.menu-item { 
+    color: var(--text-color-secondary); 
+    text-decoration: none; 
+    padding: 0.5rem 0; 
+    font-weight: 500; 
+    transition: color 0.3s; 
+}
+.menu-item:hover { 
+    color: var(--main-logo-color); 
+}
+.menu-item.active { 
+    color: var(--main-logo-color); 
+    font-weight: 600; 
+    border-bottom: 3px solid var(--main-logo-color); 
+    padding-bottom: 21px; 
+}
+.user-and-logout { 
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+}
+.user-info-navbar { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    color: var(--text-color-primary); 
+    font-weight: 600; 
+}
+.user-avatar-small { 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%; 
+    border: 3px solid var(--main-logo-color); 
+}
+.action-btn.logout-btn.btn-danger {
+    background-color: var(--accent-red);
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+.action-btn.logout-btn.btn-danger:hover {
+    background-color: #a02834;
+}
+
+
+/* ========================================================================= */
+/* MAPA (Dentro do novo Card) */
+/* ========================================================================= */
+#map {
+    width: 100%;
+    height: 400px; /* Altura ajustada */
+    margin: 0; 
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color-light);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+
+/* ========================================================================= */
+/* CARD PRINCIPAL (Formulário - Coluna da Esquerda) */
+/* ========================================================================= */
+.corrida-card {
+    flex: 1.2; /* Dá um pouco mais de espaço para o formulário (ex: 60%) */
+    min-width: 450px;
+    background-color: var(--card-background);
+    padding: var(--card-padding);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-color-light);
+    margin-bottom: 0;
+}
+
+/* Título */
+.corrida-card h3 {
+    text-align: center;
+    margin-bottom: 30px; 
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--primary-blue);
+}
+
+/* ========================================================================= */
+/* FORMULÁRIO E INPUTS */
+/* ========================================================================= */
+.form-row {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    flex: 1 1 250px; 
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+    position: relative; 
 }
 
 .form-group label {
-    font-weight: 500;
-    margin-bottom: 5px;
+    font-weight: 600;
+    margin-bottom: 7px;
+    color: var(--text-color-secondary);
+    font-size: 0.95rem;
 }
 
-/* ---------- Inputs ---------- */
+/* Inputs, Selects e Textareas */
 .form-control {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
+    padding: 10px 15px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color-light);
+    font-size: 1rem;
+    color: var(--text-color-primary);
+    background-color: var(--background-light); 
+    transition: all 0.3s ease;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); 
+    background-color: var(--card-background); 
 }
 
-/* ---------- Textarea ---------- */
 textarea.form-control {
     resize: vertical;
+    min-height: 100px;
 }
 
-/* ---------- Botão ---------- */
+/* ========================================================================= */
+/* BOTÃO DE AÇÃO */
+/* ========================================================================= */
 .action-btn {
-    display: inline-block;
+    display: block; 
     width: 100%;
-    padding: 12px;
-    background-color: #007bff;
-    color: #fff;
-    font-size: 16px;
+    padding: 15px; 
+    margin-top: 15px;
+    background-color: var(--accent-green); 
+    color: var(--card-background);
+    font-size: 1.1rem;
+    font-weight: 700;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--border-radius-md);
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.1s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .action-btn:hover {
-    background-color: #0056b3;
+    background-color: #1e7e34; 
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
 }
 
-/* ---------- Mensagens ---------- */
-.alert {
-    padding: 10px 15px;
+/* ========================================================================= */
+/* SEÇÃO DE DICAS (Dentro do novo Card) */
+/* ========================================================================= */
+.tips-section {
+    width: 100%;
+    background: none;
+    padding: 0; 
+    border: none;
+    box-shadow: none;
+    margin: 0;
+}
+
+.tips-section h4 {
+    color: var(--main-logo-color);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-color-light);
+    padding-bottom: 10px;
+}
+
+.tips-list {
+    list-style: none; /* Remove marcadores padrão */
+    padding: 0;
+}
+
+.tips-list li {
     margin-bottom: 15px;
-    border-radius: 6px;
+    padding-left: 0; /* Remove padding que havia sido usado para o emoji */
+    position: relative;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-color-primary);
+}
+
+.tips-list li::before {
+    /* Removido o content: "💡" para tirar o emoji */
+    content: ""; 
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+
+/* ========================================================================= */
+/* MENSAGENS E ALERTAS */
+/* ========================================================================= */
+.alert {
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius-md);
+    font-weight: 500;
+    border-left: 5px solid;
 }
 
 .alert-success {
     background-color: #d4edda;
     color: #155724;
+    border-color: var(--accent-green);
 }
 
 .alert-error,
 .alert-danger {
     background-color: #f8d7da;
     color: #721c24;
+    border-color: var(--accent-red);
 }
 
-/* ---------- Dropdown Autocomplete ---------- */
+/* ========================================================================= */
+/* AUTOSSUGESTÃO (DROPDOWN) */
+/* ========================================================================= */
 .autocomplete-dropdown {
     position: absolute;
-    top: 100%;
+    top: calc(100% - 8px); 
     left: 0;
     right: 0;
-    z-index: 999;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background-color: #fff;
+    z-index: 10;
+    border: 1px solid var(--border-color-light);
+    border-top: none; 
+    border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+    background-color: var(--card-background);
     max-height: 200px;
     overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .autocomplete-option {
-    padding: 8px 12px;
+    padding: 10px 15px;
     cursor: pointer;
+    font-size: 1rem;
     transition: background-color 0.2s;
 }
 
 .autocomplete-option:hover {
     background-color: #f0f0f0;
+    color: var(--primary-blue);
 }
 
-/* ---------- Ajuste para inputs com dropdown ---------- */
-.form-group {
-    position: relative;
+/* ========================================================================= */
+/* RESPONSIVIDADE */
+/* ========================================================================= */
+
+/* Quebra o layout em uma única coluna para telas menores que 1000px */
+@media (max-width: 1000px) {
+    .two-column-layout {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .corrida-card, .right-column-sidebar {
+        min-width: 100%;
+    }
+    .main-content {
+         padding: 1rem;
+    }
 }
 
-#map {
-    height: 400px;
-    margin-top: 30px;
-    border-radius: 12px;
-    border: 1px solid #ccc;
-}
-
-
-
-/* botão desabilitado */
-.action-btn[disabled],
-.action-btn.btn-disabled {
-  background: #c0c8d6;
-  color: #ffffff;
-  cursor: not-allowed;
-  opacity: 0.8;
-}
-
-/* dropdown highlight */
-.autocomplete-option.selected,
-.autocomplete-option:hover {
-  background-color: #f0f4ff;
+/* Mobile e Telas Pequenas (Abaixo de 768px) */
+@media (max-width: 768px) {
+    /* Navbar Responsiveness */
+    .top-navbar { flex-wrap: wrap; padding: 0.8rem 1rem; height: auto; }
+    .logo-area { margin: 5px 0; }
+    .menu { justify-content: center; width: 100%; order: 2; margin-top: 10px; }
+    .user-and-logout { width: 100%; justify-content: center; order: 3; margin-top: 10px; padding-top: 10px; }
+    .main-content { margin-top: 120px; padding: 1rem; }
+    
+    /* Corrida Responsiveness */
+    .corrida-container {
+        margin: 20px 10px;
+        padding: 10px;
+    }
+    .corrida-card, .right-column-sidebar {
+        padding: 20px;
+    }
+    .corrida-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+    }
+    .form-row {
+        gap: 0;
+        margin-bottom: 0;
+        flex-direction: column;
+    }
+    .form-group {
+        flex: 1 1 100%;
+        margin-bottom: 15px;
+    }
+    #map {
+        height: 300px; 
+    }
+    .map-and-tips-container {
+        gap: 20px;
+    }
 }
