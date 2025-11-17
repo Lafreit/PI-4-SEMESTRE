@@ -425,3 +425,18 @@ textarea.form-control {
         gap: 20px;
     }
 }
+.logo-area {
+    display: flex;
+    align-items: center;
+}
+
+.logo-area .logo-img {
+    height: 75px; 
+    width: auto;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+
+
+
