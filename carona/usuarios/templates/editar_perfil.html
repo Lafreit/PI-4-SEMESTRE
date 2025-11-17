@@ -3,29 +3,19 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'editar.css' %}">
-<style>
-    /* Estilos para reduzir o espaço entre o título e a lista e entre os itens da lista */
-    .side-content .tip-section h2 {
-        margin-bottom: 5px; /* Reduz espaço abaixo do título H2 */
-    }
 
-    .side-content .tip-section ul {
-        margin-top: 5px; /* Reduz espaço acima da lista UL */
-        margin-bottom: 10px; /* Reduz espaço abaixo da lista UL */
-        padding-left: 20px; /* Mantém um pequeno recuo para as bolinhas */
-    }
-
-    .side-content .tip-section ul li {
-        margin-bottom: 5px; /* Reduz o espaço entre os itens da lista (LI) */
-    }
-</style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
 
     <nav class="top-navbar" id="mainNavbar">
-        <div class="logo-area">Carona Fácil</div>
+        
+        <!-- LOGO AQUI -->
+        <div class="logo-area">
+            <img src="{% static 'img/logo.png' %}" alt="Carona Fácil" class="logo-img">
+        </div>
+
         <div class="menu">
             <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
             <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
@@ -45,14 +35,16 @@
     <main class="main-content">
     
         <div class="header-banner">
-            </div>
+        </div>
 
         {% if messages %}
             <div class="message-container" style="max-width: 950px; margin: 0 auto 20px auto;">
                 {% for message in messages %}
                     <div class="notification-banner {{ message.tags }}" role="alert">
                         <span>
-                            {% if message.tags == 'success' %}✅ Sucesso!{% elif message.tags == 'error' %}❌ Erro:{% else %}💡 Aviso:{% endif %}
+                            {% if message.tags == 'success' %}✅ Sucesso!
+                            {% elif message.tags == 'error' %}❌ Erro:
+                            {% else %}💡 Aviso:{% endif %}
                         </span>
                         {{ message }}
                     </div>
