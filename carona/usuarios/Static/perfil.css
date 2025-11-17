@@ -340,7 +340,7 @@ body.dark-mode .action-card p {
     }
 
     .logo-area .logo-img {
-        height: 45px;   /* ajuste livre */
+        height: 75px;   /* ajuste livre */
         width: auto;
         object-fit: contain;
     }
