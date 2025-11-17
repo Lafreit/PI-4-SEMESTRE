@@ -3,11 +3,14 @@
 
 {% block content %}
 <div class="notif-page">
+
+  <!-- Cabeçalho -->
   <div class="notif-header">
     <h2>Notificações</h2>
-    <div id="notif-badge" class="notif-badge"></div>
+    <div id="notif-badge" class="notif-badge">Carregando...</div>
   </div>
 
+  <!-- Lista de notificações -->
   <div id="notif-list" class="notif-list">
     {% for n in notificacoes %}
       <div class="notif-item {% if not n.lida %}nao-lida{% endif %}" data-id="{{ n.id }}">
@@ -17,8 +20,20 @@
         </div>
         <div class="notif-meta">
           <div class="notif-time">{{ n.criada_em|date:"d/m/Y H:i" }}</div>
+
           {% if not n.lida %}
             <button class="btn-marcar-lida" data-id="{{ n.id }}">Marcar como lida</button>
+          {% endif %}
+
+          {% if n.tipo == n.TIPO_SOLICITACAO_RECEBIDA and n.dados.corrida_id %}
+            <a href="{% url 'corrida:detalhe' n.dados.corrida_id %}" class="btn-detalhe">Ver corrida</a>
+
+            <!-- Botão aceitar solicitação -->
+            {% if n.dados.solicitacao_id %}
+              <button class="btn-aceitar" data-corrida="{{ n.dados.corrida_id }}" data-solicitacao="{{ n.dados.solicitacao_id }}">
+                Aceitar solicitação
+              </button>
+            {% endif %}
           {% endif %}
         </div>
       </div>
@@ -26,7 +41,16 @@
       <p>Você não possui notificações.</p>
     {% endfor %}
   </div>
+
 </div>
+
+<!-- URLs e CSRF -->
+<script>
+  const URL_MARCAR_LIDA = "{% url 'notificacao:api_marcar_lida' %}";
+  const URL_CONTAGEM = "{% url 'notificacao:api_contagem' %}";
+  const URL_ACEITAR = "{% url 'corrida:api_aceitar_solicitacao' %}";
+  const CSRF_TOKEN = "{{ csrf_token }}";
+</script>
 
 <link rel="stylesheet" href="{% static 'notificacao/css/notificacoes.css' %}">
 <script src="{% static 'notificacao/js/notificacoes.js' %}" defer></script>

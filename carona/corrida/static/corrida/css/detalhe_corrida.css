@@ -1,0 +1,92 @@
+/* detalhe_corrida.css */
+.corrida-detalhe-page {
+  max-width: 900px;
+  margin: 18px auto;
+  padding: 12px;
+  font-family: Arial, sans-serif;
+}
+
+.corrida-detalhe-page h2 {
+  margin-bottom: 16px;
+  color: #2b8cff;
+}
+
+.corrida-info {
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 24px;
+}
+
+.corrida-info p {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.solicitacoes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.solicitacao-item {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.solicitacao-item.pendente {
+  border-left: 4px solid #2b8cff;
+  background: #eef7ff;
+}
+
+.solicitacao-item.aceita {
+  border-left: 4px solid #28a745;
+  background: #e6f9ee;
+}
+
+.solicitacao-item.outros {
+  border-left: 4px solid #ccc;
+  background: #f5f5f5;
+}
+
+.solicitacao-item p {
+  margin: 0;
+}
+
+.btn-aceitar {
+  background: #2b8cff;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 8px;
+  align-self: flex-start;
+  transition: background 0.2s;
+}
+
+.btn-aceitar:hover {
+  background: #1a6ed0;
+}
+
+@media (max-width: 640px) {
+  .corrida-detalhe-page {
+    padding: 8px;
+  }
+
+  .solicitacao-item {
+    padding: 10px;
+  }
+
+  .btn-aceitar {
+    width: 100%;
+    text-align: center;
+  }
+}

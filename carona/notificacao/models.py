@@ -2,6 +2,9 @@
 from django.db import models
 from django.conf import settings
 
+
+
+
 class Notificacao(models.Model):
     TIPO_SOLICITACAO_RECEBIDA = 'solicitacao_recebida'
     TIPO_SOLICITACAO_RESPONDIDA = 'solicitacao_respondida'

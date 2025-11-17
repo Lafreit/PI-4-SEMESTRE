@@ -529,10 +529,9 @@ def historico_corridas(request):
     # Lógica para mostrar o histórico de corridas
     return render(request, 'corrida/historico_corridas.html')
 
-@login_required
-def detalhes_corrida(request, corrida_id):
-    # Lógica para mostrar detalhes de uma corrida específica
-    return render(request, 'corrida/detalhes_corrida.html')
+def detalhe_corrida(request, pk):
+    corrida = get_object_or_404(Corrida, id=pk)
+    return render(request, 'corrida/detalhe_corrida.html', {'corrida': corrida})
 
 @login_required
 @user_passes_test(is_motorista_ou_admin)
@@ -1050,3 +1049,40 @@ def minha_solicitacao_api(request, corrida_id):
             'data_solicitacao': solicit.data_solicitacao.isoformat() if solicit.data_solicitacao else None,
         }
     })
+
+
+
+@login_required
+@require_POST
+def api_aceitar_solicitacao(request):
+    try:
+        corrida_id = int(request.POST.get('corrida_id'))
+        solicitacao_id = int(request.POST.get('solicitacao_id'))
+    except Exception:
+        return HttpResponseBadRequest("IDs inválidos")
+
+    solicitacao = SolicitacaoCarona.objects.filter(
+        id=solicitacao_id,
+        corrida_id=corrida_id,
+        corrida__motorista=request.user
+    ).first()
+
+    if not solicitacao:
+        return JsonResponse({"ok": False, "error": "Solicitação não encontrada"}, status=404)
+
+    if solicitacao.status == SolicitacaoCarona.STATUS_ACEITA:
+        return JsonResponse({"ok": False, "error": "Solicitação já aceita"}, status=400)
+
+    solicitacao.status = SolicitacaoCarona.STATUS_ACEITA
+    solicitacao.save(update_fields=['status'])
+
+    # opcional: marcar notificação do passageiro como lida ou criar notificação
+    Notificacao.objects.create(
+        usuario=solicitacao.passageiro,
+        titulo="Solicitação Aceita",
+        mensagem=f"Sua solicitação para a corrida de {solicitacao.corrida.origem} → {solicitacao.corrida.destino} foi aceita!",
+        tipo=Notificacao.TIPO_SOLICITACAO_RESPONDIDA,
+        dados={"corrida_id": solicitacao.corrida.id, "solicitacao_id": solicitacao.id}
+    )
+
+    return JsonResponse({"ok": True, "status": solicitacao.status})
