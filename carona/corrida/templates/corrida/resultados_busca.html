@@ -1,120 +1,119 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_head %}
+    <!-- CSS do Leaflet para o mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Seu CSS da página de resultados -->
+    <link rel="stylesheet" href="{% static 'corrida/css/resultados_busca.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="page-container">
+<div class="main-page-wrapper">
 
-    <!-- Painel superior de busca -->
-    <div class="search-panel">
-        <h2>Encontre sua carona</h2>
-
-        <div class="inputs-row">
-            <input type="text" id="origemInput" placeholder="Origem (ex: Santo André)">
-            <input type="text" id="destinoInput" placeholder="Destino (ex: Nova Odessa)">
+    <!-- 🌟 INÍCIO DA NAVBAR FIXA 🌟 -->
+    <nav class="top-navbar" id="mainNavbar">
+        <div class="logo-area">CARONA FÁCIL</div>
+        <div class="menu">
+            <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
+            <a href="{% url 'corrida:lista_corridas' %}" class="menu-item active">Minhas Viagens</a>
+            <a href="#" class="menu-item">Central de Ajuda</a>
         </div>
 
-        <div class="tolerancia-container">
-            <label for="toleranciaRange">Tolerância (metros):</label>
-            <input type="range" id="toleranciaRange" min="100" max="5000" step="100" value="600">
-            <span id="toleranciaValor">600</span> m
+        <div class="user-and-logout">
+            <div class="user-info-navbar">
+                <!-- Assume-se que 'imgusu.png' é o avatar padrão -->
+                <img src="{% static 'img/imgusu.png' %}" alt="Avatar" class="user-avatar-small">
+                <span>{{ user.nome|default:"Sara" }}</span>
+            </div>
+            <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
         </div>
+    </nav>
+    <!-- 🌟 FIM DA NAVBAR 🌟 -->
 
-        <button id="buscarBtn">Buscar corridas</button>
-        <a href="{% url 'usuarios:pagina_inicial' %}" class="btn voltar">Voltar</a>
-    </div>
-
-    <!-- Container do mapa -->
-    <div id="map-container">
-        <div id="map"></div>
-    </div>
-
-    <!-- Resultados das corridas -->
-    <div id="corridasContainer" class="corridas-container">
-        {% for corrida in corridas %}
-        <div class="corrida-item"
-             id="corrida-{{ corrida.id }}"
-             data-corrida-id="{{ corrida.id }}"
-             data-id="{{ corrida.id }}"
-             data-motorista-id="{{ corrida.motorista.id }}">
-
-          <div class="corrida-info">
-            <div class="corrida-origem-destino">
-              <strong>{{ corrida.origem }}</strong> → <strong>{{ corrida.destino }}</strong>
-            </div>
-            <div class="corrida-meta">
-              <span class="corrida-vagas">Vagas: <span class="vagas-count">{{ corrida.vagas_disponiveis }}</span></span>
-              {% if corrida.valor %}
-                <span class="corrida-valor">R$ {{ corrida.valor }}</span>
-              {% endif %}
-            </div>
-          </div>
-
-          <!-- CONTROLES -->
-          <div class="corrida-actions">
-            {% if user.is_authenticated and user.id != corrida.motorista.id %}
-
-              {% if corrida.minha_solicitacao %}
-                <!-- Já existe solicitação — mostrar Cancelar -->
-                <button
-                    type="button"
-                    class="btn btn-solicitar"
-                    data-corrida-id="{{ corrida.id }}"
-                    data-id="{{ corrida.id }}"
-                    style="display:none;">
-                    Solicitar vaga
-                </button>
-
-                <button
-                    type="button"
-                    class="btn btn-cancelar"
-                    data-corrida-id="{{ corrida.id }}"
-                    data-id="{{ corrida.id }}"
-                    data-solicitacao-id="{{ corrida.minha_solicitacao.id }}"
-                    style="display:inline-block; background:#c0392b; color:#fff;">
-                    Cancelar solicitação
-                </button>
-
-              {% else %}
-                <!-- Ainda não existe — só solicitar -->
+    <main class="main-content">
+        <div class="container-centralizado">
+            
+            <!-- Layout principal: Busca/Resultados (Esquerda) e Mapa (Direita) -->
+            <div class="results-layout">
                 
-                <button
-                    type="button"
-                    class="btn btn-solicitar"
-                    data-corrida-id="{{ corrida.id }}"
-                    data-id="{{ corrida.id }}">
-                    Solicitar vaga
-                </button>
+                {# COLUNA DA ESQUERDA: PAINEL DE BUSCA E LISTA DE RESULTADOS #}
+                <div class="search-and-list-column">
+                    
+                    <!-- Painel de Busca com Filtros -->
+                    <div class="search-panel">
+                        <h2>Encontre sua carona 🔎</h2>
 
-                <button
-                    type="button"
-                    class="btn btn-cancelar"
-                    data-corrida-id="{{ corrida.id }}"
-                    data-id="{{ corrida.id }}"
-                    data-solicitacao-id=""
-                    style="display:none; background:#c0392b; color:#fff;">
-                    Cancelar solicitação
-                </button>
+                        <div class="inputs-row">
+                            <input type="text" id="origemInput" placeholder="Origem (ex: Santo André)">
+                            <input type="text" id="destinoInput" placeholder="Destino (ex: Nova Odessa)">
+                        </div>
 
-              {% endif %}
-            {% endif %}
+                        <div class="tolerancia-container">
+                            <label for="toleranciaRange">Tolerância:</label>
+                            <input type="range" id="toleranciaRange" min="100" max="5000" step="100" value="600">
+                            <span id="toleranciaValor">600</span> m
+                        </div>
 
-            <span class="solicitar-feedback" id="feedback-{{ corrida.id }}" aria-live="polite"></span>
-          </div>
+                        <button id="buscarBtn" class="action-btn primary-btn">Buscar corridas</button>
+                    </div>
+                    
+                    <!-- Lista de Corridas -->
+                    <h3 class="results-heading">Corridas Encontradas: (3)</h3>
+                    <div id="corridasContainer">
+                        
+                        <!-- Card 1: Exemplo de Resultado -->
+                        <div class="corrida-card">
+                            <h4>Rota: Santo André -> Nova Odessa</h4>
+                            <p>Motorista: João Silva</p>
+                            <p>Horário de Partida: 07:30</p>
+                            <p class="details-meta">Valor: R$ 15,00 | Vagas: 3</p>
+                            <button class="solicitar-btn secondary-btn">Ver Detalhes</button>
+                        </div>
+                        
+                        <!-- Card 2: Exemplo de Resultado -->
+                        <div class="corrida-card">
+                            <h4>Rota: São Paulo -> Campinas</h4>
+                            <p>Motorista: Maria Souza</p>
+                            <p>Horário de Partida: 08:00</p>
+                            <p class="details-meta">Valor: R$ 25,00 | Vagas: 2</p>
+                            <button class="solicitar-btn secondary-btn">Ver Detalhes</button>
+                        </div>
+                    </div>
+                </div>
+
+                {# COLUNA DA DIREITA: MAPA E DICAS #}
+                <div class="map-and-tips-column">
+                    
+                    <div id="map-container">
+                        <div id="map"></div>
+                    </div>
+                    
+                    <section class="tips-section">
+                        <h4>Ajuda Visual no Mapa</h4>
+                        <ul class="tips-list">
+                            <li>
+                                <p>Os marcadores indicam a **Origem (P)** e o **Destino (D)** das caronas.</p>
+                            </li>
+                            <li>
+                                <p>A área colorida em volta dos marcadores mostra a **Tolerância**.</p>
+                            </li>
+                            <li>
+                                <p>Clique em um card para destacá-lo no mapa.</p>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+                
+            </div>
+            
         </div>
-        {% empty %}
-          <p>Nenhuma corrida encontrada.</p>
-        {% endfor %}
-    </div>
+    </main>
 </div>
-
-<!-- ====== ESTILOS ====== -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link rel="stylesheet" href="{% static 'corrida/css/resultados_busca.css' %}">
-<link rel="stylesheet" href="{% static 'corrida/css/solicitar_carona.css' %}">
 
 <!-- ====== SCRIPTS ====== -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{% static 'corrida/js/resultados_busca.js' %}" defer></script>
-<script src="{% static 'corrida/js/solicitar_carona.js' %}" defer></script>
 
 {% endblock %}
