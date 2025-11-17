@@ -1,150 +1,357 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'perfil.css' %}">
-{% endblock %}
-
-{% block content %}
-<div class="dashboard-container">
-
-    <nav class="top-navbar" id="mainNavbar">
-        <div class="logo-area">Carona Fácil</div>
-        <div class="menu">
-            <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
-            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
-            <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
-            <a href="#" class="menu-item">Central de Ajuda</a>
-        </div>
-
-        <div class="user-and-logout">
-            <div class="user-info-navbar">
-                <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
-                <span>{{ user.nome }}</span>
-            </div>
-            <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
-        </div>
-    </nav>
-
-    <main class="main-content">
-
-        <button onclick="toggleDarkMode()" class="action-btn mode-toggle-btn">
-            🌙
-        </button>
-
-        <div class="header-banner">
-            <h1>Meu Perfil Motorista 🚗</h1>
-            <p>Gerencie seus dados de motorista, documentos e desempenho.</p>
-        </div>
-
-        {% if messages %}
-            <div class="message-container" style="margin-bottom: 25px; margin-top: 15px;">
-                {% for message in messages %}
-                    <div class="notification-banner {% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}"
-                            role="alert" style="padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-                        <span style="margin-right: 10px; font-size: 1.2em;">
-                            {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% endif %}
-                        </span>
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <div class="profile-cards-grid">
-
-            <section class="action-card profile-info-card">
-                <h3>Dados Pessoais</h3>
-                <p><strong>Nome:</strong> {{ user.nome }}</p>
-                <p><strong>Email:</strong> {{ user.email }}</p>
-                <p><strong>Tipo de Usuário:</strong> Motorista</p>
-                <a href="{% url 'usuarios:editar_perfil' %}" class="action-btn">Editar Dados</a>
-            </section>
-
-            <section class="action-card vehicle-info-card">
-                <h3>Informações do Veículo</h3>
-                <p><strong>Modelo:</strong> {{ user.profile_data.modelo_veiculo|default:"Não Cadastrado" }}</p>
-                <p><strong>Placa:</strong> {{ user.profile_data.placa|default:"N/A" }}</p>
-                <p><strong>CPF:</strong> {{ user.profile_data.cpf|default:"N/A" }}</p>
-                <p><strong>Status de Aprovação:</strong> <span class="status approved" style="color: var(--accent-green); font-weight: 700;">Aprovado</span></p>
-                <a href="{% url 'usuarios:atualizar_veiculo' %}" class="action-btn secondary-btn" style="background-color: var(--text-secondary); box-shadow: none;">Atualizar Veículo</a>
-            </section>
-
-            <section class="action-card plans-card">
-                <h3>Planos Disponíveis 💎</h3>
-                <div class="plan-item" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Plano Motorista Pro</span>
-                    <span class="plan-status active" style="color: var(--accent-green); font-weight: 600;">Ativo</span>
-                </div>
-                <div class="plan-item" style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Plano VIP Completo</span>
-                    <span class="plan-status upgrade" style="color: var(--primary-blue); font-weight: 600;">Fazer Upgrade</span>
-                </div>
-                <p style="margin-top:15px; color: var(--text-secondary);">Seu plano atual garante taxas reduzidas e suporte prioritário.</p>
-                <button class="action-btn secondary-btn" style="background-color: var(--text-secondary); box-shadow: none;">Gerenciar Assinatura</button>
-            </section>
-
-            <section class="action-card performance-card">
-                <h3>Desempenho 📊</h3>
-                <p><strong>Avaliação média:</strong> 4.9 ⭐</p>
-                <p><strong>Corridas concluídas:</strong> 420</p>
-                <p><strong>Avaliações 5 estrelas:</strong> 95%</p>
-                <a href="#" class="link-details" style="color: var(--primary-blue); font-weight: 600;">Ver Detalhes</a>
-            </section>
-
-            <section class="action-card documents-card">
-                <h3>Documentos</h3>
-                <p>CNH e CRLV devem estar válidos para realizar corridas.</p>
-                <p>Próxima verificação: 10/12/2025</p>
-                <button class="action-btn primary-btn">Ver Documentos</button>
-            </section>
-
-            <section class="action-card help-center-card">
-                <h3>Central de Ajuda ❓</h3>
-                <p>Precisa de suporte? Encontre respostas e envie feedback.</p>
-                <p>Atendimento 24h / 7 dias por semana.</p>
-                <a href="#" class="action-btn">Acessar Suporte</a>
-            </section>
-        </div>
-    </main>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-function toggleDarkMode() {
-    document.body.classList.toggle("dark-mode");
-    localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
-    // Usa a classe CSS correta do botão
-    const btn = document.querySelector('.mode-toggle-btn');
-    if (btn) {
-        btn.textContent = document.body.classList.contains("dark-mode") ? '☀️' : '🌙';
-    }
+:root {
+  --primary-blue: #2a5298;
+  --primary-darker-blue: #22437B;
+  --accent-green: #28C76F;
+  --red-danger: #E74C3C;
+  --red-danger-darker: #C0392B;
+  --text-color: #333333;
+  --text-secondary: #707070;
+  --background-light: #F8F8F8;
+  --white: #FFFFFF;
+  --border-radius-lg: 16px;
+  --border-radius-sm: 8px;
+  --shadow-soft: 0 4px 20px rgba(0,0,0,0.08);
+  --navbar-height: 64px;
 }
 
-window.onload = function() {
-    // Verifica modo escuro
-    if (localStorage.getItem("darkMode") === "true") {
-        document.body.classList.add("dark-mode");
+/* ======== BASE ======== */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--background-light);
+  margin: 0;
+  padding: 0;
+  color: var(--text-color);
+  line-height: 1.6;
+  transition: background-color 0.3s;
+}
+
+.dashboard-container {
+  display: block;
+  min-height: 100vh;
+}
+
+/* ======== NAVBAR ======== */
+.top-navbar {
+  background: var(--white);
+  border-bottom: none;
+  color: var(--text-color);
+  padding: 0 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--navbar-height);
+  box-sizing: border-box;
+  transition: top 0.3s ease-out;
+}
+
+.top-navbar.hidden {
+  top: calc(-1 * var(--navbar-height));
+}
+
+.logo-area {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary-blue);
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.menu {
+  display: flex;
+  gap: 20px;
+}
+
+.menu-item {
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 0.5rem 0;
+  transition: color 0.3s;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.menu-item:hover {
+  color: var(--primary-blue);
+}
+
+.menu-item.active {
+  color: var(--primary-blue);
+  font-weight: 600;
+  border-bottom: 3px solid var(--primary-blue);
+  padding-bottom: 21px;
+}
+
+.user-and-logout {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-info-navbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.user-avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-blue);
+}
+
+/* ======== MAIN ======== */
+.main-content {
+  padding: 3rem 2.5rem;
+  margin-top: var(--navbar-height);
+}
+
+/* ======== HEADER (Meu Perfil) ======== */
+.header-banner {
+  width: 100%;
+  height: 280px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  color: white;
+
+  /* Imagem de fundo com overlay escuro */
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+    url("{% static 'img/imgperfilp.png' %}");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.header-banner h1 {
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  z-index: 2;
+  position: relative;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.header-banner p {
+  font-size: 1.3rem;
+  color: #f0f0f0;
+  z-index: 2;
+  position: relative;
+  max-width: 700px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* ======== BOTÕES ======== */
+.mode-toggle-btn {
+  padding: 10px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--white);
+  color: var(--primary-blue);
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: background-color 0.3s;
+  border: none;
+  float: right;
+  margin-top: -1rem;
+  margin-right: 2.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.mode-toggle-btn:hover {
+  background-color: #f0f0f0;
+  transform: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.action-btn,
+.btn {
+  background-color: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  padding: 1rem 2rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+  text-transform: uppercase;
+  box-shadow: 0 4px 15px rgba(42,82,152,0.3);
+  text-decoration: none;
+}
+
+.action-btn:hover,
+.btn:hover {
+  background-color: var(--primary-darker-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(42,82,152,0.45);
+}
+
+/* ======== CARDS ======== */
+.profile-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.action-card {
+  background-color: var(--white);
+  padding: 30px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px;
+}
+
+.action-card h3 {
+  color: var(--primary-blue);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.action-card p {
+  margin-bottom: 10px;
+  color: var(--text-color);
+}
+
+/* ======== DARK MODE ======== */
+body.dark-mode {
+  background: #1a1a1a;
+  color: #e0e0e0;
+}
+
+body.dark-mode .top-navbar {
+  background: #2a2a2a;
+  box-shadow: 0 2px 10px rgba(255,255,255,0.05);
+}
+
+body.dark-mode .header-banner {
+  background-color: #222;
+}
+
+body.dark-mode .banner-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .action-card,
+body.dark-mode .modular-sections {
+  background: #2a2a2a;
+  box-shadow: var(--shadow-soft);
+}
+
+body.dark-mode .menu-item {
+  color: #b0b0b0;
+}
+
+body.dark-mode .menu-item:hover,
+body.dark-mode .menu-item.active {
+  color: var(--primary-blue);
+}
+
+body.dark-mode .action-card h3,
+body.dark-mode .action-card p {
+  color: #e0e0e0;
+}
+
+/* ======== RESPONSIVIDADE ======== */
+@media (max-width: 900px) {
+  .top-navbar {
+    flex-wrap: wrap;
+    padding: 0.8rem 1rem;
+    height: auto;
+  }
+
+  .menu {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    order: 2;
+    margin-top: 10px;
+  }
+
+  .user-and-logout {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    order: 3;
+    margin-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 10px;
+  }
+
+  .main-content {
+    margin-top: 120px;
+    padding-top: 1rem;
+  }
+
+  .profile-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-toggle-btn {
+    position: static;
+    float: none;
+    margin: 0 auto 10px auto;
+    order: 1;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+
+  .header-banner h1 {
+    font-size: 2rem;
+  }
+
+  .header-banner p {
+    font-size: 1.1rem;
+  }
+}
+ .logo-area {
+        display: flex;
+        align-items: center;
     }
 
-    // Atualiza ícone do botão com a classe correta
-    const btn = document.querySelector('.mode-toggle-btn');
-    if (btn) {
-        btn.textContent = document.body.classList.contains("dark-mode") ? '☀️' : '🌙';
+    .logo-area .logo-img {
+        height: 45px;   /* ajuste livre */
+        width: auto;
+        object-fit: contain;
     }
+    .logout-btn {
+    background-color: var(--red-danger) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
+}
 
-
-
-    const header = document.querySelector('.header-banner');
-    if (header) {
-        // Remove os estilos CSS inline desnecessários se o .header-banner já estiver formatado pelo CSS
-        // Apenas para garantir que a imagem do motorista seja usada, se for diferente da de passageiro:
-        header.style.backgroundImage = `
-            linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-            url('{% static 'img/perfilp.png' %}')
-        `; // Mantenho a imagem original do primeiro código
-    }
-};
-</script>
-{% endblock %}
+.logout-btn:hover {
+    background-color: var(--red-danger-darker) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(192, 57, 43, 0.45) !important;
+}
