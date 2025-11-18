@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .forms import RegistroForm, PerfilPassageiroForm, PerfilMotoristaForm 
+from .forms import RegistroForm, PerfilPassageiroForm, PerfilMotoristaForm, VeiculoForm
 from .models import Usuario, Profile 
 
 # -----------------------------
@@ -141,3 +141,30 @@ def editar_perfil(request):
     
     # Renderiza o template de edição
     return render(request, 'editar_perfil.html', context)
+@login_required
+def atualizar_veiculo_view(request):
+    """
+    View para o motorista atualizar as informações do seu veículo.
+    Garante que o Profile do usuário existe antes de tentar acessá-lo.
+    """
+    # 1. ACESSO SEGURO AO PROFILE: Usa get_or_create para garantir que o objeto Profile exista.
+    #    Se o profile já existir, ele o retorna. Se não, ele o cria.
+    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        # 2. Passa a instância do Profile existente/criado para o formulário
+        form = VeiculoForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '✅ Sucesso! As informações do seu veículo foram atualizadas.')
+            return redirect('usuarios:atualizar_veiculo') 
+        else:
+            messages.error(request, '❌ Erro! Por favor, corrija os erros no formulário.')
+    else:
+        form = VeiculoForm(instance=profile)
+
+    context = {
+        'veiculo_form': form,
+        'user': request.user,
+    }
+    return render(request, 'atualizar_veiculo.html', context)

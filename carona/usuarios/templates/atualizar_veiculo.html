@@ -2,25 +2,46 @@
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'editar.css' %}">
+<link rel="stylesheet" href="{% static 'veiculo.css' %}">
 
+<style>
+    .side-content .tip-section h2 {
+        margin-bottom: 5px; 
+    }
+
+    .side-content .tip-section ul {
+        margin-top: 5px; 
+        margin-bottom: 10px; 
+        padding-left: 20px; 
+    }
+
+    .side-content .tip-section ul li {
+        margin-bottom: 5px; 
+    }
+
+    /* Logo ajustada */
+    .logo-img {
+        height: 75px;
+        width: auto;
+        object-fit: contain;
+        display: block;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
 
     <nav class="top-navbar" id="mainNavbar">
-        
-        <!-- LOGO AQUI -->
         <div class="logo-area">
-            <img src="{% static 'img/logo.png' %}" alt="Carona Fácil" class="logo-img">
+            <img src="{% static 'img/logo.png' %}" alt="Logo Carona Fácil" class="logo-img">
         </div>
 
         <div class="menu">
             <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
-            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
+            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
             <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
-            <a href="#" class="menu-item">Central de Ajuda</a>
+            <a href="{% url 'usuarios:atualizar_veiculo' %}" class="menu-item active">Veículo</a> 
         </div>
 
         <div class="user-and-logout">
@@ -34,8 +55,7 @@
     
     <main class="main-content">
     
-        <div class="header-banner">
-        </div>
+        <div class="header-banner"></div>
 
         {% if messages %}
             <div class="message-container" style="max-width: 950px; margin: 0 auto 20px auto;">
@@ -44,7 +64,8 @@
                         <span>
                             {% if message.tags == 'success' %}✅ Sucesso!
                             {% elif message.tags == 'error' %}❌ Erro:
-                            {% else %}💡 Aviso:{% endif %}
+                            {% else %}💡 Aviso:
+                            {% endif %}
                         </span>
                         {{ message }}
                     </div>
@@ -57,13 +78,16 @@
                 
                 <div class="register-box form-card-container" style="padding: 40px 50px;"> 
                     
-                    <h1 style="font-size: 2rem; margin-bottom: 30px;">Dados da sua Conta</h1>
+                    <h1 style="font-size: 2rem; margin-bottom: 10px;">Atualizar Veículo 🚗</h1>
+                    <p class="subtitle" style="color: var(--text-secondary); margin-bottom: 30px;">
+                        Mantenha os dados do seu veículo sempre atualizados para a segurança e confiança dos passageiros.
+                    </p>
 
                     <form method="POST">
                         {% csrf_token %}
         
                         <div class="info-section">
-                            {% for field in usuario_form %}
+                            {% for field in veiculo_form %}
                                 <p class="form-field-p">
                                     {{ field.label_tag }}
                                     {{ field }}
@@ -75,8 +99,8 @@
                         </div>
 
                         <div class="form-actions" style="margin-top: 25px; display: flex; justify-content: space-between; gap: 10px;">
-                            <a href="{% url 'usuarios:meu_perfil' %}" class="btn-back" style="width: 48%;">Cancelar</a>
-                            <button type="submit" class="btn-help" style="width: 48%;">Salvar Alterações</button>
+                            <a href="{% url 'usuarios:meu_perfil' %}" class="btn-back" style="width: 48%;">Voltar ao Perfil</a>
+                            <button type="submit" class="btn-help" style="width: 48%;">Salvar Veículo</button>
                         </div>
                     </form>
                 </div>
@@ -84,22 +108,28 @@
                 <div class="side-content">
                     
                     <div class="side-top-group">
-                        <img src="{% static 'img/editar.png' %}" alt="Ilustração de Edição de Perfil" style="max-width: 110%;">
                         
                         <div class="tip-section" style="margin-top: 5px;"> 
-                            <h2>Informações Importantes:</h2>
+                            <h2>Diretrizes do Veículo:</h2>
                             <ul>
-                                <li>Altere seu e-mail se precisar de uma nova conta de acesso.</li>
-                                <li>Lembre-se de usar uma senha forte e única.</li>
-                                <li>A alteração do seu tipo de perfil (Motorista/Passageiro) é instantânea.</li>
-                                <li>Seus dados são criptografados e confidenciais.</li>
+                                <li>A placa deve ser a mesma registrada no seu documento CNH.</li>
+                                <li>O veículo deve ter no máximo 10 anos de uso.</li>
+                                <li>A quantidade de assentos define o limite de passageiros por viagem.</li>
+                                <li>A cor e o modelo auxiliam os passageiros na identificação.</li>
                             </ul>
+                        </div>
+
+                        <div class="tip-section" style="margin-top: 20px;"> 
+                            <h2>Segurança:</h2>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                                Veículos verificados aumentam a sua credibilidade e a confiança dos usuários na plataforma. Garanta que todas as informações estejam corretas e atualizadas.
+                            </p>
                         </div>
                     </div>
                     
                     <div class="side-actions">
-                        <a href="{% url 'usuarios:meu_perfil' %}" class="btn-back">Ver Meu Perfil</a>
-                        <a href="{% url 'usuarios:logout' %}" class="btn-help" style="background-color: var(--red-danger);">Sair da Conta</a>
+                        <a href="{% url 'corrida:cadastrar_corrida' %}" class="btn-help">Cadastrar Corrida</a> 
+                        <a href="{% url 'usuarios:meu_perfil' %}" class="btn-back">Voltar ao Perfil</a>
                     </div>
                 </div>
 

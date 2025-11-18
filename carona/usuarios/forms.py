@@ -36,17 +36,12 @@ class RegistroForm(forms.ModelForm):
         self.fields['nome'].label = 'Nome Completo'
         self.fields['email'].label = 'E-mail'
         self.fields['telefone'].label = 'Telefone'
-        self.fields['tipo_usuario'].choices = [
-            (key, label)
-            for key, label in Usuario.TIPO_CHOICES
-            if key != Usuario.ADMIN
-        ]
+        self.fields['tipo_usuario'].label = 'Tipo de Conta'
 
         # Aplica a classe Bootstrap a todos os campos
         for field_name, field in self.fields.items():
             field.widget.attrs.update({'class': 'form-control'})
-        
-        
+
     def clean_password2(self):
         password = self.cleaned_data.get("password")
         password2 = self.cleaned_data.get("password2")
@@ -184,3 +179,39 @@ class PerfilMotoristaForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['cpf', 'placa', 'modelo_veiculo']
+class VeiculoForm(forms.ModelForm):
+    placa = forms.CharField(
+        label='Placa do Veículo',
+        max_length=8,
+        required=True,  # Alterado para obrigatório na atualização
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: ABC-1234'})
+    )
+    modelo_veiculo = forms.CharField(
+        label='Modelo e Ano',
+        max_length=100,
+        required=True, # Alterado para obrigatório na atualização
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Fiat Palio 2018'})
+    )
+    cor = forms.CharField( # Adicionando cor, que é um campo comum para Veículo
+        label='Cor',
+        max_length=50,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Prata'})
+    )
+    assentos = forms.IntegerField( # Assumindo que você tem um campo 'assentos' no modelo Profile/Veiculo
+        label='Assentos Disponíveis (Excluindo o motorista)',
+        min_value=1,
+        max_value=6,
+        required=True,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = Profile
+        # Campos que o Motorista pode querer atualizar sobre o veículo
+        fields = ['placa', 'modelo_veiculo', 'cor', 'assentos'] 
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
