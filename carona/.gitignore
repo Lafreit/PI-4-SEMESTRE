@@ -1,9 +1,6 @@
 # Ambiente virtual
 venv/
 
-# Banco de dados SQLite (local)
-db.sqlite3
-
 # Arquivos de ambiente (chaves, configs locais)
 .env
 *.env
@@ -23,3 +20,7 @@ Thumbs.db
 # Configurações de IDE
 .vscode/
 .idea/
+
+# Arquivos gerados automaticamente
+/staticfiles/
+

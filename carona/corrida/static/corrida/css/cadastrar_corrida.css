@@ -126,3 +126,27 @@ textarea.form-control {
 .form-group {
     position: relative;
 }
+
+#map {
+    height: 400px;
+    margin-top: 30px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+}
+
+
+
+/* botão desabilitado */
+.action-btn[disabled],
+.action-btn.btn-disabled {
+  background: #c0c8d6;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* dropdown highlight */
+.autocomplete-option.selected,
+.autocomplete-option:hover {
+  background-color: #f0f4ff;
+}

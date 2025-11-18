@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Confirmar exclusão</h2>
+
+<p>Tem certeza de que deseja deletar a corrida <strong>{{ corrida.id }}</strong>?</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Sim, deletar</button>
+    <a href="{% url 'corrida:lista_corridas' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+
+{% endblock %}

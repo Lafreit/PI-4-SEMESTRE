@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="corrida-detalhe-page">
+  <h2>Detalhes da Corrida</h2>
+
+  <div class="corrida-info">
+    <p><strong>Motorista:</strong> {{ corrida.motorista.nome }}</p>
+    <p><strong>Origem:</strong> {{ corrida.origem }}{% if corrida.bairro_origem %}, {{ corrida.bairro_origem }}{% endif %}, {{ corrida.cidade_origem }} - {{ corrida.estado_origem }}</p>
+    <p><strong>Destino:</strong> {{ corrida.destino }}{% if corrida.bairro_destino %}, {{ corrida.bairro_destino }}{% endif %}, {{ corrida.cidade_destino }} - {{ corrida.estado_destino }}</p>
+    <p><strong>Data:</strong> {{ corrida.data|date:"d/m/Y" }}</p>
+    <p><strong>Horário de saída:</strong> {{ corrida.horario_saida|time:"H:i" }}</p>
+    <p><strong>Horário estimado de chegada:</strong> {{ corrida.horario_chegada|time:"H:i" }}</p>
+    <p><strong>Vagas disponíveis:</strong> {{ corrida.vagas_disponiveis }}</p>
+    <p><strong>Valor:</strong> R$ {{ corrida.valor }}</p>
+    {% if corrida.observacoes %}
+      <p><strong>Observações:</strong> {{ corrida.observacoes }}</p>
+    {% endif %}
+    <p><strong>Status:</strong> {{ corrida.get_status_display }}</p>
+  </div>
+
+  {% if user == corrida.motorista %}
+    <h3>Solicitações de Carona</h3>
+    <div class="solicitacoes-list">
+      {% for s in corrida.solicitacoes.all %}
+        <div class="solicitacao-item {% if s.status == 'PENDENTE' %}pendente{% elif s.status == 'ACEITA' %}aceita{% else %}outros{% endif %}"
+             data-status="{{ s.status }}">
+          <p><strong>Passageiro:</strong> {{ s.passageiro.nome }}</p>
+          <p><strong>Status:</strong> {{ s.get_status_display }}</p>
+
+          {% if s.status == 'PENDENTE' %}
+            <button class="btn-aceitar"
+                    data-corrida="{{ corrida.id }}"
+                    data-solicitacao="{{ s.id }}">
+              Aceitar Solicitação
+            </button>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p>Não há solicitações para esta corrida.</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+<!-- Variáveis JS necessárias para aceitar_solicitacao.js -->
+<script>
+  const CSRF_TOKEN = '{{ csrf_token }}';
+  const URL_ACEITAR = '{% url "corrida:api_aceitar_solicitacao" %}';
+  const URL_CONTAGEM = '{% url "notificacao:api_contagem" %}';
+</script>
+
+<link rel="stylesheet" href="{% static 'corrida/css/detalhe_corrida.css' %}">
+<script src="{% static 'corrida/js/aceitar_solicitacao.js' %}" defer></script>
+{% endblock %}

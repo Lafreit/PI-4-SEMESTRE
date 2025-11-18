@@ -2,7 +2,9 @@
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'corrida/css/cadastrar_corrida.css' %}">
+    <link rel="stylesheet" href="{% static 'corrida/css/cadastrar_corrida.css' %}">
+    <link rel="stylesheet" href="{% static 'corrida/css/autocomplete.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
 
 {% block content %}
@@ -14,27 +16,37 @@
             {% csrf_token %}
 
             {% if messages %}
-            <div>
-                {% for message in messages %}
-                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
-                {% endfor %}
-            </div>
+                <div>
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+                    {% endfor %}
+                </div>
             {% endif %}
 
             {% if form.non_field_errors %}
-            <div class="alert-danger">
-                {{ form.non_field_errors }}
-            </div>
+                <div class="alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
             {% endif %}
 
-            <!-- Inclui os campos via template parcial -->
             {% include "corrida/form_corrida_fields.html" %}
 
-            <button type="submit" class="action-btn">Cadastrar Corrida</button>
+            <button type="submit" class="action-btn" style= "border: none; padding: 10px 20px; border-radius: 15px;">Cadastrar Corrida</button>
+            
+                
+            <a href="{% url 'usuarios:pagina_inicial' %}">Cancelar</a>
+
         </form>
     </section>
+
+    <!-- Mapa interativo -->
+    <div id="map"></div>
 </div>
 
-<!-- JS para autocomplete -->
+<!-- autocomplete (DEVE vir antes do mapa e antes de qualquer script que use as funções) -->
 <script src="{% static 'corrida/js/autocomplete.js' %}"></script>
+
+<!-- Scripts do Leaflet e mapa -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'corrida/js/cadastrar_corrida_map.js' %}"></script>
 {% endblock %}

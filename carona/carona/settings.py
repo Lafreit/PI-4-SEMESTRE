@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-&twz63=3149t^-1)6(p^a47oev391yc(w&o_pysxx@dqmaymto
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'passageiros',
     'pagamentos',
     'corrida',
+    'notificacao', 
 ]
 
 MIDDLEWARE = [
@@ -123,11 +124,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, 'static'),
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # Default primary key field type
@@ -144,4 +147,6 @@ LOGOUT_REDIRECT_URL = 'usuarios:login'
 # Fazer a sessão expirar ao fechar o navegador
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+# Configuração da API do OpenRouteService
+ORS_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjlmZjcxZGFiMTFiYjQ5MGQ5MDczOWI2MjBjYTA0MzUzIiwiaCI6Im11cm11cjY0In0='
 

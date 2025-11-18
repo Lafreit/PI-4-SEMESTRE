@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="page-container">
+
+    <!-- Painel superior de busca -->
+    <div class="search-panel">
+        <h2>Encontre sua carona</h2>
+
+        <div class="inputs-row">
+            <input type="text" id="origemInput" placeholder="Origem (ex: Santo André)">
+            <input type="text" id="destinoInput" placeholder="Destino (ex: Nova Odessa)">
+        </div>
+
+        <div class="tolerancia-container">
+            <label for="toleranciaRange">Tolerância (metros):</label>
+            <input type="range" id="toleranciaRange" min="100" max="5000" step="100" value="600">
+            <span id="toleranciaValor">600</span> m
+        </div>
+
+        <button id="buscarBtn">Buscar corridas</button>
+        <a href="{% url 'usuarios:pagina_inicial' %}" class="btn voltar">Voltar</a>
+    </div>
+
+    <!-- Container do mapa -->
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+
+    <!-- Resultados das corridas -->
+    <div id="corridasContainer" class="corridas-container">
+        {% for corrida in corridas %}
+        <div class="corrida-item"
+             id="corrida-{{ corrida.id }}"
+             data-corrida-id="{{ corrida.id }}"
+             data-id="{{ corrida.id }}"
+             data-motorista-id="{{ corrida.motorista.id }}">
+
+          <div class="corrida-info">
+            <div class="corrida-origem-destino">
+              <strong>{{ corrida.origem }}</strong> → <strong>{{ corrida.destino }}</strong>
+            </div>
+            <div class="corrida-meta">
+              <span class="corrida-vagas">Vagas: <span class="vagas-count">{{ corrida.vagas_disponiveis }}</span></span>
+              {% if corrida.valor %}
+                <span class="corrida-valor">R$ {{ corrida.valor }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- CONTROLES -->
+          <div class="corrida-actions">
+            {% if user.is_authenticated and user.id != corrida.motorista.id %}
+
+              {% if corrida.minha_solicitacao %}
+                <!-- Já existe solicitação — mostrar Cancelar -->
+                <button
+                    type="button"
+                    class="btn btn-solicitar"
+                    data-corrida-id="{{ corrida.id }}"
+                    data-id="{{ corrida.id }}"
+                    style="display:none;">
+                    Solicitar vaga
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-cancelar"
+                    data-corrida-id="{{ corrida.id }}"
+                    data-id="{{ corrida.id }}"
+                    data-solicitacao-id="{{ corrida.minha_solicitacao.id }}"
+                    style="display:inline-block; background:#c0392b; color:#fff;">
+                    Cancelar solicitação
+                </button>
+
+              {% else %}
+                <!-- Ainda não existe — só solicitar -->
+                
+                <button
+                    type="button"
+                    class="btn btn-solicitar"
+                    data-corrida-id="{{ corrida.id }}"
+                    data-id="{{ corrida.id }}">
+                    Solicitar vaga
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-cancelar"
+                    data-corrida-id="{{ corrida.id }}"
+                    data-id="{{ corrida.id }}"
+                    data-solicitacao-id=""
+                    style="display:none; background:#c0392b; color:#fff;">
+                    Cancelar solicitação
+                </button>
+
+              {% endif %}
+            {% endif %}
+
+            <span class="solicitar-feedback" id="feedback-{{ corrida.id }}" aria-live="polite"></span>
+          </div>
+        </div>
+        {% empty %}
+          <p>Nenhuma corrida encontrada.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- ====== ESTILOS ====== -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="{% static 'corrida/css/resultados_busca.css' %}">
+<link rel="stylesheet" href="{% static 'corrida/css/solicitar_carona.css' %}">
+
+<!-- ====== SCRIPTS ====== -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'corrida/js/resultados_busca.js' %}" defer></script>
+<script src="{% static 'corrida/js/solicitar_carona.js' %}" defer></script>
+
+{% endblock %}

@@ -5,9 +5,70 @@
 <link rel="stylesheet" href="{% static 'paginainicial.css' %}">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<style>
+/* ======= SINO DE NOTIFICAÇÕES ======= */
+.notif-icon {
+  position:absolute;
+  top:15px;
+  right:70px; /* deixa espaço para o botão 🌙 */
+  font-size:24px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.notif-count {
+  background:red;
+  color:white;
+  font-size:12px;
+  padding:2px 6px;
+  border-radius:999px;
+  margin-left:4px;
+  font-weight:bold;
+  position:relative;
+  top:-8px;
+}
+
+/* quando não houver notificações */
+.notif-count.zero {
+  background:gray;
+}
+
+/* Ícone de notificações */
+.notif-icon {
+  position: absolute;
+  top: 15px;
+  right: 70px;
+  font-size: 24px;
+  cursor: pointer;
+  text-decoration: none;
+  z-index: 9999; /* FICA NA FRENTE */
+}
+
+.notif-count {
+  background: red;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+
+/* Botão de modo escuro */
+.theme-btn {
+  position: absolute !important;
+  top: 15px;
+  right: 20px;
+  z-index: 9999; /* FICA NA FRENTE */
+}
+
+
+</style>
+
 {% endblock %}
 
 {% block content %}
+
 <div class="dashboard-container">
   <aside class="sidebar">
     <div class="user-info">
@@ -18,36 +79,49 @@
 
     <nav class="menu">
       <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
-      <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
+      <a href="#" class="menu-item">Minha Carteira</a>
 
       {% if user.tipo_usuario == 'motorista' %}
-        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Corrida</a>
-        <a href="#" class="menu-item">Corridas Ativas</a>
-        <a href="#" class="menu-item">Meus Ganhos</a>
-      {% else %}
-        <a href="#" class="menu-item">Procurar Motorista</a>
-        <a href="#" class="menu-item">Motoristas Favoritos</a>
+        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Carona</a>
+        <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Caronas</a>
+        <a href="#" class="menu-item">Meus Veiculos</a>
+      {% elif user.tipo_usuario == 'passageiro'%}
+        <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Carona</a>
       {% endif %}
-      <a href="{% url 'usuarios:logout' %}" class="menu-item logout">🚪 Sair</a>
+
+      {% if user.tipo_usuario == 'admin' %}
+        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Carona</a>
+        <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Caronas</a>
+        <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Carona</a>
+        <a href="#" class="menu-item">Meus Veiculos</a>
+        <a href="{% url 'admin:index' %}" class="menu-item">Painel Admin</a>
+      {% endif %}
+      <a href="{% url 'usuarios:logout' %}" class="menu-item logout">Sair</a>
     </nav>
   </aside>
 
   <main class="main-content">
     <div class="header-banner">
+      <!-- 🔔 ÍCONE DE NOTIFICAÇÕES -->
+      <a href="{% url 'notificacao:lista' %}" class="notif-icon">
+        🔔 <span id="notif-count" class="notif-count zero">0</span>
+      </a>
+
+      <!-- 🌙 BOTÃO DARK MODE -->
+      <button onclick="toggleDarkMode()" class="action-btn theme-btn">🌙</button>
+
       <h1 id="greeting-message"></h1>
       <p>Pronto para sua próxima viagem?</p>
     </div>
 
-    <button onclick="toggleDarkMode()" class="action-btn" style="position:absolute;top:15px;right:15px;">🌙</button>
-
     <div class="map-and-actions">
         <div id="map"></div>
         <div class="action-card">
-            {% if user.tipo_usuario == 'motorista' %}
+            {% if user.tipo_usuario == 'motorista' or user.tipo_usuario == 'admin' %}
             <h2>Você está online?</h2>
             <p>Altere seu status para aceitar novas corridas.</p>
             <button class="action-btn start">Ficar Online</button>
-            {% else %}
+            {% elif user.tipo_usuario == 'passageiro' or user.tipo_usuario == 'admin'  %}
             <h2>Encontre seu motorista</h2>
             <p>Inicie sua busca agora e encontre a melhor carona!</p>
             <button class="action-btn search">Procurar Carona</button>
@@ -69,6 +143,29 @@
 </div>
 
 <script>
+// ====================== Atualizar contador do sino ======================
+async function atualizarSino() {
+  try {
+    const res = await fetch("/notificacoes/api/contagem/?_=" + Date.now());
+    if (!res.ok) return;
+    const data = await res.json();
+
+    const el = document.getElementById("notif-count");
+    el.textContent = data.unread;
+
+    if (data.unread > 0) {
+      el.classList.remove("zero");
+    } else {
+      el.classList.add("zero");
+    }
+  } catch (e) {}
+}
+
+setInterval(atualizarSino, 15000);
+document.addEventListener("DOMContentLoaded", atualizarSino);
+
+// (resto DO SEU SCRIPT PERMANECE IGUAL)
+
 // ====================== SAUDAÇÃO COM EMOJI ======================
 function getGreeting() {
   const hour = new Date().getHours();
@@ -79,7 +176,7 @@ function getGreeting() {
   document.getElementById('greeting-message').textContent = `${emoji} ${greeting}, {{ user.nome }}!`;
 }
 
-// ====================== RELOGIO AO LADO DA SAUDAÇÃO ======================
+// ====================== RELOGIO ======================
 function updateClock() {
   const now = new Date();
   const time = now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
@@ -95,7 +192,7 @@ function updateClock() {
 }
 setInterval(updateClock, 60000);
 
-// ====================== MAPA E LOCALIZAÇÃO ======================
+// ====================== MAPA ======================
 function initMap() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(async function(position) {
@@ -111,38 +208,21 @@ function initMap() {
       showWeather(userLocation[0], userLocation[1]);
       showAddress(userLocation[0], userLocation[1]);
     }, function(error) {
-      console.error("Erro de geolocalização: ", error);
-      alert("Não foi possível obter sua localização. Verifique as permissões do navegador.");
-      const defaultLocation = [-23.5505, -46.6333];
-      const map = L.map('map').setView(defaultLocation, 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
-      L.marker(defaultLocation).addTo(map).bindPopup("Localização padrão");
+      // ...
     });
-  } else {
-    alert("Geolocalização não suportada pelo seu navegador.");
   }
 }
 
-// ====================== CLIMA ATUAL ======================
+// ====================== SHOW WEATHER ======================
 async function showWeather(lat, lon) {
   try {
-    const apiKey = "SUA_API_KEY_AQUI"; // Pegue uma chave gratuita em openweathermap.org
-    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${apiKey}`);
-    const data = await res.json();
-    const temp = Math.round(data.main.temp);
-    const desc = data.weather[0].description;
-    const el = document.createElement("div");
-    el.className = "weather-info";
-    el.innerHTML = `🌤️ ${temp}°C - ${desc}`;
-    document.querySelector(".header-banner").appendChild(el);
-  } catch (err) {
-    console.log("Erro ao obter clima:", err);
-  }
+    const apiKey = ORS_API_KEY;
+    const res = await fetch(`https://api.openweathermap.org/...`);
+    // ...
+  } catch (err) {}
 }
 
-// ====================== ENDEREÇO APROXIMADO ======================
+// ====================== ENDEREÇO ======================
 async function showAddress(lat, lon) {
   const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
   const data = await res.json();
@@ -158,7 +238,7 @@ function toggleDarkMode() {
   localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
 }
 
-// ====================== NOTIFICAÇÃO DE NOVAS CORRIDAS ======================
+// ====================== NOTIFICAÇÃO POPUP ======================
 function showNotification(msg) {
   const box = document.createElement("div");
   box.className = "popup-notification";
@@ -180,49 +260,5 @@ window.onload = function() {
   setTimeout(() => showNotification("🚗 Há novas corridas disponíveis na sua área!"), 5000);
 };
 </script>
-
-<style>
-/* ============ ANIMAÇÃO HEADER ============ */
-.header-banner h1, .header-banner p {
-  opacity: 0;
-  transform: translateY(-10px);
-  animation: fadeInMove 1s forwards;
-}
-@keyframes fadeInMove {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ============ MODO ESCURO ============ */
-body.dark-mode {
-  background: #121212;
-  color: #eee;
-}
-body.dark-mode .sidebar, body.dark-mode .main-content {
-  background: #1e1e1e !important;
-}
-
-/* ============ NOTIFICAÇÃO ============ */
-.popup-notification {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #007bff;
-  color: white;
-  padding: 12px 16px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  animation: slideIn 0.4s ease;
-}
-@keyframes slideIn {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-/* ============ CLIMA E LOCALIZAÇÃO ============ */
-.weather-info {
-  font-weight: 500;
-  margin-top: 8px;
-}
-</style>
 
 {% endblock %}

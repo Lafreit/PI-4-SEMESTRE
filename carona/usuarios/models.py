@@ -38,11 +38,13 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     # Constantes para os TIPOS DE USUÁRIO
     MOTORISTA = 'motorista'
     PASSAGEIRO = 'passageiro'
+    ADMIN = 'admin'
     
     # Constante TIPO_CHOICES: Usada pelo formulário de edição (anteriormente o erro)
     TIPO_CHOICES = [
         (PASSAGEIRO, 'Passageiro'),
         (MOTORISTA, 'Motorista'),
+        (ADMIN, 'Administrador'),
     ]
 
     # CAMPOS DE AUTENTICAÇÃO
@@ -75,14 +77,13 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         
 # ----------------------------------------------------------------------
 # 3. MODELO DE PERFIL (Profile): Armazena dados extras específicos de Carona.
-#    O campo 'tipo' foi removido daqui para evitar redundância com o 'Usuario'.
 # ----------------------------------------------------------------------
 class Profile(models.Model):
     # Relação 1-para-1 com o modelo Usuario
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='profile_data' # Nome de acesso reverso
+        related_name='profile_data' 
     )
     
     # CAMPOS ESPECÍFICOS (Principalmente para Motoristas)
