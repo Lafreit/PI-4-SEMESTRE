@@ -1,0 +1,204 @@
+/* ================================
+   FONTE GLOBAL
+================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ================================
+   NAVBAR
+================================ */
+.navbar {
+    width: 100%;
+    height: 80px; /* aumentado */
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 36px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+/* --- LOGO --- */
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.nav-left img {
+    height: 100px; /* aumentado para ficar igual ao print */
+    display: block;
+}
+
+
+/* --- MENU CENTRAL --- */
+.nav-center {
+    display: flex;
+    gap: 0; /* Usamos separators, então o gap fica em pseudo */
+    align-items: center;
+}
+
+/* Links da nav */
+.nav-center a {
+    display: inline-block; /* 🔥 Necessário para o underline acompanhar o tamanho da palavra */
+    text-decoration: none;
+    color: #4b5563;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 0 20px;
+    padding-bottom: 7px;
+    position: relative;
+    transition: color 0.18s ease;
+    line-height: 1.2;
+}
+
+
+
+/* Separator: insere "|" antes de cada link exceto o primeiro */
+.nav-center a + a::before {
+    content: "  |";
+    color: #cbd5e1; /* tom cinza suave */
+    margin: 0 6px;
+    font-weight: 700;
+    opacity: 0.95;
+}
+
+/* Hover */
+.nav-center a:hover {
+    color: #1d4ed8;
+}
+
+/* Item ativo: cor + sublinhado mais largo */
+.nav-center a.active {
+    color: #1d4ed8;
+}
+
+/* Underline ativo (seletor ::after) - não conflita com o separator (::before) */
+.nav-center a.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px; /* ajustado para ficar exatamente abaixo do texto */
+    width: 100%;
+    height: 3px; /* mais visível */
+    background: #1d4ed8;
+    border-radius: 2px;
+    transform-origin: left center;
+    /* animação suave */
+    transition: transform 0.22s cubic-bezier(.2,.9,.3,1), opacity 0.18s;
+    transform: scaleX(1);
+    opacity: 1;
+}
+
+
+/* Se quiser animação ao entrar (opcional) */
+.nav-center a::after {
+    /* por padrão não aparece nos não-ativos — mantém espaço limpo */
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 100%;
+    height: 3px;
+    background: #1d4ed8;
+    border-radius: 3px;
+    transform-origin: left center;
+    transform: scaleX(0);
+    opacity: 0;
+    transition: transform 0.22s cubic-bezier(.2,.9,.3,1), opacity 0.18s;
+}
+.nav-center a:hover::after {
+    transform: scaleX(1);
+    opacity: 0.18; /* hover mostra linha sutil */
+}
+/* ativo força visibilidade */
+.nav-center a.active::after {
+    transform: scaleX(1);
+    opacity: 1;
+}
+
+/* --- ÁREA DIREITA (perfil + botão sair) --- */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.profile {
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.profile img {
+    width: 50px; /* aumentado */
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #1d4ed8;
+}
+
+.user-name {
+    font-size: 16px; /* aumentado */
+    color: #374151;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+/* Botão SAIR */
+.btn-logout {
+    display: inline-block;
+    background: #f43f5e;
+    padding: 9px 20px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.16s ease, transform 0.12s;
+}
+.btn-logout:hover {
+    background: #e11d48;
+    transform: translateY(-1px);
+}
+
+/* ================================
+   RESPONSIVIDADE
+================================ */
+@media (max-width: 980px) {
+    .nav-center a {
+        font-size: 15px;
+        padding: 0 10px;
+    }
+    .nav-left img { height: 52px; }
+    .profile img { width: 44px; height: 44px; }
+}
+
+@media (max-width: 700px) {
+    .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        height: auto;
+        padding: 10px 18px;
+        gap: 10px;
+    }
+    .nav-center {
+        order: 3;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+    /* esconder separadores em mobile para visual mais limpo */
+    .nav-center a + a::before {
+        display: none;
+    }
+    .nav-left {
+        justify-content: space-between;
+    }
+}

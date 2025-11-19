@@ -3,15 +3,87 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Caronas</title>
+    <title>{% block title %}Carona{% endblock %}</title>
+
     {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block extra_head %}{% endblock %}
 </head>
+
 <body>
 
-    {% block content %}{% endblock %}
-    
-    {% block scripts %}{% endblock %}
-    {% load static %}
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="nav-left">
+            <a href="{% url 'usuarios:pagina_inicial' %}" class="logo">
+                <img src="{% static 'img/logo.png' %}" alt="logo">
+            </a>
+        </div>
+
+        <!-- MENU CENTRAL -->
+        <nav class="nav-center">
+           <!-- Botões / Ações condicionais por tipo de usuário -->
+            <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
+           
+            {% if request.user.is_authenticated %}
+            
+                {% if request.user.tipo_usuario == 'motorista' %}
+                <a href="{% url 'corrida:cadastrar_corrida' %}" class="action-btn start">Cadastrar Corrida</a>
+                <a href="{% url 'corrida:lista_corridas' %}" class="action-btn">Minhas Caronas</a>
+
+                {% elif request.user.tipo_usuario == 'passageiro' %}
+                <a href="{% url 'corrida:buscar_corridas' %}" class="action-btn search">Buscar Corridas</a>
+                <a href="#" class="action-btn">Motoristas Favoritos</a>
+
+                {% else %}
+                <!-- usuário genérico / outros tipos: mostra tudo -->
+                <a href="{% url 'corrida:cadastrar_corrida' %}" class="action-btn start">Cadastrar Corrida</a>
+                <a href="#" class="action-btn">Corridas Ativas</a>
+                <a href="#" class="action-btn">Meus Ganhos</a>
+                <a href="{% url 'corrida:buscar_corridas' %}" class="action-btn search">Buscar Corridas</a>
+                <a href="#" class="action-btn">Motoristas Favoritos</a>
+                {% endif %}
+
+                {% if request.user.tipo_usuario == 'admin' %}
+                <a href="{% url 'admin:index' %}" class="action-btn admin">Painel Admin</a>
+                {% endif %}
+
+               <a href = "{% url 'notificacao:lista' %}" class="action-btn notifications">Notificações
+                   {% with request.user.notificacoes_nao_lidas.count as nao_lidas %}
+                       {% if nao_lidas > 0 %}
+                           <span class="notification-badge">{{ nao_lidas }}</span>
+                       {% endif %}
+                   {% endwith %}
+                </a>
+                <a href="#" class="action-btn">Carteira</a>
+            {% endif %}
+
+        </nav>
+
+        <!-- USER À DIREITA -->
+        <div class="nav-right">
+
+            {% if request.user.is_authenticated %}
+                <div class="user-info">
+                    {% if request.user.profile.foto %}
+                        <img src="{{ request.user.profile.foto.url }}" class="avatar" alt="foto">
+                    {% else %}
+                        <img src="{% static 'img/default-user.png' %}" class="avatar" alt="foto">
+                    {% endif %}
+                    <span class="user-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                </div>
+
+                <a href="{% url 'usuarios:logout' %}" class="btn-logout">SAIR</a>
+            {% endif %}
+        </div>
+
+    </header>
+
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
 </body>
 </html>
