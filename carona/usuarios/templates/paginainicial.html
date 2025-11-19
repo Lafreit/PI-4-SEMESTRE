@@ -24,8 +24,10 @@
 </div>
 
         <div class="menu">
-            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
+            <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil  |  </a>
             <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
+            <a href="{% url 'notificacao:lista' %}" class="menu-item">Notificações</a>
             
             <a href="#" class="menu-item" onclick="openTabFromNavbar(event, 'dicas-usuario')">Dicas de Usuário</a>
         </div>

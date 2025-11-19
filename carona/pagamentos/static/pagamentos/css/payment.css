@@ -1,0 +1,4 @@
+body { font-family: Arial, sans-serif; padding: 16px; }
+img { max-width: 300px; height: auto; display:block; margin-bottom: 12px; }
+textarea { width: 100%; }
+button { padding: 8px 12px; margin-top: 8px; cursor: pointer; }

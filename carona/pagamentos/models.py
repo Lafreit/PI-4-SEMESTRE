@@ -1,18 +1,31 @@
+# pagamentos/models.py
 from django.db import models
+from django.conf import settings
+from django.utils import timezone
+from corrida.models import Corrida
 
-class Pagamento(models.Model):
-    solicitacao_carona = models.OneToOneField('passageiros.SolicitacaoCarona', on_delete=models.CASCADE)
-    valor_total = models.DecimalField(max_digits=10, decimal_places=2)
-    taxa_app = models.DecimalField(max_digits=10, decimal_places=2)
-    valor_motorista = models.DecimalField(max_digits=10, decimal_places=2)
-    metodo_pagamento = models.CharField(max_length=50)
-    STATUS_CHOICE = [
-        ('penddente', 'Pendente'),
-        ('processado', 'Processado'),
-        ('falha', 'falha'),
+class Payment(models.Model):
+    STATUS_CHOICES = [
+        ("PENDING", "Pendente"),
+        ("CREATED", "Criado"),
+        ("PAID", "Pago"),
+        ("EXPIRED", "Expirado"),
+        ("FAILED", "Falhou"),
     ]
-    status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='penddente')
-    data_pagamento = models.DateTimeField(auto_now_add=True)
+
+    corrida = models.ForeignKey(Corrida, on_delete=models.CASCADE, related_name="payments")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    amount_cents = models.PositiveIntegerField()
+    abacate_id = models.CharField(max_length=128, null=True, blank=True)
+    brCode = models.TextField(null=True, blank=True)
+    brCodeBase64 = models.TextField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
+    payload = models.JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def amount_display(self):
+        return f"R$ {self.amount_cents/100:.2f}"
 
     def __str__(self):
-        return f'Pagamento {self.solicitacao_carona.id}'
+        return f"Payment {self.pk} - Corrida {self.corrida_id} - {self.status}"
