@@ -1,92 +1,65 @@
 /* ========================================================================= */
-/* VARIÁVEIS DE CORES E FONTES */
+/* VARIÁVEIS DE CORES E ESTILOS (DEFINIÇÃO FINAL) */
 /* ========================================================================= */
 :root {
-    /* Cores Primárias */
-    --primary-blue: #007bff; /* Principal cor de ação */
-    --primary-dark: #0056b3; /* Hover do botão */
-    --accent-green: #28a745; /* Cor para sucesso */
-    --accent-red: #dc3545;   /* Cor para erros/perigo */
-    --main-logo-color: #2a5298; /* Cor para logo/destaque da navbar */
-    --navbar-height: 64px; 
-
+    /* Cores Principais */
+    --primary-blue: #2a5298; /* Azul principal (Carona Fácil) */
+    --secondary-blue: #007bff; /* Azul de destaque/ação */
+    --hover-blue: #0056b3; 
+    
     /* Cores Neutras */
-    --background-light: #f8f9fa; /* Fundo geral da página */
-    --card-background: #ffffff; /* Fundo do card */
-    --text-color-primary: #343a40; /* Texto principal */
+    --background-light: #f4f6f9; /* Fundo suave da página */
+    --card-background: #ffffff; /* Fundo dos cards */
+    --text-color-primary: #343a40; 
     --text-color-secondary: #6c757d; /* Labels, textos de ajuda */
-    --border-color-light: #e9ecef; /* Bordas suaves */
-    --border-color-focus: #adb5bd; /* Borda de foco padrão */
+    --border-color-light: #e9ecef; 
+    --border-color-focus: #adb5bd;
 
-    /* Tipografia e Estilos */
-    --font-family-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    /* Acentos e Ações */
+    --accent-red: #dc3545; /* Vermelho para Cancelar/Sair/Perigo */
+    --accent-dark: #495057; /* Cinza Escuro para Excluir (Usado na lista) */
+    --accent-green: #28a745; /* Cor para sucesso/Cadastrar/Atualizar */
+
+    /* Dimensões e Tipografia */
+    --font-family-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     --border-radius-lg: 16px;
     --border-radius-md: 8px;
-    --card-padding: 30px; /* Variável para padding padrão */
+    --navbar-height: 70px; /* Altura padrão da navbar */
+    --card-padding: 30px;
+    --shadow-light: 0 4px 12px rgba(0,0,0,0.08); 
 }
 
 /* ========================================================================= */
-/* ESTRUTURA GERAL E LAYOUT DO DASHBOARD */
+/* 1. ESTRUTURA GERAL E BASE */
 /* ========================================================================= */
 body {
-    background-color: var(--background-light);
     font-family: var(--font-family-sans);
+    background-color: var(--background-light);
     color: var(--text-color-primary);
+    line-height: 1.6;
     min-height: 100vh;
 }
 
 .dashboard-container {
-    display: block;
     min-height: 100vh;
 }
 
-/* Main Content e Padding para desviar da Navbar fixa */
 .main-content {
-    padding: 3rem 2.5rem;
-    margin-top: calc(var(--navbar-height) + 1rem); 
-    min-height: calc(100vh - var(--navbar-height) - 4rem); 
-}
-
-/* CONTAINER PRINCIPAL (Configurações do contêiner central) */
-.corrida-container {
-    max-width: 1200px; 
-    margin: 40px auto;
-    padding: 0 20px;
+    margin-top: var(--navbar-height); 
+    padding: 30px 25px; 
+    min-height: calc(100vh - var(--navbar-height));
     box-sizing: border-box;
 }
 
-/* --- LAYOUT DE DUAS COLUNAS PRINCIPAL --- */
-.two-column-layout {
-    display: flex;
-    gap: 30px; /* Espaço entre as colunas */
-    align-items: flex-start; /* Alinha o conteúdo ao topo de cada coluna */
+.corrida-container {
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 0;
+    box-sizing: border-box;
 }
 
 /* ========================================================================= */
-/* COLUNA DA DIREITA (Contêiner Único para Mapa e Dicas) */
-/* ========================================================================= */
-.right-column-sidebar {
-    flex: 1; /* Ocupa a outra metade da largura */
-    /* Estilos de Card aplicados diretamente à coluna da direita */
-    background-color: var(--card-background);
-    border-radius: var(--border-radius-lg);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    border: 1px solid var(--border-color-light);
-    padding: var(--card-padding); /* Padding geral do Card */
-    /* Usamos flex-direction column para empilhar o conteúdo dentro do card */
-    display: flex;
-    flex-direction: column;
-}
-
-/* Contêiner interno para gerenciar o espaçamento entre o mapa e as dicas */
-.map-and-tips-container {
-    display: flex;
-    flex-direction: column;
-    gap: 30px; /* Espaçamento entre o mapa e a seção de dicas */
-}
-
-/* ========================================================================= */
-/* ESTILOS DA NAVBAR PADRÃO */
+/* 2. ESTILOS DA NAVBAR */
 /* ========================================================================= */
 .top-navbar {
     background: var(--card-background);
@@ -96,44 +69,50 @@ body {
     align-items: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     z-index: 1000;
-    position: fixed;
+    position: fixed; 
     top: 0;
     left: 0;
     right: 0;
     height: var(--navbar-height);
-    box-sizing: border-box;
 }
+
 .logo-area { 
-    font-size: 1.8rem; 
-    font-weight: 800; 
-    color: var(--main-logo-color); 
-    text-transform: uppercase; 
-    letter-spacing: -0.5px; 
+    font-size: 1.5rem; 
+    font-weight: 900; 
+    color: var(--primary-blue); 
+    letter-spacing: 0.5px; 
+    white-space: nowrap; 
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
+
+.logo-img {
+    height: 75px;
+    width: auto;
+}
+
 .menu { 
     display: flex; 
-    gap: 20px; 
+    gap: 30px; 
 }
 .menu-item { 
-    color: var(--text-color-secondary); 
+    color: var(--text-color-primary); 
     text-decoration: none; 
     padding: 0.5rem 0; 
     font-weight: 500; 
     transition: color 0.3s; 
 }
-.menu-item:hover { 
-    color: var(--main-logo-color); 
+.menu-item:hover, .menu-item.active { 
+    color: var(--primary-blue); 
+    border-bottom: 3px solid var(--primary-blue);
 }
-.menu-item.active { 
-    color: var(--main-logo-color); 
-    font-weight: 600; 
-    border-bottom: 3px solid var(--main-logo-color); 
-    padding-bottom: 21px; 
-}
+
 .user-and-logout { 
     display: flex; 
     align-items: center; 
     gap: 20px; 
+    white-space: nowrap;
 }
 .user-info-navbar { 
     display: flex; 
@@ -143,63 +122,117 @@ body {
     font-weight: 600; 
 }
 .user-avatar-small { 
-    width: 40px; 
-    height: 40px; 
+    width: 35px; 
+    height: 35px; 
     border-radius: 50%; 
-    border: 3px solid var(--main-logo-color); 
+    border: 2px solid var(--primary-blue); 
+    object-fit: cover;
 }
+
+
 .action-btn.logout-btn.btn-danger {
     background-color: var(--accent-red);
     color: #fff;
     padding: 8px 15px;
-    border-radius: 8px;
+    border-radius: var(--border-radius-md);
     font-weight: 600;
     text-decoration: none;
     transition: background-color 0.2s;
+    font-size: 0.85em; /* Tamanho da fonte exato da lista */
+    font-weight: 500;
 }
 .action-btn.logout-btn.btn-danger:hover {
     background-color: #a02834;
 }
 
 
+
+
 /* ========================================================================= */
-/* MAPA (Dentro do novo Card) */
+/* 3. LAYOUT DUAS COLUNAS (CADASTRO/EDIÇÃO) */
 /* ========================================================================= */
-#map {
-    width: 100%;
-    height: 400px; /* Altura ajustada */
-    margin: 0; 
-    border-radius: var(--border-radius-md);
-    border: 1px solid var(--border-color-light);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+.two-column-layout {
+    display: flex;
+    gap: 30px; 
+    align-items: flex-start;
 }
 
-
-/* ========================================================================= */
-/* CARD PRINCIPAL (Formulário - Coluna da Esquerda) */
-/* ========================================================================= */
+/* Coluna do Formulário */
 .corrida-card {
-    flex: 1.2; /* Dá um pouco mais de espaço para o formulário (ex: 60%) */
+    flex: 1.2; 
     min-width: 450px;
     background-color: var(--card-background);
     padding: var(--card-padding);
     border-radius: var(--border-radius-lg);
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     border: 1px solid var(--border-color-light);
-    margin-bottom: 0;
 }
-
-/* Título */
 .corrida-card h3 {
-    text-align: center;
+    text-align: left;
     margin-bottom: 30px; 
     font-weight: 700;
     font-size: 1.8rem;
     color: var(--primary-blue);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color-light);
+}
+
+/* Coluna da Sidebar/Mapa (Card Único) */
+.right-column-sidebar {
+    flex: 1; 
+    background-color: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-color-light);
+    padding: var(--card-padding); 
+    display: flex;
+    flex-direction: column;
+}
+
+.map-and-tips-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* MAPA */
+#map {
+    width: 100%;
+    height: 400px;
+    margin: 0; 
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color-light);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+/* DICAS */
+.tips-section {
+    width: 100%;
+    padding: 0; 
+    border: none;
+    box-shadow: none;
+    margin: 0;
+}
+.tips-section h4 {
+    color: var(--primary-blue);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-color-light);
+    padding-bottom: 10px;
+}
+.tips-list { list-style: none; padding: 0; }
+.tips-list li {
+    margin-bottom: 15px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-color-primary);
+    padding-left: 0;
+    position: relative;
 }
 
 /* ========================================================================= */
-/* FORMULÁRIO E INPUTS */
+/* 4. FORMULÁRIO E INPUTS */
 /* ========================================================================= */
 .form-row {
     display: flex;
@@ -223,22 +256,21 @@ body {
     font-size: 0.95rem;
 }
 
-/* Inputs, Selects e Textareas */
 .form-control {
     padding: 10px 15px;
     border-radius: var(--border-radius-md);
     border: 1px solid var(--border-color-light);
     font-size: 1rem;
     color: var(--text-color-primary);
-    background-color: var(--background-light); 
+    background-color: var(--background-light);
     transition: all 0.3s ease;
 }
 
 .form-control:focus {
     outline: none;
     border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); 
-    background-color: var(--card-background); 
+    box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.15);
+    background-color: var(--card-background);
 }
 
 textarea.form-control {
@@ -246,9 +278,7 @@ textarea.form-control {
     min-height: 100px;
 }
 
-/* ========================================================================= */
-/* BOTÃO DE AÇÃO */
-/* ========================================================================= */
+/* BOTÃO DE AÇÃO PRINCIPAL (Atualizar Corrida) */
 .action-btn {
     display: block; 
     width: 100%;
@@ -262,63 +292,17 @@ textarea.form-control {
     border-radius: var(--border-radius-md);
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s;
-    text-transform: uppercase;
+    text-transform: uppercase; 
     letter-spacing: 0.5px;
 }
 
 .action-btn:hover {
-    background-color: #1e7e34; 
+    background-color: #1e7e34;
     transform: translateY(-1px); 
     box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
 }
 
-/* ========================================================================= */
-/* SEÇÃO DE DICAS (Dentro do novo Card) */
-/* ========================================================================= */
-.tips-section {
-    width: 100%;
-    background: none;
-    padding: 0; 
-    border: none;
-    box-shadow: none;
-    margin: 0;
-}
-
-.tips-section h4 {
-    color: var(--main-logo-color);
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-    border-bottom: 2px solid var(--border-color-light);
-    padding-bottom: 10px;
-}
-
-.tips-list {
-    list-style: none; /* Remove marcadores padrão */
-    padding: 0;
-}
-
-.tips-list li {
-    margin-bottom: 15px;
-    padding-left: 0; /* Remove padding que havia sido usado para o emoji */
-    position: relative;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: var(--text-color-primary);
-}
-
-.tips-list li::before {
-    /* Removido o content: "💡" para tirar o emoji */
-    content: ""; 
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
-
-/* ========================================================================= */
 /* MENSAGENS E ALERTAS */
-/* ========================================================================= */
 .alert {
     padding: 12px 20px;
     margin-bottom: 20px;
@@ -326,117 +310,116 @@ textarea.form-control {
     font-weight: 500;
     border-left: 5px solid;
 }
+.alert-success { background-color: #d4edda; color: #155724; border-color: var(--accent-green); }
+.alert-error, .alert-danger { background-color: #f8d7da; color: #721c24; border-color: var(--accent-red); }
+.form-group .errorlist { color: var(--accent-red); font-size: 0.85rem; margin-top: 5px; padding-left: 0; list-style: none; }
 
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border-color: var(--accent-green);
-}
-
-.alert-error,
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border-color: var(--accent-red);
-}
 
 /* ========================================================================= */
-/* AUTOSSUGESTÃO (DROPDOWN) */
+/* 5. ESTILOS DE LISTA DE CORRIDAS (Base que você forneceu) */
 /* ========================================================================= */
-.autocomplete-dropdown {
-    position: absolute;
-    top: calc(100% - 8px); 
-    left: 0;
-    right: 0;
-    z-index: 10;
-    border: 1px solid var(--border-color-light);
-    border-top: none; 
-    border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
-    background-color: var(--card-background);
-    max-height: 200px;
-    overflow-y: auto;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+
+.corridas-container {
+    max-width: 1400px;
+    margin: 30px auto; 
+    padding: var(--card-padding);
+    background: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-light);
 }
 
-.autocomplete-option {
-    padding: 10px 15px;
+/* Tabela e Botões de Ação na Tabela (Manutenção dos estilos da lista) */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap; 
+}
+.btn-action {
+    padding: 6px 10px;
+    font-size: 0.85em;
+    font-weight: 500;
+    text-align: center;
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    border: none;
     cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.2s;
 }
 
-.autocomplete-option:hover {
-    background-color: #f0f0f0;
-    color: var(--primary-blue);
+/* 2. Cancelar (VERMELHO) - ESTE É O ESTILO USADO COMO BASE PARA O SAIR */
+.btn-action.cancelar { 
+    background-color: var(--accent-red); 
+    color: white; 
 }
+.btn-action.cancelar:hover { 
+    background-color: #a02834; 
+    box-shadow: 0 2px 5px rgba(220, 53, 69, 0.4); 
+}
+/* ... (outros estilos de lista omitidos por brevidade) ... */
+
 
 /* ========================================================================= */
-/* RESPONSIVIDADE */
+/* 6. RESPONSIVIDADE */
 /* ========================================================================= */
 
-/* Quebra o layout em uma única coluna para telas menores que 1000px */
 @media (max-width: 1000px) {
+    /* Navbar Responsiveness */
+    .top-navbar {
+        flex-direction: column; 
+        align-items: flex-start;
+        height: auto; 
+        padding: 15px 1rem;
+    }
+    .menu { 
+        justify-content: space-around; 
+        width: 100%; 
+        gap: 15px;
+        flex-wrap: wrap;
+        padding: 10px 0;
+        border-top: 1px solid var(--border-color-light);
+        border-bottom: 1px solid var(--border-color-light);
+    }
+    .user-and-logout { 
+        width: 100%; 
+        justify-content: space-between; 
+        margin-top: 10px; 
+    }
+    .main-content { 
+        margin-top: 180px;
+        padding: 1rem 0; 
+    }
+
+    /* Layout Duas Colunas -> Uma Coluna */
     .two-column-layout {
         flex-direction: column;
         gap: 20px;
     }
     .corrida-card, .right-column-sidebar {
         min-width: 100%;
-    }
-    .main-content {
-         padding: 1rem;
+        flex: none;
     }
 }
 
-/* Mobile e Telas Pequenas (Abaixo de 768px) */
 @media (max-width: 768px) {
-    /* Navbar Responsiveness */
-    .top-navbar { flex-wrap: wrap; padding: 0.8rem 1rem; height: auto; }
-    .logo-area { margin: 5px 0; }
-    .menu { justify-content: center; width: 100%; order: 2; margin-top: 10px; }
-    .user-and-logout { width: 100%; justify-content: center; order: 3; margin-top: 10px; padding-top: 10px; }
-    .main-content { margin-top: 120px; padding: 1rem; }
-    
-    /* Corrida Responsiveness */
-    .corrida-container {
-        margin: 20px 10px;
-        padding: 10px;
+    .main-content { 
+        margin-top: 210px;
+        padding: 1rem;
     }
+    .logo-area { width: 100%; text-align: center; margin-bottom: 10px; }
+    .user-and-logout { justify-content: center; }
+
+    /* Corrida Responsiveness */
     .corrida-card, .right-column-sidebar {
         padding: 20px;
     }
-    .corrida-card h3 {
-        font-size: 1.5rem;
-        margin-bottom: 25px;
-    }
     .form-row {
         gap: 0;
-        margin-bottom: 0;
         flex-direction: column;
     }
     .form-group {
         flex: 1 1 100%;
         margin-bottom: 15px;
     }
-    #map {
-        height: 300px; 
-    }
-    .map-and-tips-container {
-        gap: 20px;
-    }
+    #map { height: 300px; }
+    .map-and-tips-container { gap: 20px; }
 }
-.logo-area {
-    display: flex;
-    align-items: center;
-}
-
-.logo-area .logo-img {
-    height: 75px; 
-    width: auto;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-
-
-
