@@ -1,164 +1,405 @@
-/* --- Container e alertas existentes --- */
-.corridas-container {
-    max-width: 1000px;
-    margin: 40px auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+/* ========================================================================= */
+/* VARIÁVEIS DE CORES E ESTILOS (DEFINIÇÃO) */
+/* ========================================================================= */
+:root {
+    --primary-blue: #2a5298; /* Azul principal (Carona Fácil) */
+    --secondary-blue: #007bff; /* Azul de destaque/ação */
+    --hover-blue: #0056b3; 
+    --background-light: #f4f6f9; /* Fundo suave da página */
+    --card-background: #ffffff; /* Fundo dos cards */
+    --text-color-primary: #343a40; 
+    --border-color-light: #e9ecef; 
+    --shadow-light: 0 4px 12px rgba(0,0,0,0.08); 
+    --font-family-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --border-radius-lg: 16px;
+    --border-radius-md: 8px;
+    --navbar-height: 70px; /* Altura padrão da navbar */
+    --accent-red: #dc3545; /* Vermelho para Cancelar */
+    --accent-dark: #495057; /* Cinza Escuro para Excluir */
+    --card-padding: 25px;
 }
 
-.corridas-container h2 {
-    text-align: center;
-    margin-bottom: 25px;
-    color: #333;
+/* ========================================================================= */
+/* 1. ESTRUTURA GERAL E BASE */
+/* ========================================================================= */
+body {
+    font-family: var(--font-family-sans);
+    background-color: var(--background-light);
+    color: var(--text-color-primary);
+    line-height: 1.6;
+    min-height: 100vh;
 }
 
-.alert {
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 10px;
+/* Container da página (wrapper) */
+.main-page-wrapper {
+    min-height: 100vh;
 }
 
-.alert.success {
-    background: #d4edda;
-    color: #155724;
+/* Main Content: Adiciona margem para desviar da navbar fixa */
+.main-content {
+    margin-top: var(--navbar-height); 
+    padding: 30px 0;
+    min-height: calc(100vh - var(--navbar-height));
 }
 
-.alert.error {
-    background: #f8d7da;
-    color: #721c24;
+.container-centralizado {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 25px;
 }
 
-/* --- Botões existentes --- */
-.btn {
+/* ========================================================================= */
+/* 2. ESTILOS DA NAVBAR (REFINADA) */
+/* ========================================================================= */
+.top-navbar {
+    background: var(--card-background);
+    padding: 0 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    z-index: 1000;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--navbar-height);
+}
+
+.logo-area { 
+    font-size: 1.5rem; 
+    font-weight: 900; 
+    color: var(--primary-blue); 
+    letter-spacing: 0.5px; 
+    white-space: nowrap; 
+    line-height: 1;
+}
+
+.logo-img {
+    height: 75px;
+    width: auto;
+}
+
+.menu { 
+    display: flex; 
+    gap: 30px; 
+}
+.menu-item { 
+    color: var(--text-color-primary); 
+    text-decoration: none; 
+    padding: 0.5rem 0; 
+    font-weight: 500; 
+    transition: color 0.3s; 
+}
+.menu-item:hover, .menu-item.active { 
+    color: var(--primary-blue); 
+    border-bottom: 3px solid var(--primary-blue);
+}
+
+.user-and-logout { 
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+    white-space: nowrap;
+}
+.user-info-navbar { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    color: var(--text-color-primary); 
+    font-weight: 600; 
+}
+.user-avatar-small { 
+    width: 35px; 
+    height: 35px; 
+    border-radius: 50%; 
+    border: 2px solid var(--primary-blue); 
+    object-fit: cover;
+
+}
+.action-btn.logout-btn.btn-danger {
+    background-color: var(--accent-red);
+    color: #fff;
+    
+    padding: 8px 15px;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
     text-decoration: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    transition: 0.3s;
+    transition: background-color 0.2s;
+}
+.action-btn.logout-btn.btn-danger:hover {
+    background-color: #a02834;
+}
+
+/* ========================================================================= */
+/* 3. ESTILOS ESPECÍFICOS DA LISTA DE CORRIDAS (Tabela) */
+/* ========================================================================= */
+
+.corridas-container {
+    max-width: 1400px;
+    margin: 30px auto; 
+    padding: var(--card-padding);
+    background: var(--card-background);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-light);
+}
+
+.main-content > .corridas-container {
+    margin-top: 0;
+}
+
+h2 {
+    color: var(--primary-blue);
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-color-light);
+}
+
+/* Alerts */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: var(--border-radius-md);
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+.alert.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+.alert.error, .alert.danger { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+
+/* Botão Cadastrar Nova Corrida */
+.actions-header {
+    display: flex;
+    justify-content: flex-end; 
+    margin-bottom: 20px;
+}
+.btn-cadastrar {
+    background: var(--primary-blue);
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+    box-shadow: 0 3px 6px rgba(42, 82, 152, 0.3);
+}
+.btn-cadastrar:hover {
+    background: var(--hover-blue);
+}
+
+/* Tabela */
+.table-responsive { overflow-x: auto; }
+.corridas-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px; 
+}
+.corridas-table thead th {
+    background-color: var(--background-light);
+    color: var(--text-color-primary);
+    font-weight: 600;
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 2px solid var(--border-color-light);
+    font-size: 0.9em;
+}
+.corridas-table tbody tr {
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color-light);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.corridas-table tbody tr:hover:not(.cancelada) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+.corridas-table tbody td {
+    padding: 15px;
+    color: var(--text-color-primary);
+    font-size: 0.95em;
+    vertical-align: middle;
+}
+.corridas-table tbody tr.cancelada {
+    background-color: #fff0f0; 
+    color: #999;
+    opacity: 0.8;
+}
+.corridas-table tbody tr.cancelada td {
+    text-decoration: line-through;
+    color: #999;
+}
+
+/* Status Badges */
+.status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8em;
+    white-space: nowrap;
+    display: inline-block;
+}
+.status-ativa { background-color: #d1e7dd; color: #0f5132; }
+.status-cancelada { background-color: #f8d7da; color: #721c24; }
+.status-concluida { background-color: #cff4fc; color: #055160; }
+
+/* Botões de Ação na Tabela */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap; 
+}
+.btn-action {
+    padding: 6px 10px;
+    font-size: 0.85em;
+    font-weight: 500;
     text-align: center;
+    border-radius: var(--border-radius-md);
+    text-decoration: none;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    border: none;
     cursor: pointer;
 }
 
-.btn.editar {
-    background: #2196f3;
-    color: white;
+/* 1. Editar (Amarelo) */
+.btn-action.editar { 
+    background-color: #ffc107; 
+    color: var(--text-color-primary); 
+}
+.btn-action.editar:hover { 
+    background-color: #e0a800; 
+    box-shadow: 0 2px 5px rgba(255, 193, 7, 0.4); 
 }
 
-.btn.editar:hover {
-    background: #0d8bf2;
+/* 2. Cancelar (VERMELHO) */
+.btn-action.cancelar { 
+    background-color: var(--accent-red); 
+    color: white; 
+}
+.btn-action.cancelar:hover { 
+    background-color: #a02834; 
+    box-shadow: 0 2px 5px rgba(220, 53, 69, 0.4); 
 }
 
-.btn.cancelar {
-    background: #e53935;
-    color: white;
+/* 3. Excluir (CINZA ESCURO/CHUMBO) */
+.btn-action.btn-danger { 
+    background-color: var(--accent-dark); /* #495057 */
+    color: white; 
+}
+.btn-action.btn-danger:hover { 
+    background-color: #343a40; 
+    box-shadow: 0 2px 5px rgba(73, 80, 87, 0.4); 
 }
 
-.btn.cancelar:hover {
-    background: #c62828;
+/* 4. Reativar (Verde) */
+.btn-action.reativar { 
+    background-color: #28a745; 
+    color: white; 
+}
+.btn-action.reativar:hover { 
+    background-color: #1e7e34; 
 }
 
-.btn.reativar {
-    background: #43a047;
-    color: white;
-}
+.inline-form { display: inline-block; }
 
-.btn.reativar:hover {
-    background: #2e7d32;
-}
 
-/* --- Tabela nova --- */
-.table-responsive {
-    overflow-x: auto;
-    margin-top: 20px;
-}
+/* ========================================================================= */
+/* 4. RESPONSIVIDADE */
+/* ========================================================================= */
 
-.corridas-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
+@media (max-width: 1000px) {
+    /* Navbar Responsiveness */
+    .top-navbar {
+        flex-direction: column; 
+        align-items: flex-start;
+        height: auto; 
+        padding: 15px 1rem;
+    }
+    .logo-area { width: 100%; text-align: center; margin-bottom: 10px; }
+    .menu { 
+        justify-content: space-around; 
+        width: 100%; 
+        gap: 15px;
+        flex-wrap: wrap;
+        padding: 10px 0;
+        border-top: 1px solid var(--border-color-light);
+        border-bottom: 1px solid var(--border-color-light);
+    }
+    .user-and-logout { 
+        width: 100%; 
+        justify-content: space-between; 
+        margin-top: 10px; 
+    }
+    .main-content { 
+        margin-top: 180px; 
+        padding: 1rem 0; 
+    }
 
-.corridas-table th,
-.corridas-table td {
-    padding: 12px 10px;
-    text-align: left;
-    border-bottom: 1px solid rgba(20,20,20,0.08);
-    font-size: 0.95rem;
-    color: #22303a;
-}
+    /* Tabela Responsiva (Transforma em blocos) */
+    .corridas-container { margin: 15px auto; padding: 15px; }
+    .actions-header { justify-content: center; }
+    .btn-cadastrar { width: 100%; text-align: center; max-width: 350px; }
 
-.corridas-table thead th {
-    background: #f9fff9; /* manter coerente com card ativo */
-    font-weight: 700;
-}
+    .corridas-table, 
+    .corridas-table tbody, 
+    .corridas-table tr, 
+    .corridas-table td { display: block; }
+    .corridas-table thead { display: none; }
 
-.corridas-table tbody tr:hover {
-    background: #f1f7ff;
-}
+    .corridas-table tr {
+        margin-bottom: 20px;
+        padding: 15px;
+        border-bottom: 3px solid var(--primary-blue);
+        box-shadow: var(--shadow-light);
+    }
+    
+    .corridas-table td {
+        text-align: right;
+        padding: 8px 0;
+        border-bottom: 1px solid #f8f9fa;
+        position: relative;
+    }
 
-/* Linha cancelada na tabela */
-.corridas-table tbody tr.cancelada {
-    background-color: #f8d7da;
-    color: #721c24;
-    opacity: 0.9;
-}
+    .corridas-table td:before {
+        content: attr(data-label);
+        float: left;
+        font-weight: 600;
+        color: var(--primary-blue);
+        margin-right: 10px;
+    }
 
-/* Status dentro da tabela */
-.corridas-table td .badge {
-    padding: 4px 8px;
-    border-radius: 8px;
-    font-weight: bold;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-}
+    /* Mapeamento dos Rótulos (Baseado no HTML) */
+    .corridas-table tbody td:nth-of-type(1):before { content: "Origem:"; }
+    .corridas-table tbody td:nth-of-type(2):before { content: "Destino:"; }
+    .corridas-table tbody td:nth-of-type(3):before { content: "Data:"; }
+    .corridas-table tbody td:nth-of-type(4):before { content: "Saída:"; }
+    .corridas-table tbody td:nth-of-type(5):before { content: "Chegada:"; }
+    .corridas-table tbody td:nth-of-type(6):before { content: "Vagas:"; }
+    .corridas-table tbody td:nth-of-type(7):before { content: "Valor:"; }
+    .corridas-table tbody td:nth-of-type(8):before { content: "Status:"; }
+    .corridas-table tbody td:nth-of-type(9):before { content: "Motorista:"; }
+    
+    .corridas-table tbody td:nth-of-type(10) { 
+        text-align: left;
+        border-bottom: none;
+        padding-top: 15px;
+        border-top: 1px solid var(--border-color-light);
+    }
+    .corridas-table tbody td:nth-of-type(10):before { content: "Ações:"; float: none; }
 
-.corridas-table td .badge.ativa {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.corridas-table td .badge.cancelada {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-/* Botões dentro da tabela */
-.corridas-table td .btn {
-    margin-right: 4px;
-}
-
-/* Responsividade */
-@media (max-width: 720px) {
-    .corridas-table th, .corridas-table td {
-        padding: 8px 6px;
-        font-size: 0.9rem;
+    .action-buttons {
+        justify-content: space-around;
+    }
+    .btn-action {
+        flex-grow: 1;
     }
 }
 
-
-.voltar-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-}
-
-.btn-voltar {
-    background-color: #4a90e2;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 600;
-    transition: 0.2s ease;
-}
-
-.btn-voltar:hover {
-    background-color: #357ABD;
+@media (max-width: 768px) {
+    .main-content {
+        margin-top: 210px; /* Ajuste para navbar em telas bem pequenas */
+    }
 }
