@@ -1,57 +1,125 @@
-{% extends "base.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carona | Lista notificações</title>
+    <link rel="stylesheet" href="{% static 'veiculo.css' %}">
+    <link rel="stylesheet" href="{% static 'static/css/notificacoes.css' %}">
+    </head>
+<body>
+    <div class="dashboard-container">
 
-{% block content %}
-<div class="notif-page">
+        <nav class="top-navbar" id="mainNavbar">
+            <div class="logo-area">
+                <img src="{% static 'img/logo.png' %}" alt="Logo Carona Fácil" class="logo-img">
+            </div>
 
-  <!-- Cabeçalho -->
-  <div class="notif-header">
-    <h2>Notificações</h2>
-    <div id="notif-badge" class="notif-badge">Carregando...</div>
-  </div>
+            <div class="menu">
+                <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+                <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
+                <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
+                <a href="{% url 'notificacao:lista' %}" class="menu-item active">Notificações</a> 
+            </div>
 
-  <!-- Lista de notificações -->
-  <div id="notif-list" class="notif-list">
-    {% for n in notificacoes %}
-      <div class="notif-item {% if not n.lida %}nao-lida{% endif %}" data-id="{{ n.id }}">
-        <div class="notif-main">
-          <div class="notif-title">{{ n.titulo }}</div>
-          <div class="notif-msg">{{ n.mensagem }}</div>
-        </div>
-        <div class="notif-meta">
-          <div class="notif-time">{{ n.criada_em|date:"d/m/Y H:i" }}</div>
+            <div class="user-and-logout">
+                
+                <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema claro/escuro">
+                    <span class="icon-light">☀️</span>
+                    <span class="icon-dark">🌙</span>
+                </button>
+                
+                <div class="user-info-navbar">
+                    <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
+                    <span>{% if user.is_authenticated %}{{ user.nome }}{% endif %}</span>
+                </div>
+                <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
+            </div>
+        </nav>
+        
+        <main class="main-content">
+            <div class="notif-page">
 
-          {% if not n.lida %}
-            <button class="btn-marcar-lida" data-id="{{ n.id }}">Marcar como lida</button>
-          {% endif %}
+                <div class="notif-header">
+                    <h2>Notificações</h2>
+                </div>
 
-          {% if n.tipo == n.TIPO_SOLICITACAO_RECEBIDA and n.dados.corrida_id %}
-            <a href="{% url 'corrida:detalhe' n.dados.corrida_id %}" class="btn-detalhe">Ver corrida</a>
+                <div id="notif-list" class="notif-list">
+                    {% for n in notificacoes %}
+                        <div class="notif-item tipo-{{ n.tipo }} {% if not n.lida %}nao-lida{% endif %}" data-id="{{ n.id }}">
+                            <div class="notif-main">
+                                <div class="notif-title">{{ n.titulo }}</div>
+                                <div class="notif-msg">{{ n.mensagem }}</div>
+                            </div>
+                            
+                            <div class="notif-meta">
+                                <div class="notif-time">{{ n.criada_em|date:"d/m/Y H:i" }}</div>
 
-            <!-- Botão aceitar solicitação -->
-            {% if n.dados.solicitacao_id %}
-              <button class="btn-aceitar" data-corrida="{{ n.dados.corrida_id }}" data-solicitacao="{{ n.dados.solicitacao_id }}">
-                Aceitar solicitação
-              </button>
-            {% endif %}
-          {% endif %}
-        </div>
-      </div>
-    {% empty %}
-      <p>Você não possui notificações.</p>
-    {% endfor %}
-  </div>
+                                {% if not n.lida %}
+                                    <button class="btn-acao btn-marcar-lida" data-id="{{ n.id }}">Marcar como lida</button>
+                                {% endif %}
 
-</div>
+                                {% if n.tipo == n.TIPO_SOLICITACAO_RECEBIDA and n.dados.corrida_id %}
+                                    <a href="{% url 'corrida:detalhe' n.dados.corrida_id %}" class="btn-acao btn-detalhe">Ver corrida</a>
 
-<!-- URLs e CSRF -->
-<script>
-  const URL_MARCAR_LIDA = "{% url 'notificacao:api_marcar_lida' %}";
-  const URL_CONTAGEM = "{% url 'notificacao:api_contagem' %}";
-  const URL_ACEITAR = "{% url 'corrida:api_aceitar_solicitacao' %}";
-  const CSRF_TOKEN = "{{ csrf_token }}";
-</script>
+                                    {% if n.dados.solicitacao_id %}
+                                        <button class="btn-acao btn-aceitar" 
+                                                    data-corrida="{{ n.dados.corrida_id }}" 
+                                                    data-solicitacao="{{ n.dados.solicitacao_id }}">
+                                                Aceitar solicitação
+                                            </button>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="nenhuma-notif">Você não possui notificações.</p>
+                    {% endfor %}
+                </div>
 
-<link rel="stylesheet" href="{% static 'notificacao/css/notificacoes.css' %}">
-<script src="{% static 'notificacao/js/notificacoes.js' %}" defer></script>
-{% endblock %}
+            </div>
+            
+        </main>
+        
+    </div>
+
+    <script>
+        // URLs e CSRF para o JavaScript
+        const URL_MARCAR_LIDA = "{% url 'notificacao:api_marcar_lida' %}";
+        const URL_CONTAGEM = "{% url 'notificacao:api_contagem' %}";
+        const URL_ACEITAR = "{% url 'corrida:api_aceitar_solicitacao' %}";
+        const CSRF_TOKEN = "{{ csrf_token }}";
+
+        // ===================================
+        // LÓGICA DE ALTERNÂNCIA DE TEMA (NOVO)
+        // ===================================
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // 1. Aplicar tema salvo (se houver)
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+
+        // 2. Atualizar ícone baseado no tema atual
+        function updateToggleIcon(theme) {
+            const isDark = theme === 'dark';
+            document.querySelector('.icon-light').style.display = isDark ? 'none' : 'block';
+            document.querySelector('.icon-dark').style.display = isDark ? 'block' : 'none';
+        }
+        updateToggleIcon(savedTheme);
+
+
+        // 3. Listener para o clique
+        themeToggle.addEventListener('click', () => {
+            let currentTheme = html.getAttribute('data-theme');
+            let newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleIcon(newTheme);
+        });
+        
+    </script>
+    <script src="{% static 'notificacao/js/notificacoes.js' %}" defer></script>
+</body>
+</html>
