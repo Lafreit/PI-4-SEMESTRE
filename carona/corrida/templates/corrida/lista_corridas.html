@@ -1,88 +1,114 @@
-{% extends "base.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Carona | Lista Corridas</title>
+    
+    <link rel="stylesheet" href="{% static 'corrida/css/lista_corridas.css' %}">
+</head>
+<body>
 
-{% block extra_head %}
+<div class="main-page-wrapper">
 
-<link rel="stylesheet" href="{% static 'corrida/css/lista_corridas.css' %}"> {% endblock %}
+    <nav class="top-navbar" id="mainNavbar">
+        <div class="logo-area">
+            <img src="{% static 'img/logo.png' %}" alt="Logo Carona Fácil" class="logo-img">
+        </div>
+        <div class="menu">
+            <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
+            <a href="{% url 'corrida:lista_corridas' %}" class="menu-item active">Minhas Viagens</a>
+            <a href="#" class="menu-item">Central de Ajuda</a>
+        </div>
 
-{% block content %}
+        <div class="user-and-logout">
+            <div class="user-info-navbar">
+                <img src="{% static 'img/imgusu.png' %}" alt="Avatar" class="user-avatar-small">
+                <span>{{ user.nome|default:"Usuário" }}</span>
+            </div>
+            <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
+        </div>
+    </nav>
+    <main class="main-content">
+        <div class="corridas-container">
+            <h2>Minhas Corridas Cadastradas 🚗</h2>
 
-<div class="corridas-container"> <h2>Minhas Corridas 🚗</h2>
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-{% endif %}
-
-{% if corridas %}
-    <div class="table-responsive">
-        <table class="corridas-table">
-            <thead>
-                <tr>
-                    <th>Origem</th>
-                    <th>Destino</th>
-                    <th>Data</th>
-                    <th>Saída</th>
-                    <th>Chegada</th>
-                    <th>Vagas</th>
-                    <th>Valor</th>
-                    <th>Status</th>
-                    <th>Motorista</th>
-                    <th>Ações</th>
-                    
-                </tr>
-            </thead>
-            <tbody>
-                {% for corrida in corridas %}
-                    <tr id="corrida-row-{{ corrida.id }}" class="{% if corrida.status == 'cancelada' %}cancelada{% endif %}">
-                        <td>{{ corrida.origem }}</td>
-                        <td>{{ corrida.destino }}</td>
-                        <td>{{ corrida.data|date:"d/m/Y" }}</td>
-                        <td>{{ corrida.horario_saida }}</td>
-                        <td>{{ corrida.horario_chegada }}</td>
-                        <td>{{ corrida.vagas_disponiveis }}</td>
-                        <td>R$ {{ corrida.valor }}</td>
-                        <td>{{ corrida.get_status_display }}</td>
-                        <td>{{ corrida.motorista.nome }}</td>
-                        <td>
-                            <a href="{% url 'corrida:editar_corrida' corrida.id %}" class="btn editar">Editar</a>
-
-                            <form action="{% url 'corrida:cancelar_corrida' corrida.id %}" method="post" class="inline-form" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn {% if corrida.status == 'cancelada' %}reativar{% else %}cancelar{% endif %}">
-                                    {% if corrida.status == 'cancelada' %}Reativar{% else %}Cancelar{% endif %}
-                                </button>
-                            </form>
-
-                            {% if user.is_authenticated and corrida.motorista == user %}
-                                <button
-                                    type="button"
-                                    class="btn btn-danger btn-delete-corrida"
-                                    data-corrida-id="{{ corrida.id }}"
-                                >
-                                    Excluir
-                                </button>
-                            {% endif %}
-
-                        </td>
-                    </tr>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                 {% endfor %}
-            </tbody>
-            
-            <a href="{% url 'usuarios:pagina_inicial' %}" class="btn voltar">Voltar</a>
-            
-        </table>
-    </div>
-{% else %}
-    <p>Você ainda não cadastrou nenhuma corrida.</p>
-{% endif %}
+            {% endif %}
 
-</div> {% endblock %}
+            {% if corridas %}
+                <div class="table-responsive">
+                    <table class="corridas-table">
+                        <thead>
+                            <tr>
+                                <th>Origem</th>
+                                <th>Destino</th>
+                                <th>Data</th>
+                                <th>Saída</th>
+                                <th>Chegada</th>
+                                <th>Vagas</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Motorista</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for corrida in corridas %}
+                                <tr id="corrida-row-{{ corrida.id }}" class="{% if corrida.status == 'cancelada' %}cancelada{% endif %}">
+                                    <td>{{ corrida.origem }}</td>
+                                    <td>{{ corrida.destino }}</td>
+                                    <td>{{ corrida.data|date:"d/m/Y" }}</td>
+                                    <td>{{ corrida.horario_saida }}</td>
+                                    <td>{{ corrida.horario_chegada }}</td>
+                                    <td>{{ corrida.vagas_disponiveis }}</td>
+                                    <td>R$ {{ corrida.valor }}</td>
+                                    <td>{{ corrida.get_status_display }}</td>
+                                    <td>{{ corrida.motorista.nome }}</td>
+                                    <td class="action-buttons">
+                                        <a href="{% url 'corrida:editar_corrida' corrida.id %}" class="btn btn-sm btn-action editar">
+                                            Editar
+                                        </a>
 
+                                        <form action="{% url 'corrida:cancelar_corrida' corrida.id %}" method="post" class="inline-form" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-action {% if corrida.status == 'cancelada' %}reativar{% else %}cancelar{% endif %}">
+                                                {% if corrida.status == 'cancelada' %}Reativar{% else %}Cancelar{% endif %}
+                                            </button>
+                                        </form>
 
+                                        {% if user.is_authenticated and corrida.motorista == user %}
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-action btn-danger btn-delete-corrida"
+                                                data-corrida-id="{{ corrida.id }}"
+                                            >
+                                                Excluir
+                                            </button>
+                                        {% endif %}
+                                        
+                                        </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                        </table>
+                </div>
+            {% else %}
+                <p>Você ainda não cadastrou nenhuma corrida.</p>
+            {% endif %}
 
-{% block scripts %}
+        </div>
+    </main>
+</div>
 
-<script>console.log("lista_corridas template carregado");</script> <script src="{% static 'corrida/js/delete_corrida.js' %}?v=1" defer></script>
+<script>console.log("lista_corridas template carregado");</script> 
+<script src="{% static 'corrida/js/delete_corrida.js' %}?v=1" defer></script>
 
-{% endblock %}
+</body>
+</html>
