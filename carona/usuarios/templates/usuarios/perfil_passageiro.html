@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+
 {% load static %}
 
 {% block extra_head %}
@@ -7,7 +7,7 @@
 
 {% block content %}
 <div class="dashboard-container">
-
+ <title>Carona | Perfil Passageiro</title>
   <nav class="top-navbar" id="mainNavbar">
 
     <!-- LOGO AQUI -->
@@ -19,13 +19,14 @@
 
     <div class="menu">
       <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
-      <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
+      <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil Passageiro</a>
       <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
       <a href="#" class="menu-item">Central de Ajuda</a>
     </div>
 
     <div class="user-and-logout">
       <div class="user-info-navbar">
+      <button onclick="toggleDarkMode()" class="mode-toggle-btn">☀️</button>
         <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
         <span>{{ user.nome }}</span>
       </div>
@@ -34,7 +35,7 @@
   </nav>
 
   <main class="main-content">
-    <button onclick="toggleDarkMode()" class="action-btn mode-toggle-btn">🌙</button>
+   
 
     <!-- HEADER -->
     <div class="header-banner">
@@ -105,7 +106,7 @@ function toggleDarkMode() {
   localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
   const btn = document.querySelector('.mode-toggle-btn');
   if (btn) {
-    btn.textContent = document.body.classList.contains("dark-mode") ? '☀️' : '🌙';
+    btn.textContent = document.body.classList.contains("dark-mode") ? '🌙' : '☀️';
   }
 }
 
@@ -116,7 +117,7 @@ window.onload = function() {
 
   const btn = document.querySelector('.mode-toggle-btn');
   if (btn) {
-    btn.textContent = document.body.classList.contains("dark-mode") ? '☀️' : '🌙';
+    btn.textContent = document.body.classList.contains("dark-mode") ? '🌙' : '☀️';
   }
 
   const header = document.querySelector('.header-banner');
