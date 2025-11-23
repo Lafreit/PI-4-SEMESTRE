@@ -97,6 +97,11 @@ body {
     line-height: 1;
 }
 
+.logo-img {
+    height: 75px;
+    width: auto;
+}
+
 .menu { 
     display: flex; 
     gap: 30px; 
@@ -219,7 +224,7 @@ body {
     transition: background 0.2s;
     text-transform: uppercase;
 }
-.action-btn:hover {
+.action-btn.primary-btn:hover {
     background: var(--hover-blue);
 }
 
@@ -257,6 +262,7 @@ body {
     gap: 15px;
 }
 
+/* CARD PRINCIPAL (Estrutura ajustada para flex) */
 .corrida-card {
     background: var(--card-background);
     padding: var(--card-padding);
@@ -264,6 +270,10 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     border: 1px solid var(--border-color-light);
     transition: transform 0.1s, box-shadow 0.2s;
+    /* NOVO: Flexbox para alinhar info e botão */
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
 }
 
 .corrida-card:hover {
@@ -272,32 +282,136 @@ body {
     cursor: pointer;
 }
 
-.corrida-card h4 {
+/* Bloco de Informações */
+.corrida-info {
+    flex: 1; 
+    padding-right: 20px; 
+}
+.corrida-origem-destino {
     font-size: 1.15rem;
     color: var(--primary-blue);
-    margin-bottom: 8px;
+    margin-bottom: 5px;
+    font-weight: 600;
 }
+.corrida-meta {
+    font-size: 0.95rem;
+    color: #6c757d;
+    display: flex;
+    gap: 15px;
+    margin-top: 5px;
+}
+.corrida-valor, .corrida-vagas {
+    font-weight: 700;
+    color: var(--secondary-blue);
+}
+.corrida-vagas .vagas-count {
+    color: var(--accent-red); /* Destaca a contagem de vagas */
+}
+.corrida-datas {
+    font-style: italic;
+    color: #495057;
+}
+
 .details-meta {
     font-weight: 600;
     color: var(--text-color-primary);
     margin-top: 5px;
 }
 
+/* Bloco de Ações */
+.corrida-actions {
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-end; 
+    min-width: 150px; 
+}
+.feedback {
+    margin-top: 5px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: green;
+}
+.feedback-error {
+    color: var(--accent-red);
+}
+
+/* ========================================================================= */
+/* BOTÕES DE AÇÃO - MELHORIA VISUAL */
+/* ========================================================================= */
+
+/* Botão do Exemplo Estático (Se for mantido) */
 .solicitar-btn.secondary-btn {
-    background-color: var(--secondary-blue);
+    background: var(--secondary-blue);
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 8px 15px;
+    border-radius: var(--border-radius-md); 
+    padding: 10px 18px; 
     margin-top: 15px;
     cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s;
+    font-weight: 700; 
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
     float: right;
+    box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
 }
 .solicitar-btn.secondary-btn:hover {
-    background-color: var(--hover-blue);
+    background: var(--hover-blue);
+    box-shadow: 0 6px 10px rgba(0, 123, 255, 0.3);
+    transform: translateY(-1px);
 }
+
+/* ESTILO PRINCIPAL: BOTÃO GERADO PELO JAVASCRIPT (.btn-solicitar) */
+.corrida-actions .btn-solicitar {
+    background: linear-gradient(135deg, var(--secondary-blue) 0%, #0093ff 100%);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md); 
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: auto; /* Ajusta largura ao conteúdo */
+}
+
+.corrida-actions .btn-solicitar:hover {
+    background: linear-gradient(135deg, #0093ff 0%, var(--secondary-blue) 100%);
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.45);
+    transform: translateY(-2px);
+}
+
+.corrida-actions .btn-solicitar:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* ESTILO CANCELAR SOLICITAÇÃO (.btn-cancelar) */
+.corrida-actions .btn-cancelar {
+    background: #dc3545 !important; 
+    color: #fff !important;
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+    width: auto;
+}
+.corrida-actions .btn-cancelar:hover {
+    background: #c82333 !important;
+    box-shadow: 0 6px 10px rgba(220, 53, 69, 0.3);
+    transform: translateY(-1px);
+}
+
 
 /* ========================================================================= */
 /* SEÇÃO DE DICAS (Tips) */
@@ -382,6 +496,25 @@ body {
     #map-container {
         height: 350px; /* Reduz a altura do mapa em telas menores */
     }
+
+    /* Ajuste do card em telas pequenas */
+    .corrida-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .corrida-info {
+        padding-right: 0;
+        margin-bottom: 15px;
+    }
+    .corrida-actions {
+        width: 100%;
+        align-items: center; /* Centraliza o botão */
+    }
+    .corrida-actions .btn-solicitar,
+    .corrida-actions .btn-cancelar {
+        width: 100%; /* Faz o botão ocupar a largura total no mobile */
+        max-width: 300px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -391,8 +524,8 @@ body {
     .main-content {
         margin-top: 210px; /* Ajuste para navbar em telas bem pequenas */
     }
-}
-.logo-img {
-    height: 75px;
-    width: auto;
+    .corrida-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
 }
