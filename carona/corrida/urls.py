@@ -1,4 +1,5 @@
 from django.urls import path
+from .views import motorista_iniciar_corrida, motorista_encerrar_corrida, passageiro_acompanhamento, detalhe_corrida
 from . import views
 
 app_name = 'corrida'
@@ -31,4 +32,11 @@ urlpatterns = [
     # Endpoints relacionados a uma corrida específica
     path('corrida/<int:corrida_id>/minha_solicitacao/', views.minha_solicitacao_api, name='minha_solicitacao_api'),
     path('<int:corrida_id>/solicitar/', views.solicitar_carona, name='solicitar_carona'),
+
+
+    path("acompanhamento/<int:corrida_id>/", passageiro_acompanhamento, name="acompanhamento"),
+    path("iniciar/<int:corrida_id>/", motorista_iniciar_corrida, name="iniciar_corrida"),
+    path("encerrar/<int:corrida_id>/", motorista_encerrar_corrida, name="encerrar_corrida"),
+    path('detalhe/<int:pk>/', detalhe_corrida, name='detalhe_corrida'),
+
 ]

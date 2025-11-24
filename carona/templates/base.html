@@ -40,10 +40,7 @@
                 {% else %}
                 <!-- usuário genérico / outros tipos: mostra tudo -->
                 <a href="{% url 'corrida:cadastrar_corrida' %}" class="action-btn start">Cadastrar Corrida</a>
-                <a href="#" class="action-btn">Corridas Ativas</a>
-                <a href="#" class="action-btn">Meus Ganhos</a>
                 <a href="{% url 'corrida:buscar_corridas' %}" class="action-btn search">Buscar Corridas</a>
-                <a href="#" class="action-btn">Motoristas Favoritos</a>
                 {% endif %}
 
                 {% if request.user.tipo_usuario == 'admin' %}
@@ -57,7 +54,7 @@
                        {% endif %}
                    {% endwith %}
                 </a>
-                <a href="#" class="action-btn">Carteira</a>
+                <a href="{% url 'pagamentos:carteira' %}" class="action-btn">Carteira</a>
             {% endif %}
 
         </nav>

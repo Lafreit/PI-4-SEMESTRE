@@ -9,20 +9,47 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
-from pathlib import Path
+# settings.py (trecho inicial) — cole no topo do arquivo
 import os
-from decouple import config
+from pathlib import Path
 from dotenv import load_dotenv
-load_dotenv()
 
 
+# Retenção do sistema em depósitos (%)
+RETENCAO_SISTEMA = 0.10  # 10% por padrão
 
-ABACATEPAY_KEY = config("ABACATEPAY_KEY")
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# caminho base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# carrega o arquivo .env na raiz do projeto (BASE_DIR)
+ENV_PATH = BASE_DIR / ".env"
+if ENV_PATH.exists():
+    load_dotenv(dotenv_path=ENV_PATH)
+
+
+# --- ABACATEPAY ---
+# settings.py
+ABACATEPAY_WEBHOOK_SECRET = "babuinosbobocasbalbiciandoembandohpgrifinoria"
+ABACATEPAY_PUBLIC_KEY = "t9dXRhHHo3yDEj5pVDYz0frf7q6bMKyMRmxxCPIPp3RCplBfXRxqlC6ZpiWmOqj4L63qEaeUOtrCI8P0VMUgo6iIga2ri9ogaHFs0WIIywSMg0q7RmBfybe1E5XJcfC4IW3alNqym0tXoAKkzvfEjZxV6bE0oG2zJrNNYmUCKZyV0KZ3JS8Votf9EAWWYdiDkMkpbMdPggfh1EqHlVkMiTady6jOR3hyzGEHrIz2Ret0xHKMbiqkr9HS1JhNHDX9"
+
+
+
+ABACATEPAY_BASE_URL = os.getenv("ABACATEPAY_BASE_URL", "https://api.abacatepay.com/v1")
+ABACATEPAY_API_KEY = os.getenv("ABACATEPAY_API_KEY", "")
+ABACATEPAY_TIMEOUT = int(os.getenv("ABACATEPAY_TIMEOUT", 30))
+ABACATEPAY_RETRIES = int(os.getenv("ABACATEPAY_RETRIES", 2))
+
+
+# URLs de redirecionamento padrão para pagamentos
+ABACATEPAY_RETURN_URL = os.getenv(
+    "ABACATEPAY_RETURN_URL", "https://127.0.0.1:8000/pagamentos/retorno/"
+)
+ABACATEPAY_COMPLETION_URL = os.getenv(
+    "ABACATEPAY_COMPLETION_URL", "https://127.0.0.1:8000/pagamentos/concluido/"
+)
+
+# --- URL base da aplicação ---
+SITE_BASE_URL = os.getenv("SITE_BASE_URL", "http://127.0.0.1:8000")
 
 
 # Quick-start development settings - unsuitable for production
@@ -34,7 +61,8 @@ SECRET_KEY = 'django-insecure-&twz63=3149t^-1)6(p^a47oev391yc(w&o_pysxx@dqmaymto
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

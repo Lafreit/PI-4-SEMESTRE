@@ -81,7 +81,7 @@
 }
 
 /* Botões */
-.btn-marcar-lida, .btn-detalhe, .btn-aceitar {
+.btn-marcar-lida, .btn-detalhe, .btn-aceitar, .btn-acompanhamento {
   padding: 6px 12px;
   border-radius: 6px;
   border: none;
@@ -116,6 +116,16 @@
 
 .btn-aceitar:hover {
   background: #218838;
+}
+
+/* Botão: acompanhar + pagar */
+.btn-acompanhamento {
+  background: #ff8c1a;
+  color: white;
+}
+
+.btn-acompanhamento:hover {
+  background: #e06f00;
 }
 
 /* Animação de marcação como lida */
