@@ -1,4 +1,3 @@
-
 {% load static %}
 
 {% block extra_head %}
@@ -58,6 +57,19 @@
                         {% endif %}
 
                         {% include "corrida/form_corrida_fields.html" %}
+
+                        {# Render explicitamente o campo de periodicidade (adicionado no form) #}
+                        {% if form.periodicidade %}
+                          <div class="form-group">
+                            {{ form.periodicidade.label_tag }}
+                            {{ form.periodicidade }}
+                            {% if form.periodicidade.errors %}
+                              <div class="alert-danger">
+                                {{ form.periodicidade.errors }}
+                              </div>
+                            {% endif %}
+                          </div>
+                        {% endif %}
                         
                         <button type="submit" class="action-btn">Cadastrar Corrida</button>
                     </form>

@@ -21,6 +21,25 @@
   </div>
 
   {% if user == corrida.motorista %}
+    <!-- Controles do motorista: Iniciar / Finalizar corrida -->
+    <div class="corrida-controles">
+      <form id="form-iniciar" action="{% url 'corrida:iniciar_corrida' corrida.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" id="btn-iniciar" class="btn"
+                {% if corrida.status != 'ativa' %}disabled{% endif %}>
+          Iniciar Corrida
+        </button>
+      </form>
+
+      <form id="form-encerrar" action="{% url 'corrida:encerrar_corrida' corrida.id %}" method="post" style="display:inline; margin-left:8px;">
+        {% csrf_token %}
+        <button type="submit" id="btn-encerrar" class="btn btn-danger"
+                {% if corrida.status != 'em_andamento' %}disabled{% endif %}>
+          Finalizar Corrida
+        </button>
+      </form>
+    </div>
+
     <h3>Solicitações de Carona</h3>
     <div class="solicitacoes-list">
       {% for s in corrida.solicitacoes.all %}
@@ -41,14 +60,29 @@
         <p>Não há solicitações para esta corrida.</p>
       {% endfor %}
     </div>
+  {% else %}
+    <!-- Para outros usuários (passageiros) apenas lista de solicitações não aparece -->
+    <h3>Informações</h3>
+    <p>Somente o motorista pode controlar a corrida (iniciar / finalizar).</p>
   {% endif %}
 </div>
 
-<!-- Variáveis JS necessárias para aceitar_solicitacao.js -->
+<!-- confirmação JS para iniciar/encerrar -->
 <script>
-  const CSRF_TOKEN = '{{ csrf_token }}';
-  const URL_ACEITAR = '{% url "corrida:api_aceitar_solicitacao" %}';
-  const URL_CONTAGEM = '{% url "notificacao:api_contagem" %}';
+document.addEventListener('DOMContentLoaded', function() {
+  const formIniciar = document.getElementById('form-iniciar');
+  if (formIniciar) {
+    formIniciar.addEventListener('submit', function(e) {
+      if (!confirm('Confirma iniciar a corrida?')) e.preventDefault();
+    });
+  }
+  const formEncerrar = document.getElementById('form-encerrar');
+  if (formEncerrar) {
+    formEncerrar.addEventListener('submit', function(e) {
+      if (!confirm('Confirma encerrar a corrida?')) e.preventDefault();
+    });
+  }
+});
 </script>
 
 <link rel="stylesheet" href="{% static 'corrida/css/detalhe_corrida.css' %}">

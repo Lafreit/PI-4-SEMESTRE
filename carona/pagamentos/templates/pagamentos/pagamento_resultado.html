@@ -10,25 +10,35 @@
   {% if erro %}
     <h2>Erro ao criar pagamento</h2>
     <pre>{{ erro|safe }}</pre>
+    <h3>Resposta bruta (raw):</h3>
+    <pre>{{ raw|safe }}</pre>
     <a href="javascript:history.back()">Voltar</a>
   {% else %}
     <h2>Pagamento - QR Code PIX</h2>
 
     {% if data.brCodeBase64 %}
-      <img id="pix-qrcode" src="{{ data.brCodeBase64 }}" alt="QR Code PIX">
+      <!-- Adicionado prefixo correto para Base64 -->
+      <img id="pix-qrcode" src="data:image/png;base64,{{ data.brCodeBase64 }}" alt="QR Code PIX">
     {% elif data.brCode %}
       <p><strong>Código copia e cola:</strong></p>
       <textarea readonly rows="4" cols="60" id="brcode">{{ data.brCode }}</textarea>
       <button id="copy-btn">Copiar</button>
     {% else %}
-      <pre>{{ data|default:raw|safe }}</pre>
+      <h3>Resposta bruta (raw):</h3>
+      <pre>{{ raw|safe }}</pre>
     {% endif %}
 
-    <p>Status: <span id="status">{{ data.status }}</span></p>
+    <p>Status: <span id="status" aria-live="polite">{{ data.status|default:"CREATED" }}</span></p>
+    <p id="countdown" style="color:green;" aria-live="polite"></p>
+
+    <!-- Inputs ocultos usados pelo JS -->
     <input type="hidden" id="payment-id" value="{{ payment_id }}">
+    <input type="hidden" id="expires-in" value="{{ data.expires_in|default:3600 }}">
+
     <a href="/">Voltar</a>
   {% endif %}
 
+  <!-- JS para copiar código, contagem regressiva e atualização automática -->
   <script src="{% static 'pagamentos/payment.js' %}"></script>
 </body>
 </html>

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'pagamentos/acompanhamento.css' %}">
+<script src="{% static 'pagamentos/acompanhamento.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="acomp-page">
+    <div class="acomp-header">
+        <h2>Acompanhamento da Corrida</h2>
+        <span class="acomp-status">{{ corrida.get_status_display }}</span>
+    </div>
+
+    <div class="acomp-list">
+        <div class="acomp-item" id="corrida-card-{{ corrida.id }}">
+            <div class="acomp-main">
+                <div class="acomp-title">Corrida {{ corrida.id }} - {{ corrida.origem }} → {{ corrida.destino }}</div>
+                <div class="acomp-msg">
+                    Valor: R$ {{ corrida.valor_total }} <br>
+                    Motorista: {{ corrida.motorista.username }}
+                </div>
+            </div>
+            <div class="acomp-meta">
+                <span class="status-corrida">{{ corrida.get_status_display }}</span>
+                {% if corrida.status != "PAID" and user == corrida.passageiro %}
+                    <button data-corrida-id="{{ corrida.id }}" class="btn-acompanhamento btn-pagar-corrida">
+                        Pagar Corrida
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

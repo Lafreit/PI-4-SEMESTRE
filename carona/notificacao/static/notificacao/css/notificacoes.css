@@ -190,6 +190,15 @@ body {
 .notif-msg {
     color: var(--text-secondary);
     font-size: 0.95rem;
+/* Botões */
+.btn-marcar-lida, .btn-detalhe, .btn-aceitar, .btn-acompanhamento {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.2s;
 }
 
 .notif-meta {
@@ -263,6 +272,19 @@ body {
     .menu { justify-content: center; width: 100%; order: 2; margin-top: 10px; }
     .user-and-logout { width: 100%; justify-content: center; order: 3; margin-top: 10px; padding-top: 10px; }
     .main-content { margin-top: 120px; padding: 1rem; }
+/* Botão: acompanhar + pagar */
+.btn-acompanhamento {
+  background: #ff8c1a;
+  color: white;
+}
+
+.btn-acompanhamento:hover {
+  background: #e06f00;
+}
+
+/* Animação de marcação como lida */
+.notif-item.marcar-lida {
+  animation: fadeOutUp 0.5s forwards;
 }
 
 @media (max-width: 600px) {

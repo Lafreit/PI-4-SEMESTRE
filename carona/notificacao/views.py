@@ -4,13 +4,49 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from .models import Notificacao
 from django.views.decorators.http import require_POST, require_GET
-
-
+from corrida.models import Corrida
+import json
 
 @login_required
 def lista_notificacoes(request):
     # mostra todas notificações do usuário (paginável se desejar)
-    notificacoes = Notificacao.objects.filter(usuario=request.user).order_by('-criada_em')[:100]
+    notificacoes = list(Notificacao.objects.filter(usuario=request.user).order_by('-criada_em')[:100])
+
+    # Normalizar/Enriquecer cada notificação com informações sobre a corrida (quando aplicável)
+    for n in notificacoes:
+        # garantir que n.dados seja dict (pode ser string JSON dependendo de como foi salvo)
+        dados = n.dados
+        if isinstance(dados, str):
+            try:
+                dados = json.loads(dados)
+            except Exception:
+                dados = {}
+        elif dados is None:
+            dados = {}
+
+        # expõe uma versão normalizada para o template (sem underscore)
+        n.dados_normalizados = dados
+
+        # detectar corrida_id em keys comuns
+        corrida_id = None
+        if isinstance(dados, dict) and 'corrida_id' in dados:
+            corrida_id = dados.get('corrida_id')
+        elif isinstance(dados, dict) and 'corrida' in dados:
+            corrida_id = dados.get('corrida')
+
+        n.corrida_id = corrida_id
+        n.corrida_exists = False
+        n.corrida_status = None
+
+        if corrida_id:
+            try:
+                corrida = Corrida.objects.get(id=int(corrida_id))
+                n.corrida_exists = True
+                n.corrida_status = getattr(corrida, 'status', None)
+            except (Corrida.DoesNotExist, ValueError, TypeError):
+                n.corrida_exists = False
+                n.corrida_status = None
+
     return render(request, "notificacao/lista_notificacoes.html", {"notificacoes": notificacoes})
 
 @login_required
