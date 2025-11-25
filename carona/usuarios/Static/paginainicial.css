@@ -60,19 +60,22 @@ letter-spacing:-0.5px;
 .menu-item{
 color:var(--text-secondary);
 text-decoration:none;
-padding:0.5rem 0;
-transition:color 0.3s;
+/* CORRIGIDO: Padroniza o padding vertical para que a linha não desça */
+padding:19.5px 0 19.5px 0; /* Padding superior e inferior para centralizar o item dentro dos 64px */
+transition:color 0.3s, border-bottom 0.3s, font-weight 0.3s; /* Adicionado font-weight para transição */
 font-weight:500;
 font-size:1rem;
+height: var(--navbar-height); /* Garante que todos os items tenham a altura da barra */
+box-sizing: border-box; /* Inclui o padding na altura */
 }
+
 .menu-item:hover{
 color:var(--primary-blue);
 }
 .menu-item.active{
-color:var(--primary-blue);
 font-weight:600;
-border-bottom:3px solid var(--primary-blue);
-padding-bottom:21px;
+
+/* LINHA REMOVIDA: padding-bottom:21px; */
 }
 /*Links VIP e Especiais*/
 .menu-item.vip-link{
@@ -125,27 +128,31 @@ text-shadow:1px 1px 3px rgba(0,0,0,0.8);/*Sombra no texto para POP*/
 z-index:20;
 }
 /*Mover o botão do Modo Escuro e ajustar para fundo escuro*/
-.mode-toggle-btn{
-position:absolute;
-top:20px;
-right:20px;
-padding:10px;
-border-radius:50%;
-width:40px;
-height:40px;
-display:flex;
-justify-content:center;
-align-items:center;
-background-color:rgba(255,255,255,0.2);/*Fundo semi-transparente*/
-color:var(--white);
-font-size:1.1rem;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
-transition:background-color 0.3s;
+.mode-toggle-btn {
+    position: static;
+    margin-right: 5px;
+    background-color: transparent;
+    color: var(--text-color);
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    font-size: 1.6rem !important;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent !important;
+    color: var(--text-color) !important;
+    box-shadow: none !important;
+    border: none !important;
 }
+
 .mode-toggle-btn:hover{
-background-color:rgba(255,255,255,0.4);
+background-color:rgba(255, 255, 255, 0);
 transform:none;
-box-shadow:0 4px 8px rgba(0,0,0,0.15);
+box-shadow:0 4px 8px rgba(0, 0, 0, 0);
 }
 /*======LAYOUT PRINCIPAL:MAPA e AÇÕES (USANDO CARDS MODERNOS)======*/
 .map-and-actions{
@@ -307,6 +314,7 @@ margin-right:5px;
 font-size:0.9rem;
 text-transform:uppercase;
 }
+.tab-button.active{border-bottom:3px solid var(--primary-blue);} /* Garante a linha azul no mobile */
 .mode-toggle-btn{
 position:static;
 margin-left:auto;
@@ -316,76 +324,76 @@ body.dark-mode .mode-toggle-btn{background-color:#333;}
 }
 
 .logo-area {
-    display: flex;
-    align-items: center;
-    height: var(--navbar-height);
+display: flex;
+align-items: center;
+height: var(--navbar-height);
 }
 
 .logo-img {
-    height: 75px;     /* tamanho ideal para não estourar */
-    width: auto;
-    object-fit: contain;
-    display: block;
+height: 75px; /* tamanho ideal para não estourar */
+width: auto;
+object-fit: contain;
+ display: block;
 }
 /* Estilos adicionais para o banner */
 .imagem-horario { display: none; }
 
 /* Estilo para o indicador de scroll (animação de seta) */
 .scroll-indicator {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--white);
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    opacity: 0.8;
-    animation: bounce 2s infinite;
+ position: absolute;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+color: var(--white);
+ font-size: 0.9rem;
+ font-weight: 500;
+ text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+ opacity: 0.8;
+ animation: bounce 2s infinite;
 }
 
 .arrow-down {
-    display: block;
-    font-size: 2rem;
-    line-height: 1;
+ display: block;
+font-size: 2rem;
+line-height: 1;
 }
 
 @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
-    40% { transform: translateY(-10px) translateX(-50%); }
-    60% { transform: translateY(-5px) translateX(-50%); }
+ 0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+ 40% { transform: translateY(-10px) translateX(-50%); }
+60% { transform: translateY(-5px) translateX(-50%); }
 }
 
 .location-info {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-top: 10px;
+font-size: 1.1rem;
+ font-weight: 500;
+ margin-top: 10px;
 }
 /* Estilo para o relógio dentro do H1 */
 #greeting-message .clock-display {
-    font-size: 1.5rem; /* Ajuste o tamanho da fonte para o relógio */
-    font-weight: 400; /* Deixe mais leve que o nome */
-    margin-left: 20px;
+ font-size: 1.5rem; /* Ajuste o tamanho da fonte para o relógio */
+font-weight: 400; /* Deixe mais leve que o nome */
+ margin-left: 20px;
 }
 
 /* ESTILOS NOVOS */
 .red-btn {
-    background-color: #e74c3c !important; /* Vermelho forte */
-    color: white !important;
-    border: none !important;
-    padding: 0.5rem 1rem !important;
-    border-radius: 5px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background-color 0.2s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+ background-color: #e74c3c !important; /* Vermelho forte */
+ color: white !important;
+ border: none !important;
+ padding: 0.5rem 1rem !important;
+ border-radius: 5px;
+ font-weight: 600;
+ text-decoration: none;
+ transition: background-color 0.2s;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .red-btn:hover {
-    background-color: #c0392b !important; /* Vermelho mais escuro no hover */
+ background-color: #c0392b !important; /* Vermelho mais escuro no hover */
 }
 
 /* Esconde o botão duplicado de aba que só serve para ativar o JS */
 .hidden-tab {
-    display: none !important;
+ display: none !important;
 }

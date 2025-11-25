@@ -81,9 +81,7 @@ body {
 }
 
 .menu-item.active {
-  color: var(--primary-blue);
   font-weight: 600;
-  border-bottom: 3px solid var(--primary-blue);
   padding-bottom: 21px;
 }
 
@@ -131,7 +129,6 @@ body {
   overflow: hidden;
   color: white;
 
-  /* Imagem de fundo com overlay escuro */
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
     url("{% static 'img/imgperfilp.png' %}");
@@ -159,35 +156,33 @@ body {
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
 }
 
-/* ======== BOTÕES ======== */
+/* ======== BOTÃO DARK MODE — AGORA AO LADO ESQUERDO DA FOTO ======== */
+.user-info-navbar {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* espaço entre os itens */
+}
+
 .mode-toggle-btn {
-  padding: 10px;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--white);
-  color: var(--primary-blue);
-  font-size: 1.1rem;
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: background-color 0.3s;
-  border: none;
-  float: right;
-  margin-top: -1rem;
-  margin-right: 2.5rem;
-  position: relative;
-  z-index: 10;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-color);
+    font-size: 1.8rem;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .mode-toggle-btn:hover {
-  background-color: #f0f0f0;
-  transform: none;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: scale(1.1);
 }
 
+/* ======== BOTÕES GERAIS ======== */
 .action-btn,
 .btn {
   background-color: var(--primary-blue);
@@ -283,6 +278,15 @@ body.dark-mode .action-card p {
 
 /* ======== RESPONSIVIDADE ======== */
 @media (max-width: 900px) {
+
+  .mode-toggle-btn {
+    left: 10px; 
+    top: 10px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.4rem;
+  }
+
   .top-navbar {
     flex-wrap: wrap;
     padding: 0.8rem 1rem;
@@ -316,16 +320,6 @@ body.dark-mode .action-card p {
     grid-template-columns: 1fr;
   }
 
-  .mode-toggle-btn {
-    position: static;
-    float: none;
-    margin: 0 auto 10px auto;
-    order: 1;
-    width: 50px;
-    height: 50px;
-    font-size: 1.5rem;
-  }
-
   .header-banner h1 {
     font-size: 2rem;
   }
@@ -334,24 +328,27 @@ body.dark-mode .action-card p {
     font-size: 1.1rem;
   }
 }
- .logo-area {
-        display: flex;
-        align-items: center;
-    }
 
-    .logo-area .logo-img {
-        height: 75px;   /* ajuste livre */
-        width: auto;
-        object-fit: contain;
-    }
-    .logout-btn {
-    background-color: var(--red-danger) !important;
-    color: white !important;
-    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
+.logo-area {
+  display: flex;
+  align-items: center;
+}
+
+.logo-area .logo-img {
+  height: 75px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ======== BOTÃO LOGOUT ======== */
+.logout-btn {
+  background-color: var(--red-danger) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
 }
 
 .logout-btn:hover {
-    background-color: var(--red-danger-darker) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(192, 57, 43, 0.45) !important;
+  background-color: var(--red-danger-darker) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(192, 57, 43, 0.45) !important;
 }

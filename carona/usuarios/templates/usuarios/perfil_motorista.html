@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+
 {% load static %}
 
 {% block extra_head %}
@@ -8,7 +8,7 @@
 
 {% block content %}
 <div class="dashboard-container">
-
+ <title>Carona | Perfil Motorista</title>
     <nav class="top-navbar" id="mainNavbar">
 
         <div class="logo-area">
@@ -24,6 +24,7 @@
 
         <div class="user-and-logout">
             <div class="user-info-navbar">
+                <button onclick="toggleDarkMode()" class="mode-toggle-btn">☀️</button>
                 <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
                 <span>{{ user.nome }}</span>
             </div>
@@ -32,10 +33,6 @@
     </nav>
 
     <main class="main-content">
-
-        <button onclick="toggleDarkMode()" class="action-btn mode-toggle-btn">
-            🌙
-        </button>
 
         <div class="header-banner">
             <h1>Meu Perfil Motorista 🚗</h1>
@@ -131,7 +128,7 @@ function toggleDarkMode() {
 
     const btn = document.querySelector('.mode-toggle-btn');
     if (btn) {
-        btn.textContent = document.body.classList.contains("dark-mode") ? '☀️' : '🌙';
+        btn.textContent = document.body.classList.contains("dark-mode") ? '🌙' : '☀️';
     }
 }
 
@@ -142,7 +139,7 @@ window.onload = function() {
 
     const btn = document.querySelector('.mode-toggle-btn');
     if (btn) {
-        btn.textContent = document.body.classList.contains("dark-mode") ? '☀️' : '🌙';
+        btn.textContent = document.body.classList.contains("dark-mode") ? '🌙' : '☀️';
     }
 
     const header = document.querySelector('.header-banner');

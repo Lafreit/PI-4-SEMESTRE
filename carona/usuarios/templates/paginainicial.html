@@ -14,32 +14,38 @@
 {% endblock %}
 
 {% block content %}
-
+<title>Carona | Pagina Inicial</title>
 <div class="dashboard-container">
     
-    <nav class="top-navbar" id="mainNavbar">
-        <div class="logo-area">
-    <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo-img">
-</div>
+   <nav class="top-navbar" id="mainNavbar">
 
-        <div class="menu">
-            <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
-            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil  |  </a>
-            <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
-            <a href="{% url 'notificacao:lista' %}" class="menu-item">Notificações</a>
-            
-            <a href="#" class="menu-item" onclick="openTabFromNavbar(event, 'dicas-usuario')">Dicas de Usuário</a>
+    <div class="logo-area">
+        <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo-img">
+    </div>
+
+    <div class="menu">
+        <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+        <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
+        <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
+        <a href="{% url 'notificacao:lista' %}" class="menu-item">Notificações</a>
+        <a href="#" class="menu-item" onclick="openTabFromNavbar(event, 'dicas-usuario')">Dicas de Usuário</a>
+    </div>
+
+    <div class="user-and-logout">
+
+        <div class="user-info-navbar">
+            <button onclick="toggleDarkMode()" id="themeToggleBtn" class="action-btn mode-toggle-btn">
+        ☀️
+    </button>
+            <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
+            <span>{{ user.nome }}</span>
         </div>
 
-        <div class="user-and-logout">
-             <div class="user-info-navbar">
-                <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
-                <span>{{ user.nome }}</span>
-            </div>
-            <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn red-btn">Sair</a>
-        </div>
-    </nav>
-    
+        <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn red-btn">Sair</a>
+    </div>
+
+</nav>
+
 
     <main class="main-content">
         <div class="header-banner">
@@ -47,8 +53,6 @@
             <p>Pronto para sua próxima viagem?</p>
             
             <div id="weather-and-location"></div>
-
-            <button onclick="toggleDarkMode()" class="action-btn mode-toggle-btn">🌙</button>
 
             <div class="scroll-indicator">
                 <span class="arrow-down">↓</span> Role para ver o mapa e mais
@@ -348,17 +352,25 @@ async function showAddress(lat, lon) {
         console.warn("Erro ao obter endereço:", err);
     }
 }
+function updateThemeIcon() {
+    const btn = document.getElementById("themeToggleBtn");
+    const darkModeActive = document.body.classList.contains("dark-mode");
 
+    // Se estiver no modo escuro → mostra o sol
+    btn.textContent = darkModeActive ? "🌙" : "☀️";
+}
 // MODO ESCURO
 function toggleDarkMode() {
-    // 1. Alterna a classe dark-mode no body
     document.body.classList.toggle("dark-mode");
     
-    // 2. Salva a preferência
+    // salva preferência
     const darkModeActive = document.body.classList.contains("dark-mode");
     localStorage.setItem("darkMode", darkModeActive);
-    
-    // 3. Atualiza o background dinâmico para respeitar a nova preferência de modo
+
+    // atualiza ícone do botão
+    updateThemeIcon();
+
+    // atualiza o background conforme modo
     getGreetingAndBackground(true);
 }
 
@@ -373,7 +385,7 @@ window.onload = function() {
     if (localStorage.getItem("darkMode") === "true") {
         document.body.classList.add("dark-mode");
     }
-    
+     updateThemeIcon();   // ⬅️ AQUI
     getGreetingAndBackground();
     initMap();
 };

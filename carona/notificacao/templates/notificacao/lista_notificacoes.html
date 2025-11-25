@@ -1,103 +1,125 @@
-{% extends "base.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carona | Lista notificações</title>
+    <link rel="stylesheet" href="{% static 'veiculo.css' %}">
+    <link rel="stylesheet" href="{% static 'static/css/notificacoes.css' %}">
+    </head>
+<body>
+    <div class="dashboard-container">
 
-{% block content %}
-<div class="notif-page">
+        <nav class="top-navbar" id="mainNavbar">
+            <div class="logo-area">
+                <img src="{% static 'img/logo.png' %}" alt="Logo Carona Fácil" class="logo-img">
+            </div>
 
-  <!-- Cabeçalho -->
-  <div class="notif-header">
-    <h2>Notificações</h2>
-    <div id="notif-badge" class="notif-badge">Carregando...</div>
-  </div>
+            <div class="menu">
+                <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+                <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
+                <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
+                <a href="{% url 'notificacao:lista' %}" class="menu-item active">Notificações</a> 
+            </div>
 
-  <!-- Lista de notificações -->
-  <div id="notif-list" class="notif-list">
-    {% for n in notificacoes %}
-      <div class="notif-item {% if not n.lida %}nao-lida{% endif %}" data-id="{{ n.id }}"
-           {% if n.dados_normalizados.corrida_id %} data-corrida="{{ n.dados_normalizados.corrida_id }}"{% endif %}>
-        <div class="notif-main">
-          <div class="notif-title">{{ n.titulo }}</div>
-          <div class="notif-msg">{{ n.mensagem }}</div>
+            <div class="user-and-logout">
+                
+                <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema claro/escuro">
+                    <span class="icon-light">☀️</span>
+                    <span class="icon-dark">🌙</span>
+                </button>
+                
+                <div class="user-info-navbar">
+                    <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
+                    <span>{% if user.is_authenticated %}{{ user.nome }}{% endif %}</span>
+                </div>
+                <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
+            </div>
+        </nav>
+        
+        <main class="main-content">
+            <div class="notif-page">
 
-          {# ===== Pequenos dados úteis (aparecem apenas se existirem) ===== #}
-          <div class="notif-dados" style="font-size:0.9rem;color:#555;margin-top:8px;">
-            {% if n.dados_normalizados.corrida_id %}
-              <div><strong>Corrida:</strong> {{ n.dados_normalizados.corrida_id }}</div>
-            {% endif %}
-            {% if n.dados_normalizados.solicitacao_id %}
-              <div><strong>Solicitação:</strong> {{ n.dados_normalizados.solicitacao_id }}</div>
-            {% endif %}
-            {% if n.dados_normalizados.payment %}
-              {# se n.dados_normalizados.payment for um objeto/dict com campos comuns #}
-              {% if n.dados_normalizados.payment.amount_display %}
-                <div><strong>Valor:</strong> {{ n.dados_normalizados.payment.amount_display }}</div>
-              {% endif %}
-              {% if n.dados_normalizados.payment.status %}
-                <div><strong>Status pagamento:</strong> {{ n.dados_normalizados.payment.status }}</div>
-              {% endif %}
-            {% endif %}
-          </div>
-          {# ============================================================ #}
+                <div class="notif-header">
+                    <h2>Notificações</h2>
+                </div>
 
-        </div>
+                <div id="notif-list" class="notif-list">
+                    {% for n in notificacoes %}
+                        <div class="notif-item tipo-{{ n.tipo }} {% if not n.lida %}nao-lida{% endif %}" data-id="{{ n.id }}">
+                            <div class="notif-main">
+                                <div class="notif-title">{{ n.titulo }}</div>
+                                <div class="notif-msg">{{ n.mensagem }}</div>
+                            </div>
+                            
+                            <div class="notif-meta">
+                                <div class="notif-time">{{ n.criada_em|date:"d/m/Y H:i" }}</div>
 
-        <div class="notif-meta">
-          <div class="notif-time">{{ n.criada_em|date:"d/m/Y H:i" }}</div>
+                                {% if not n.lida %}
+                                    <button class="btn-acao btn-marcar-lida" data-id="{{ n.id }}">Marcar como lida</button>
+                                {% endif %}
 
-          {% if not n.lida %}
-            <button class="btn-marcar-lida" data-id="{{ n.id }}">Marcar como lida</button>
-          {% endif %}
+                                {% if n.tipo == n.TIPO_SOLICITACAO_RECEBIDA and n.dados.corrida_id %}
+                                    <a href="{% url 'corrida:detalhe' n.dados.corrida_id %}" class="btn-acao btn-detalhe">Ver corrida</a>
 
-          {# ===== Lógica para mostrar os botões na coluna meta ===== #}
+                                    {% if n.dados.solicitacao_id %}
+                                        <button class="btn-acao btn-aceitar" 
+                                                    data-corrida="{{ n.dados.corrida_id }}" 
+                                                    data-solicitacao="{{ n.dados.solicitacao_id }}">
+                                                Aceitar solicitação
+                                            </button>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="nenhuma-notif">Você não possui notificações.</p>
+                    {% endfor %}
+                </div>
 
-          {# Mostrar Acompanhar & pagar apenas se: corrida existe, está em andamento e o título NÃO for "Solicitação Aceita" #}
-          {% if n.corrida_exists and n.corrida_status == 'em_andamento' and n.titulo != "Solicitação Aceita" and request.user.tipo_usuario == 'passageiro' or request.user.tipo_usuario == 'admin' %}
-            <button class="btn-acompanhamento"
-                    data-corrida="{{ n.dados_normalizados.corrida_id }}"
-                    data-notif="{{ n.id }}">
-              Acompanhar & pagar
-            </button>
+            </div>
+            
+        </main>
+        
+    </div>
 
-          {# Se tiver corrida_id mas não cumprir a condição acima => mostrar link "Ver detalhes" #}
-          {% elif n.dados_normalizados.corrida_id %}
-            <a href="{% url 'corrida:detalhe' n.dados_normalizados.corrida_id %}" class="btn-detalhe">Ver detalhes</a>
-          {% endif %}
+    <script>
+        // URLs e CSRF para o JavaScript
+        const URL_MARCAR_LIDA = "{% url 'notificacao:api_marcar_lida' %}";
+        const URL_CONTAGEM = "{% url 'notificacao:api_contagem' %}";
+        const URL_ACEITAR = "{% url 'corrida:api_aceitar_solicitacao' %}";
+        const CSRF_TOKEN = "{{ csrf_token }}";
 
-          {# Caso específico: se for solicitação recebida e tiver solicitacao_id, mostra botão aceitar #}
-          {% if n.tipo == n.TIPO_SOLICITACAO_RECEBIDA and n.dados_normalizados.solicitacao_id %}
-            <button class="btn-aceitar" data-corrida="{{ n.dados_normalizados.corrida_id }}" data-solicitacao="{{ n.dados_normalizados.solicitacao_id }}">
-              Aceitar solicitação
-            </button>
-          {% endif %}
+        // ===================================
+        // LÓGICA DE ALTERNÂNCIA DE TEMA (NOVO)
+        // ===================================
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
 
-                    
-          {# NOVO: Se a solicitação já estiver aceita, mostrar botão cancelar #}
-          {% if n.tipo == n.TIPO_SOLICITACAO_RECEBIDA and n.dados_normalizados.status == 'ACEITA' %}
-            <button class="btn-cancelar-solicitacao"
-                    data-corrida="{{ n.dados_normalizados.corrida_id }}"
-                    data-solicitacao="{{ n.dados_normalizados.solicitacao_id }}">
-                Cancelar solicitação
-            </button>
-          {% endif %}
+        // 1. Aplicar tema salvo (se houver)
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
 
-        </div>
-      </div>
-    {% empty %}
-      <p>Você não possui notificações.</p>
-    {% endfor %}
-  </div>
+        // 2. Atualizar ícone baseado no tema atual
+        function updateToggleIcon(theme) {
+            const isDark = theme === 'dark';
+            document.querySelector('.icon-light').style.display = isDark ? 'none' : 'block';
+            document.querySelector('.icon-dark').style.display = isDark ? 'block' : 'none';
+        }
+        updateToggleIcon(savedTheme);
 
-</div>
 
-<!-- URLs e CSRF -->
-<script>
-  const URL_MARCAR_LIDA = "{% url 'notificacao:api_marcar_lida' %}";
-  const URL_CONTAGEM = "{% url 'notificacao:api_contagem' %}";
-  const URL_ACEITAR = "{% url 'corrida:api_aceitar_solicitacao' %}";
-  const URL_ACOMP_BASE = "{% url 'corrida:acompanhamento' 0 %}"; // ex: /corrida/acompanhamento/0/
-  const CSRF_TOKEN = "{{ csrf_token }}";
-</script>
-
-<link rel="stylesheet" href="{% static 'notificacao/css/notificacoes.css' %}">
-<script src="{% static 'notificacao/js/notificacoes.js' %}" defer></script>
-{% endblock %}
+        // 3. Listener para o clique
+        themeToggle.addEventListener('click', () => {
+            let currentTheme = html.getAttribute('data-theme');
+            let newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleIcon(newTheme);
+        });
+        
+    </script>
+    <script src="{% static 'notificacao/js/notificacoes.js' %}" defer></script>
+</body>
+</html>
