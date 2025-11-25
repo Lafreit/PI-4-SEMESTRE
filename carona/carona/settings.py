@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 
 # Retenção do sistema em depósitos (%)
-RETENCAO_SISTEMA = 0.10  # 10% por padrão
+PORCENTAGEM_RETENCAO = 0.12  # 12%
 
 # caminho base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -1,12 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="pt-br" data-theme="light"> <head>
+<html lang="pt-br" data-theme="light">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carona | Lista notificações</title>
     <link rel="stylesheet" href="{% static 'veiculo.css' %}">
-    <link rel="stylesheet" href="{% static 'static/css/notificacoes.css' %}">
-    </head>
+    <link rel="stylesheet" href="{% static 'notificacao/css/notificacoes.css' %}">
+</head>
 <body>
     <div class="dashboard-container">
 
@@ -19,16 +20,15 @@
                 <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
                 <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
                 <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
-                <a href="{% url 'notificacao:lista' %}" class="menu-item active">Notificações</a> 
+                <a href="{% url 'notificacao:lista' %}" class="menu-item active">Notificações</a>
             </div>
 
             <div class="user-and-logout">
-                
                 <button id="theme-toggle" class="theme-toggle" aria-label="Alternar tema claro/escuro">
                     <span class="icon-light">☀️</span>
                     <span class="icon-dark">🌙</span>
                 </button>
-                
+
                 <div class="user-info-navbar">
                     <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
                     <span>{% if user.is_authenticated %}{{ user.nome }}{% endif %}</span>
@@ -36,10 +36,9 @@
                 <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
             </div>
         </nav>
-        
+
         <main class="main-content">
             <div class="notif-page">
-
                 <div class="notif-header">
                     <h2>Notificações</h2>
                 </div>
@@ -50,8 +49,45 @@
                             <div class="notif-main">
                                 <div class="notif-title">{{ n.titulo }}</div>
                                 <div class="notif-msg">{{ n.mensagem }}</div>
+
+                                <!-- Mostrar apenas origem / destino / quem solicitou (se existirem) -->
+                                <div class="notif-extra">
+                                    {% if n.dados_normalizados.origine or n.dados_normalizados.origem or n.dados_normalizados.destino %}
+                                        <div class="campo-origem-destino">
+                                            {% if n.dados_normalizados.origem %}
+                                                <span class="lbl">Origem:</span>
+                                                <span class="val">{{ n.dados_normalizados.origem }}</span>
+                                            {% elif n.dados_normalizados.origine %}
+                                                <span class="lbl">Origem:</span>
+                                                <span class="val">{{ n.dados_normalizados.origine }}</span>
+                                            {% endif %}
+
+                                            {% if n.dados_normalizados.destino %}
+                                                <span class="lbl">Destino:</span>
+                                                <span class="val">{{ n.dados_normalizados.destino }}</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if n.dados_normalizados.passageiro_nome %}
+                                        <div class="campo-solicitante">
+                                            <span class="lbl">Solicitação por:</span>
+                                            <span class="val">{{ n.dados_normalizados.passageiro_nome }}</span>
+                                        </div>
+                                    {% elif n.dados_normalizados.passageiro %}
+                                        <div class="campo-solicitante">
+                                            <span class="lbl">Solicitação por:</span>
+                                            <span class="val">{{ n.dados_normalizados.passageiro }}</span>
+                                        </div>
+                                    {% elif n.dados_normalizados.usuario %}
+                                        <div class="campo-solicitante">
+                                            <span class="lbl">Solicitação por:</span>
+                                            <span class="val">{{ n.dados_normalizados.usuario }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
                             </div>
-                            
+
                             <div class="notif-meta">
                                 <div class="notif-time">{{ n.criada_em|date:"d/m/Y H:i" }}</div>
 
@@ -59,16 +95,25 @@
                                     <button class="btn-acao btn-marcar-lida" data-id="{{ n.id }}">Marcar como lida</button>
                                 {% endif %}
 
-                                {% if n.tipo == n.TIPO_SOLICITACAO_RECEBIDA and n.dados.corrida_id %}
-                                    <a href="{% url 'corrida:detalhe' n.dados.corrida_id %}" class="btn-acao btn-detalhe">Ver corrida</a>
+                                <!-- Botões para solicitações recebidas -->
+                                {% if n.tipo == n.TIPO_SOLICITACAO_RECEBIDA and n.dados_normalizados.corrida_id %}
+                                    <a href="{% url 'corrida:detalhe' n.dados_normalizados.corrida_id %}" class="btn-acao btn-detalhe">Ver corrida</a>
 
-                                    {% if n.dados.solicitacao_id %}
-                                        <button class="btn-acao btn-aceitar" 
-                                                    data-corrida="{{ n.dados.corrida_id }}" 
-                                                    data-solicitacao="{{ n.dados.solicitacao_id }}">
-                                                Aceitar solicitação
-                                            </button>
+                                    {% if n.dados_normalizados.solicitacao_id %}
+                                        <button class="btn-acao btn-aceitar"
+                                                data-corrida="{{ n.dados_normalizados.corrida_id }}"
+                                                data-solicitacao="{{ n.dados_normalizados.solicitacao_id }}">
+                                            Aceitar solicitação
+                                        </button>
                                     {% endif %}
+                                {% endif %}
+
+                                <!-- Botão Acompanhar / Pagar corrida (só para "corrida iniciada" e corrida em andamento) -->
+                                {% if n.corrida_id and "corrida iniciada" in n.titulo|lower and n.corrida_status == "em_andamento" %}
+                                    <a href="{% url 'corrida:acompanhamento' n.corrida_id %}"
+                                       class="btn-acao btn-pagar-acao" title="Abrir pagamento/checkout da corrida">
+                                        Acompanhar & Pagar 
+                                    </a>
                                 {% endif %}
                             </div>
                         </div>
@@ -78,48 +123,42 @@
                 </div>
 
             </div>
-            
         </main>
-        
+
     </div>
 
     <script>
-        // URLs e CSRF para o JavaScript
+        // URLs (sem espaços extras)
         const URL_MARCAR_LIDA = "{% url 'notificacao:api_marcar_lida' %}";
         const URL_CONTAGEM = "{% url 'notificacao:api_contagem' %}";
-        const URL_ACEITAR = "{% url 'corrida:api_aceitar_solicitacao' %}";
         const CSRF_TOKEN = "{{ csrf_token }}";
 
-        // ===================================
-        // LÓGICA DE ALTERNÂNCIA DE TEMA (NOVO)
-        // ===================================
+        // Alternância de tema
         const themeToggle = document.getElementById('theme-toggle');
         const html = document.documentElement;
-
-        // 1. Aplicar tema salvo (se houver)
         const savedTheme = localStorage.getItem('theme') || 'light';
         html.setAttribute('data-theme', savedTheme);
-
-        // 2. Atualizar ícone baseado no tema atual
         function updateToggleIcon(theme) {
             const isDark = theme === 'dark';
-            document.querySelector('.icon-light').style.display = isDark ? 'none' : 'block';
-            document.querySelector('.icon-dark').style.display = isDark ? 'block' : 'none';
+            const iconLight = document.querySelector('.icon-light');
+            const iconDark = document.querySelector('.icon-dark');
+            if (iconLight && iconDark) {
+                iconLight.style.display = isDark ? 'none' : 'block';
+                iconDark.style.display = isDark ? 'block' : 'none';
+            }
         }
         updateToggleIcon(savedTheme);
-
-
-        // 3. Listener para o clique
-        themeToggle.addEventListener('click', () => {
-            let currentTheme = html.getAttribute('data-theme');
-            let newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateToggleIcon(newTheme);
-        });
-        
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                let currentTheme = html.getAttribute('data-theme');
+                let newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateToggleIcon(newTheme);
+            });
+        }
     </script>
+
     <script src="{% static 'notificacao/js/notificacoes.js' %}" defer></script>
 </body>
 </html>

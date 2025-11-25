@@ -22,14 +22,20 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 
-
+from decimal import Decimal
 from .services import create_payment_for_corrida
 from .models import Payment, Carteira, WebhookEventProcessed
 from corrida.models import Corrida
 from pagamentos.services import criar_pix_carteira
 import os
 
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.conf import settings
+from django.db import transaction
 
+from usuarios.models import Usuario
+from corrida.models import SolicitacaoCarona
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -504,44 +510,55 @@ def adicionar_saldo_view(request):
         return JsonResponse({"success": False, "message": "Erro ao processar pagamento"})
 
 
-
 @login_required
-@require_POST
 @transaction.atomic
 def pagar_corrida_view(request, corrida_id):
     """
     Processa o pagamento de uma corrida usando a carteira do passageiro.
-    Debita da carteira do passageiro, credita do motorista, aplica retenção do sistema.
     """
+    if request.method != "POST":
+        return JsonResponse({"ok": False, "error": "Método inválido"}, status=405)
+
     corrida = get_object_or_404(Corrida, pk=corrida_id)
 
-    # apenas passageiro vinculado à corrida pode pagar
-    if request.user != corrida.passageiro:
-        return JsonResponse({"ok": False, "error": "Acesso negado"}, status=403)
+    # verifica se o usuário logado é passageiro da corrida
+    # aqui assumimos que passageiro é aquele que tem uma SolicitacaoCarona aceita
+    passageiro_solicitacao = corrida.solicitacoes.filter(
+        passageiro=request.user, status='ACEITA'
+    ).first()
+    if not passageiro_solicitacao:
+        return JsonResponse({"ok": False, "error": "Acesso negado: não é passageiro desta corrida"}, status=403)
 
-    valor_corrida = corrida.valor_total
-    passageiro_carteira, _ = Carteira.objects.get_or_create(user=request.user)
+    # pega valor da corrida
+    valor_corrida = corrida.valor
+    if valor_corrida is None:
+        return JsonResponse({"ok": False, "error": "Valor da corrida não definido"}, status=400)
     
+    valor_corrida = Decimal(valor_corrida)
+
+    # carteira do passageiro
+    passageiro_carteira, _ = Carteira.objects.get_or_create(user=request.user)
+
     if passageiro_carteira.saldo < valor_corrida:
         return JsonResponse({"ok": False, "error": "Saldo insuficiente"}, status=400)
 
     # carteira do motorista
     motorista_carteira, _ = Carteira.objects.get_or_create(user=corrida.motorista)
 
-    # porcentagem de retenção do sistema
-    RETENCAO_PORCENTAGEM = getattr(settings, "PORCENTAGEM_RETENCAO", 0.10)  # 10% por padrão
-    valor_retenido = valor_corrida * RETENCAO_PORCENTAGEM
-    valor_liquido_motorista = valor_corrida - valor_retenido
+    # porcentagem de retenção (flexível via settings)
+    RETENCAO_PORCENTAGEM = Decimal(getattr(settings, "PORCENTAGEM_RETENCAO", 0.10))
+    valor_retenido = (valor_corrida * RETENCAO_PORCENTAGEM).quantize(Decimal("0.01"))
+    valor_liquido_motorista = (valor_corrida - valor_retenido).quantize(Decimal("0.01"))
 
-    # debitar do passageiro
+    # debitar passageiro
     passageiro_carteira.saldo -= valor_corrida
     passageiro_carteira.save(update_fields=["saldo"])
 
-    # creditar no motorista
+    # creditar motorista
     motorista_carteira.saldo += valor_liquido_motorista
     motorista_carteira.save(update_fields=["saldo"])
 
-    # registrar Payment histórico
+    # registra pagamento no histórico (Payment)
     payment = Payment.objects.create(
         corrida=corrida,
         user=request.user,
@@ -550,21 +567,23 @@ def pagar_corrida_view(request, corrida_id):
         payment_method="CARTEIRA",
         external_id=f"corrida-{corrida.id}-carteira",
         payload={
-            "retencao_percent": RETENCAO_PORCENTAGEM,
-            "valor_retenido": valor_retenido,
-            "valor_liquido_motorista": valor_liquido_motorista,
+            "retencao_percent": float(RETENCAO_PORCENTAGEM),
+            "valor_retenido": float(valor_retenido),
+            "valor_liquido_motorista": float(valor_liquido_motorista),
         }
     )
 
     return JsonResponse({
         "ok": True,
         "payment_id": payment.id,
-        "valor_corrida": valor_corrida,
-        "retencao": valor_retenido,
-        "valor_motorista": valor_liquido_motorista,
-        "novo_saldo_passageiro": passageiro_carteira.saldo,
-        "novo_saldo_motorista": motorista_carteira.saldo,
+        "valor_corrida": float(valor_corrida),
+        "retencao": float(valor_retenido),
+        "valor_motorista": float(valor_liquido_motorista),
+        "novo_saldo_passageiro": float(passageiro_carteira.saldo),
+        "novo_saldo_motorista": float(motorista_carteira.saldo),
+        "mensagem": "Pagamento realizado com sucesso!"
     })
+
 
 
 @login_required
