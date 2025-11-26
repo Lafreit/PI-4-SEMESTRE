@@ -144,6 +144,13 @@
     border: 2px solid #1d4ed8;
 }
 
+.user-avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-blue);
+}
+
 .user-name {
     font-size: 16px; /* aumentado */
     color: #374151;

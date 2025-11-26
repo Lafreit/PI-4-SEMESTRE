@@ -65,9 +65,9 @@
             {% if request.user.is_authenticated %}
                 <div class="user-info">
                     {% if request.user.profile.foto %}
-                        <img src="{{ request.user.profile.foto.url }}" class="avatar" alt="foto">
+                        <img src="{{ request.user.profile.foto.url }}" class=".user-avatar-small" alt="foto">
                     {% else %}
-                        <img src="{% static 'img/default-user.png' %}" class="avatar" alt="foto">
+                        <img src="{% static 'img/default-user.png' %}" class=".user-avatar-small" alt="foto">
                     {% endif %}
                     <span class="user-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
                 </div>

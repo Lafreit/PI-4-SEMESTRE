@@ -43,7 +43,6 @@
                     <th>Valor</th>
                     <th>Status</th>
                     <th>Data</th>
-                    <th>Pagamento</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,20 +53,6 @@
                     <td>{{ p.amount_display }}</td>
                     <td>{{ p.get_status_display }}</td>
                     <td>{{ p.created_at|date:"d/m/Y H:i" }}</td>
-                    <td>
-                        {% if p.status == "PENDING" %}
-                            {% if p.billing_url %}
-                                <a href="{{ p.billing_url }}" target="_blank" class="btn-pagar">Pagar / Ver QR</a>
-                            {% else %}
-                                <form method="POST" action="{% url 'pagamentos:refresh_qr' p.id %}" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn-gerar">Gerar Pagamento</button>
-                                </form>
-                            {% endif %}
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
