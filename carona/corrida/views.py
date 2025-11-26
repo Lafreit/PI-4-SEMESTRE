@@ -23,7 +23,6 @@ from django.http import Http404
 from urllib.parse import quote_plus
 import re
 
-
 import logging
 from typing import Optional, Tuple
 
@@ -948,13 +947,19 @@ def cancelar_solicitacao(request, solicitacao_id):
 
 
 
-
 @login_required
 @require_POST
 def responder_solicitacao(request, solicitacao_id):
+    """
+    Recebe POST com 'action' = 'aceitar' | 'rejeitar'
+    Apenas o motorista da corrida pode responder.
+    """
     action = request.POST.get('action')
     if action not in ('aceitar', 'rejeitar'):
         return JsonResponse({'erro': 'Ação inválida.'}, status=400)
+
+    from corrida.models import SolicitacaoCarona, Corrida  # import local para evitar ciclos
+    from notificacao.models import Notificacao  # seu model de notificações
 
     solicit = get_object_or_404(SolicitacaoCarona, id=solicitacao_id)
     corrida = solicit.corrida
@@ -965,47 +970,58 @@ def responder_solicitacao(request, solicitacao_id):
 
     try:
         with transaction.atomic():
+            # bloqueia a corrida para evitar race conditions
             corrida_locked = Corrida.objects.select_for_update().get(id=corrida.id)
 
-            from notificacao.models import Notificacao
-
             if action == 'aceitar':
-
-                # Sem vagas → não pode aceitar
+                # Verifica vagas no objeto bloqueado
                 if corrida_locked.vagas_disponiveis <= 0:
                     return JsonResponse({'erro': 'Não há vagas disponíveis.'}, status=400)
 
+                # atualiza solicitação
                 solicit.status = SolicitacaoCarona.STATUS_ACEITA
                 solicit.save(update_fields=['status'])
 
-                # decrementa vagas
+                # decrementa vagas com F() para segurança concorrente
                 Corrida.objects.filter(id=corrida.id).update(
                     vagas_disponiveis=dj_models.F('vagas_disponiveis') - 1
                 )
 
-                # 🔔 Notifica passageiro
+                # Notifica passageiro
                 Notificacao.objects.create(
                     usuario=solicit.passageiro,
                     mensagem=f"Sua solicitação para a corrida {corrida.origem} → {corrida.destino} foi ACEITA!",
-                    link=f"/corrida/detalhes/{corrida.id}/",
+                    dados={
+                        "corrida_id": corrida.id,
+                        "solicitacao_id": solicit.id,
+                        "link": f"{reverse('corrida:detalhe', args=[corrida.id])}"
+                    },
+                    tipo=Notificacao.TIPO_SOLICITACAO_RESPONDIDA
                 )
 
             else:  # rejeitar
                 solicit.status = SolicitacaoCarona.STATUS_RECUSADA
                 solicit.save(update_fields=['status'])
 
-                # 🔔 Notifica o passageiro
+                # Notifica passageiro
                 Notificacao.objects.create(
                     usuario=solicit.passageiro,
                     mensagem=f"Sua solicitação para a corrida {corrida.origem} → {corrida.destino} foi RECUSADA.",
-                    link=f"/corrida/detalhes/{corrida.id}/",
+                    dados={
+                        "corrida_id": corrida.id,
+                        "solicitacao_id": solicit.id,
+                        "link": f"{reverse('corrida:detalhe', args=[corrida.id])}"
+                    },
+                    tipo=Notificacao.TIPO_SOLICITACAO_RESPONDIDA
                 )
 
-    except Exception:
+    except Exception as exc:
+        logger.exception("Erro interno ao processar a solicitação (responder_solicitacao) solicitacao_id=%s action=%s user=%s", solicitacao_id, action, request.user.id)
+        # Retorna mensagem curta ao client (evita vazar stacktrace)
         return JsonResponse({'erro': 'Erro interno ao processar a solicitação.'}, status=500)
 
+    # Se chegou até aqui, deu certo
     return JsonResponse({'ok': True, 'status': solicit.status})
-
 
 
 @require_GET

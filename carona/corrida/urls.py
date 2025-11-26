@@ -38,5 +38,6 @@ urlpatterns = [
     path("iniciar/<int:corrida_id>/", motorista_iniciar_corrida, name="iniciar_corrida"),
     path("encerrar/<int:corrida_id>/", motorista_encerrar_corrida, name="encerrar_corrida"),
     path('detalhe/<int:pk>/', detalhe_corrida, name='detalhe_corrida'),
+    
 
 ]

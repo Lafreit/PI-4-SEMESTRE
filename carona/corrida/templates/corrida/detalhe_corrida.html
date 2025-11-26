@@ -2,7 +2,10 @@
 {% load static %}
 
 {% block content %}
-<div class="corrida-detalhe-page">
+<div class="corrida-detalhe-page"
+     id="corrida-detalhe"
+     data-corrida-id="{{ corrida.id }}"
+     data-corrida-status="{{ corrida.status }}">
   <h2>Detalhes da Corrida</h2>
 
   <div class="corrida-info">
@@ -12,29 +15,36 @@
     <p><strong>Data:</strong> {{ corrida.data|date:"d/m/Y" }}</p>
     <p><strong>Horário de saída:</strong> {{ corrida.horario_saida|time:"H:i" }}</p>
     <p><strong>Horário estimado de chegada:</strong> {{ corrida.horario_chegada|time:"H:i" }}</p>
-    <p><strong>Vagas disponíveis:</strong> {{ corrida.vagas_disponiveis }}</p>
+    <p><strong>Vagas disponíveis:</strong> <span id="corrida-vagas">{{ corrida.vagas_disponiveis }}</span></p>
     <p><strong>Valor:</strong> R$ {{ corrida.valor }}</p>
     {% if corrida.observacoes %}
       <p><strong>Observações:</strong> {{ corrida.observacoes }}</p>
     {% endif %}
-    <p><strong>Status:</strong> {{ corrida.get_status_display }}</p>
+    <p><strong>Status:</strong> <span id="corrida-status-text">{{ corrida.get_status_display }}</span></p>
   </div>
 
   {% if user == corrida.motorista %}
-    <!-- Controles do motorista: Iniciar / Finalizar corrida -->
+    <!-- Controles do motorista -->
     <div class="corrida-controles">
       <form id="form-iniciar" action="{% url 'corrida:iniciar_corrida' corrida.id %}" method="post" style="display:inline;">
         {% csrf_token %}
-        <button type="submit" id="btn-iniciar" class="btn"
-                {% if corrida.status != 'ativa' %}disabled{% endif %}>
+        <button type="button" id="btn-iniciar" class="btn"
+                {% if corrida.status == 'em_andamento' %}disabled{% endif %}>
           Iniciar Corrida
         </button>
       </form>
 
       <form id="form-encerrar" action="{% url 'corrida:encerrar_corrida' corrida.id %}" method="post" style="display:inline; margin-left:8px;">
         {% csrf_token %}
-        <button type="submit" id="btn-encerrar" class="btn btn-danger"
+        <button type="button" id="btn-encerrar" class="btn btn-danger"
                 {% if corrida.status != 'em_andamento' %}disabled{% endif %}>
+          Encerrar (temporário)
+        </button>
+
+        <!-- Botão para encerrar definitivamente -->
+        <button type="button" id="btn-finalizar" class="btn btn-danger"
+                style="margin-left:8px;"
+                title="Finalizar permanentemente (não poderá iniciar novamente)">
           Finalizar Corrida
         </button>
       </form>
@@ -44,47 +54,55 @@
     <div class="solicitacoes-list">
       {% for s in corrida.solicitacoes.all %}
         <div class="solicitacao-item {% if s.status == 'PENDENTE' %}pendente{% elif s.status == 'ACEITA' %}aceita{% else %}outros{% endif %}"
+             data-solicitacao="{{ s.id }}"
              data-status="{{ s.status }}">
           <p><strong>Passageiro:</strong> {{ s.passageiro.nome }}</p>
-          <p><strong>Status:</strong> {{ s.get_status_display }}</p>
+          <p>
+            <strong>Status:</strong>
+            <span class="status-text">{{ s.get_status_display }}</span>
+          </p>
 
-          {% if s.status == 'PENDENTE' %}
-            <button class="btn-aceitar"
-                    data-corrida="{{ corrida.id }}"
-                    data-solicitacao="{{ s.id }}">
-              Aceitar Solicitação
-            </button>
+          {% if s.status == "PENDENTE" or s.status == "ACEITA" %}
+            <div class="botoes-acoes" role="group" aria-label="Ações da solicitação">
+              <button type="button"
+                      class="btn-acao btn-aceitar"
+                      data-solicitacao="{{ s.id }}"
+                      data-corrida="{{ corrida.id }}"
+                      data-action="aceitar">
+                Aceitar
+              </button>
+
+              <button type="button"
+                      class="btn-acao btn-rejeitar"
+                      data-solicitacao="{{ s.id }}"
+                      data-corrida="{{ corrida.id }}"
+                      data-action="rejeitar">
+                Cancelar
+              </button>
+            </div>
           {% endif %}
         </div>
       {% empty %}
         <p>Não há solicitações para esta corrida.</p>
       {% endfor %}
     </div>
+
   {% else %}
-    <!-- Para outros usuários (passageiros) apenas lista de solicitações não aparece -->
     <h3>Informações</h3>
     <p>Somente o motorista pode controlar a corrida (iniciar / finalizar).</p>
   {% endif %}
 </div>
 
-<!-- confirmação JS para iniciar/encerrar -->
+<!-- Config JS úteis -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const formIniciar = document.getElementById('form-iniciar');
-  if (formIniciar) {
-    formIniciar.addEventListener('submit', function(e) {
-      if (!confirm('Confirma iniciar a corrida?')) e.preventDefault();
-    });
-  }
-  const formEncerrar = document.getElementById('form-encerrar');
-  if (formEncerrar) {
-    formEncerrar.addEventListener('submit', function(e) {
-      if (!confirm('Confirma encerrar a corrida?')) e.preventDefault();
-    });
-  }
-});
+  // Se o reverse do Django funcionar com 0, você pode descomentar:
+  // const RESPONDER_URL_TEMPLATE = "{% url 'corrida:responder_solicitacao' 0 %}";
+  const URL_CONTAGEM = "{% url 'notificacao:api_contagem' %}";
+  // Rotas AJAX para iniciar/encerrar (fallbacks existem no JS)
+  const URL_INICIAR_TEMPLATE = "{% url 'corrida:iniciar_corrida' corrida.id %}";
+  const URL_ENCERRAR_TEMPLATE = "{% url 'corrida:encerrar_corrida' corrida.id %}";
 </script>
 
 <link rel="stylesheet" href="{% static 'corrida/css/detalhe_corrida.css' %}">
-<script src="{% static 'corrida/js/aceitar_solicitacao.js' %}" defer></script>
+<script src="{% static 'corrida/js/detalhe_corrida.js' %}" defer></script>
 {% endblock %}
