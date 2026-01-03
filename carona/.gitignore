@@ -24,3 +24,5 @@ Thumbs.db
 # Arquivos gerados automaticamente
 /staticfiles/
 
+# Arquivos de banco de dados SQLite
+*.sqlite3
