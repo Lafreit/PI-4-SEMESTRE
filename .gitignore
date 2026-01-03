@@ -23,3 +23,8 @@ Thumbs.db
 
 # Arquivos de banco de dados SQLite
 *.sqlite3
+
+# .env files
+.env
+*.env
+carona/.env
