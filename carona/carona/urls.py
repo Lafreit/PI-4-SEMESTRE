@@ -12,5 +12,6 @@ urlpatterns = [
     path('usuarios/', include('usuarios.urls', namespace='usuarios')),
     path('corrida/', include ('corrida.urls', namespace='corrida')),
     path('notificacao/', include('notificacao.urls', namespace='notificacao')),
+    path("pagamentos/", include("pagamentos.urls")),
     # path('veiculos/', include('veiculos.urls')),
 ]

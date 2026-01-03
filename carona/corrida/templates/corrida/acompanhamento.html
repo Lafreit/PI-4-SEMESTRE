@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'corrida/css/acompanhamento.css' %}">
+<script src="{% static 'corrida/js/acompanhamento.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+  <div class="card-container">
+    <div class="card-acomp">
+      <!-- Header do card -->
+      <header class="card-header">
+        <h2 class="card-title">Acompanhamento da Corrida</h2>
+        <span class="card-subtitle">Corrida #{{ corrida.id }}</span>
+      </header>
+
+      <!-- Corpo do card -->
+      <main class="card-body">
+        <div class="row">
+          <div class="col-label">Origem</div>
+          <div class="col-value">{{ corrida.origem }}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-label">Destino</div>
+          <div class="col-value">{{ corrida.destino }}</div>
+        </div>
+
+        <div class="row">
+          <div class="col-label">Motorista</div>
+          <div class="col-value">
+            {% if corrida.motorista.nome %}
+              {{ corrida.motorista.nome }}
+            {% else %}
+              {{ corrida.motorista.email }}
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-label">Status Corrida</div>
+          <div class="col-value">
+            <span class="status-badge status-{{ corrida.status }}">{{ corrida.get_status_display }}</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-label">Status Pagamento</div>
+          <div class="col-value">
+            
+              {% if payment.status == "PAID" %}
+                <span class="status-badge status-finalizada">Pago</span>
+              {% else %}
+                <span class="status-badge status-em_andamento">Pendente</span>
+              {% endif %}
+          
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-label">Valor</div>
+          <div class="col-value">
+            {% if corrida.valor %}
+              R$ {{ corrida.valor|floatformat:2 }}
+            {% else %}
+              —
+            {% endif %}
+          </div>
+        </div>
+
+        <hr class="sep">
+
+        <!-- Informações adicionais -->
+        <div class="extras">
+          <div class="row small">
+            <div class="col-label">Data</div>
+            <div class="col-value">
+              {% if corrida.data %}{{ corrida.data|date:"d/m/Y" }}{% else %}—{% endif %}
+            </div>
+          </div>
+
+          <div class="row small">
+            <div class="col-label">Horário saída</div>
+            <div class="col-value">
+              {% if corrida.horario_saida %}{{ corrida.horario_saida|time:"H:i" }}{% else %}—{% endif %}
+            </div>
+          </div>
+
+          <div class="row small">
+            <div class="col-label">Vagas disponíveis</div>
+            <div class="col-value">{{ corrida.vagas_disponiveis }}</div>
+          </div>
+
+          {% if corrida.observacoes %}
+            <div class="row small">
+              <div class="col-label">Observações</div>
+              <div class="col-value">{{ corrida.observacoes }}</div>
+            </div>
+          {% endif %}
+        </div>
+      </main>
+
+      <!-- Footer do card com botões -->
+      <footer class="card-footer">
+        <button class="btn-empty" aria-label="ação-da-corrida"></button>
+
+          {% if payment.status != "PAID" %}
+            <button class="btn-primary btn-pagar" data-corrida-id="{{ corrida.id }}">
+              Pagar
+            </button>
+          {% endif %}
+    
+      </footer>
+
+      <!-- Container para mensagens temporárias -->
+      <div id="mensagens-corrida" style="position: absolute; top: 10px; right: 10px; z-index: 999;"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

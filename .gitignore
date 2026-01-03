@@ -1,9 +1,6 @@
 # Ambiente virtual
 venv/
 
-# Arquivos de ambiente (chaves, configs locais)
-.env
-*.env
 
 # Cache e compilados do Python
 __pycache__/

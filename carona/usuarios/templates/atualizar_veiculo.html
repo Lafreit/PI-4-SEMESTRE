@@ -1,0 +1,116 @@
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'veiculo.css' %}">
+{% endblock %}
+ <title>Carona | Atualizar veiculo</title>
+{% block content %}
+<div class="dashboard-container">
+
+    <nav class="top-navbar" id="mainNavbar">
+        <div class="logo-area">
+            <img src="{% static 'img/logo.png' %}" alt="" class="logo-img">
+        </div>
+
+        <div class="menu">
+            <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
+            <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
+            <a href="{% url 'usuarios:atualizar_veiculo' %}" class="menu-item active">Veículo</a> 
+        </div>
+
+        <div class="user-and-logout">
+            <div class="user-info-navbar">
+                <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
+                <span>{{ user.nome }}</span>
+            </div>
+            <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
+        </div>
+    </nav>
+    
+    <main class="main-content">
+    
+        <div class="header-banner"></div>
+
+        {% if messages %}
+            <div class="message-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        <span>
+                            {% if message.tags == 'success' %}✅ Sucesso!
+                            {% elif message.tags == 'error' %}❌ Erro:
+                            {% else %}💡 Aviso:
+                            {% endif %}
+                        </span>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="register-single-wrapper">
+            <div class="register-container">
+                
+                <div class="register-box"> 
+                    
+                    <h1>Atualizar Veículo 🚗</h1>
+                    <p class="subtitle">
+                        Mantenha os dados do seu veículo sempre atualizados para a segurança e confiança dos passageiros.
+                    </p>
+
+                    <form method="POST">
+                        {% csrf_token %}
+        
+                        <div class="info-section">
+                            {% for field in veiculo_form %}
+                                <p class="form-field-p">
+                                    {{ field.label_tag }}
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <span class="error-message">{{ field.errors }}</span>
+                                    {% endif %}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="{% url 'usuarios:meu_perfil' %}" class="btn-back">Voltar ao Perfil</a>
+                            <button type="submit" class="btn-help">Salvar Veículo</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="side-content">
+                    
+                    <div class="side-top-group">
+                        
+                        <div class="tip-section"> 
+                            <h2>Diretrizes do Veículo:</h2>
+                            <ul>
+                                <li>A placa deve ser a mesma registrada no seu documento CNH.</li>
+                                <li>O veículo deve ter no máximo 10 anos de uso.</li>
+                                <li>A quantidade de assentos define o limite de passageiros por viagem.</li>
+                                <li>A cor e o modelo auxiliam os passageiros na identificação.</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip-section"> 
+                            <h2>Segurança:</h2>
+                            <p class="tip-text">
+                                Veículos verificados aumentam a sua credibilidade e a confiança dos usuários na plataforma. Garanta que todas as informações estejam corretas e atualizadas.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="side-actions">
+                        <a href="{% url 'corrida:cadastrar_corrida' %}" class="btn-help">Cadastrar Corrida</a> 
+                        <a href="{% url 'usuarios:meu_perfil' %}" class="btn-back">Voltar ao Perfil</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+    </main>
+</div>
+{% endblock %}

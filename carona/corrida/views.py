@@ -6,7 +6,7 @@ from .forms import CorridaForm
 from .models import Corrida, SolicitacaoCarona
 from .utils import geocode_endereco, gerar_rota, nearest_point_on_route
 from django.views.decorators.http import require_POST, require_GET
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseForbidden
 import json, unicodedata, requests, logging, math
 from datetime import datetime, timedelta, date, time
 from django.urls import reverse
@@ -16,6 +16,27 @@ from django.conf import settings
 from django.db import IntegrityError, transaction, models as dj_models
 from django.db.models import Prefetch
 from notificacao.models import Notificacao
+from pagamentos.models import Payment
+
+from pagamentos.services import criar_pix_qr
+from django.http import Http404
+from urllib.parse import quote_plus
+import re
+
+import logging
+from typing import Optional, Tuple
+
+from django.db.models import Q
+
+from pagamentos.services import create_payment_for_corrida
+
+
+# tolerâncias (caemback para valores padrão caso não estejam em settings)
+TOLERANCIA_MIN = getattr(settings, "TOLERANCIA_MIN", 100)
+TOLERANCIA_MAX = getattr(settings, "TOLERANCIA_MAX", 50000)
+TOLERANCIA_CIDADE = getattr(settings, "TOLERANCIA_CIDADE", 5000)
+TOLERANCIA_ESTADO = getattr(settings, "TOLERANCIA_ESTADO", 20000)
+TOLERANCIA_PAIS = getattr(settings, "TOLERANCIA_PAIS", 50000)
 
 
 
@@ -244,7 +265,6 @@ def _rota_para_lista(rota):
         rota_serializada = []
     return rota_serializada
 
-
 def serialize_corrida(corrida, distancia_m=None):
     """Retorna dict serializável para template / API."""
     rota_serializada = _rota_para_lista(corrida.rota)
@@ -256,6 +276,33 @@ def serialize_corrida(corrida, distancia_m=None):
 
     horario_saida_str = corrida.horario_saida.strftime("%H:%M") if getattr(corrida, "horario_saida", None) else None
     horario_chegada_str = corrida.horario_chegada.strftime("%H:%M") if getattr(corrida, "horario_chegada", None) else None
+
+    # motorista nome
+    motorista_nome = None
+    try:
+        motorista_nome = getattr(corrida.motorista, "nome", None) or getattr(corrida.motorista, "email", None)
+    except Exception:
+        motorista_nome = None
+
+    # data formatada (dia/mês/ano)
+    data_str = corrida.data.strftime("%d/%m/%Y") if getattr(corrida, "data", None) else None
+
+    # periodicidade: tentar ler do parent_template se existir
+    periodicidade = None
+    try:
+        tpl = getattr(corrida, "parent_template", None)
+        if tpl:
+            freq = getattr(tpl, "frequency", None) or getattr(tpl, "periodicity", None) or None
+            if freq == "daily":
+                periodicidade = "Diária"
+            elif freq == "weekly":
+                periodicidade = "Semanal"
+            elif freq == "monthly":
+                periodicidade = "Mensal"
+            else:
+                periodicidade = None
+    except Exception:
+        periodicidade = None
 
     return {
         "id": corrida.id,
@@ -271,7 +318,13 @@ def serialize_corrida(corrida, distancia_m=None):
         "valor": float(corrida.valor) if corrida.valor is not None else 0.0,
         "vagas_disponiveis": int(corrida.vagas_disponiveis or 0),
         "distancia_m": float(distancia_m) if distancia_m is not None else float(getattr(corrida, "distancia_ao_passageiro", 0.0)),
+
+        # novos campos
+        "motorista_nome": motorista_nome,
+        "data": data_str,
+        "periodicidade": periodicidade,
     }
+
 
 
 def find_corridas_near(lat, lon, tolerancia_metros):
@@ -666,7 +719,7 @@ def buscar_corridas(request):
 
         tolerancia_metros = max(TOLERANCIA_MIN, min(tolerancia_metros, TOLERANCIA_MAX))
 
-        # → Busca corridas pelo algoritmo de proximidade
+        # → Busca corridas pelo algoritmo de proximidade (find_corridas_near retorna iterable de (corrida, distancia))
         corridas_encontradas = []
         try:
             for corrida, distancia in find_corridas_near(lat, lon, tolerancia_metros):
@@ -678,13 +731,14 @@ def buscar_corridas(request):
         # Buscar solicitações do usuário (uma única query)
         solicitacoes_map = {}
         try:
-            corrida_ids = [c.id for c in corridas_encontradas]
-            qs_solic = SolicitacaoCarona.objects.filter(
-                corrida_id__in=corrida_ids,
-                passageiro=request.user
-            )
-            for s in qs_solic:
-                solicitacoes_map[s.corrida_id] = s
+            corrida_ids = [c.id for c in corridas_encontradas] if corridas_encontradas else []
+            if corrida_ids:
+                qs_solic = SolicitacaoCarona.objects.filter(
+                    corrida_id__in=corrida_ids,
+                    passageiro=request.user
+                )
+                for s in qs_solic:
+                    solicitacoes_map[s.corrida_id] = s
         except Exception as e:
             logger.exception("Erro ao buscar solicitações: %s", e)
 
@@ -702,29 +756,42 @@ def buscar_corridas(request):
             corridas_serializadas.append(ser)
 
     # ================================================================
-    # 2) GEOCODE FALHOU → FALLBACK DE BUSCA POR TEXTO
+    # 2) GEOCODE FALHOU → FALLBACK DE BUSCA POR TEXTO (USANDO Q / icontains)
     # ================================================================
     else:
         try:
-            palavras = termo_busca.split()
-            candidatos = []
-            for corrida in Corrida.objects.filter(status="ativa"):
-                origem_n = normalizar_texto(str(corrida.origem))
-                destino_n = normalizar_texto(str(corrida.destino))
-                if any(p in origem_n or p in destino_n for p in palavras):
-                    candidatos.append(corrida)
+            # tokens: cada palavra + a frase inteira (para "sao paulo")
+            palavras = [p for p in termo_busca.split() if p]
+            tokens = list(dict.fromkeys(palavras + [termo_busca]))  # remove duplicatas mantendo ordem
 
+            texto_q = Q()
+            for t in tokens:
+                texto_q |= (
+                    Q(origem__icontains=t) |
+                    Q(destino__icontains=t) |
+                    Q(bairro_origem__icontains=t) |
+                    Q(bairro_destino__icontains=t) |
+                    Q(cidade_origem__icontains=t) |
+                    Q(cidade_destino__icontains=t) |
+                    Q(estado_origem__icontains=t) |
+                    Q(estado_destino__icontains=t)
+                )
+
+            candidatos_qs = Corrida.objects.filter(Q(status="ativa") & texto_q).distinct()
+
+            # montar mapa de solicitações
             solicitacoes_map = {}
-            corrida_ids = [c.id for c in candidatos]
-            qs_solic = SolicitacaoCarona.objects.filter(
-                corrida_id__in=corrida_ids,
-                passageiro=request.user
-            )
-            for s in qs_solic:
-                solicitacoes_map[s.corrida_id] = s
+            corrida_ids = [c.id for c in candidatos_qs]
+            if corrida_ids:
+                qs_solic = SolicitacaoCarona.objects.filter(
+                    corrida_id__in=corrida_ids,
+                    passageiro=request.user
+                )
+                for s in qs_solic:
+                    solicitacoes_map[s.corrida_id] = s
 
             corridas_serializadas = []
-            for c in candidatos:
+            for c in candidatos_qs:
                 ser = serialize_corrida(c)
 
                 solic = solicitacoes_map.get(c.id)
@@ -748,7 +815,6 @@ def buscar_corridas(request):
         "endereco": endereco_passageiro,
         "tolerancia_metros": tolerancia_metros,
     })
-
 
 
 
@@ -828,7 +894,7 @@ def solicitar_carona(request, corrida_id):
                 mensagem=f"{user.nome} solicitou uma vaga na sua corrida de {corrida.origem} → {corrida.destino}.",
                 tipo=Notificacao.TIPO_SOLICITACAO_RECEBIDA,
                 dados={
-                    "link": f"/corrida/detalhes/{corrida.id}/",
+                    "link": reverse("corrida:detalhe", args=[corrida.id]),
                     "corrida_id": corrida.id,
                     "solicitacao_id": solicit.id,
                 },
@@ -849,7 +915,6 @@ def solicitar_carona(request, corrida_id):
     }, status=201 if created else 200)
 
 
-
 @login_required
 @require_POST
 def cancelar_solicitacao(request, solicitacao_id):
@@ -865,7 +930,7 @@ def cancelar_solicitacao(request, solicitacao_id):
     solicit.status = SolicitacaoCarona.STATUS_CANCELADA
     solicit.save(update_fields=['status'])
 
-    # 🔔 Criar notificação correta
+    # Notificar motorista
     Notificacao.objects.create(
         usuario=solicit.corrida.motorista,
         titulo="Solicitação cancelada",
@@ -873,7 +938,8 @@ def cancelar_solicitacao(request, solicitacao_id):
         tipo=Notificacao.TIPO_SOLICITACAO_RESPONDIDA,
         dados={
             "corrida_id": solicit.corrida.id,
-            "solicitacao_id": solicit.id
+            "solicitacao_id": solicit.id,
+            "link": reverse("corrida:detalhe", args=[solicit.corrida.id])
         }
     )
 
@@ -884,9 +950,16 @@ def cancelar_solicitacao(request, solicitacao_id):
 @login_required
 @require_POST
 def responder_solicitacao(request, solicitacao_id):
+    """
+    Recebe POST com 'action' = 'aceitar' | 'rejeitar'
+    Apenas o motorista da corrida pode responder.
+    """
     action = request.POST.get('action')
     if action not in ('aceitar', 'rejeitar'):
         return JsonResponse({'erro': 'Ação inválida.'}, status=400)
+
+    from corrida.models import SolicitacaoCarona, Corrida  # import local para evitar ciclos
+    from notificacao.models import Notificacao  # seu model de notificações
 
     solicit = get_object_or_404(SolicitacaoCarona, id=solicitacao_id)
     corrida = solicit.corrida
@@ -897,48 +970,58 @@ def responder_solicitacao(request, solicitacao_id):
 
     try:
         with transaction.atomic():
+            # bloqueia a corrida para evitar race conditions
             corrida_locked = Corrida.objects.select_for_update().get(id=corrida.id)
 
-            from notificacao.models import Notificacao
-
             if action == 'aceitar':
-
-                # Sem vagas → não pode aceitar
+                # Verifica vagas no objeto bloqueado
                 if corrida_locked.vagas_disponiveis <= 0:
                     return JsonResponse({'erro': 'Não há vagas disponíveis.'}, status=400)
 
+                # atualiza solicitação
                 solicit.status = SolicitacaoCarona.STATUS_ACEITA
                 solicit.save(update_fields=['status'])
 
-                # decrementa vagas
+                # decrementa vagas com F() para segurança concorrente
                 Corrida.objects.filter(id=corrida.id).update(
                     vagas_disponiveis=dj_models.F('vagas_disponiveis') - 1
                 )
 
-                # 🔔 Notifica passageiro
+                # Notifica passageiro
                 Notificacao.objects.create(
                     usuario=solicit.passageiro,
                     mensagem=f"Sua solicitação para a corrida {corrida.origem} → {corrida.destino} foi ACEITA!",
-                    link=f"/corrida/detalhes/{corrida.id}/",
+                    dados={
+                        "corrida_id": corrida.id,
+                        "solicitacao_id": solicit.id,
+                        "link": f"{reverse('corrida:detalhe', args=[corrida.id])}"
+                    },
+                    tipo=Notificacao.TIPO_SOLICITACAO_RESPONDIDA
                 )
 
             else:  # rejeitar
                 solicit.status = SolicitacaoCarona.STATUS_RECUSADA
                 solicit.save(update_fields=['status'])
 
-                # 🔔 Notifica o passageiro
+                # Notifica passageiro
                 Notificacao.objects.create(
                     usuario=solicit.passageiro,
                     mensagem=f"Sua solicitação para a corrida {corrida.origem} → {corrida.destino} foi RECUSADA.",
-                    link=f"/corrida/detalhes/{corrida.id}/",
+                    dados={
+                        "corrida_id": corrida.id,
+                        "solicitacao_id": solicit.id,
+                        "link": f"{reverse('corrida:detalhe', args=[corrida.id])}"
+                    },
+                    tipo=Notificacao.TIPO_SOLICITACAO_RESPONDIDA
                 )
 
-    except Exception:
+    except Exception as exc:
+        logger.exception("Erro interno ao processar a solicitação (responder_solicitacao) solicitacao_id=%s action=%s user=%s", solicitacao_id, action, request.user.id)
+        # Retorna mensagem curta ao client (evita vazar stacktrace)
         return JsonResponse({'erro': 'Erro interno ao processar a solicitação.'}, status=500)
 
+    # Se chegou até aqui, deu certo
     return JsonResponse({'ok': True, 'status': solicit.status})
-
-
 
 
 @require_GET
@@ -954,18 +1037,74 @@ def buscar_corridas_api(request):
     except (ValueError, TypeError):
         tolerancia = TOLERANCIA_CIDADE
 
-    lat, lon = geocode_endereco(origem_text)
-    if lat is None or lon is None:
-        return JsonResponse({'ok': False, 'erro': 'Não foi possível geocodificar o endereço de origem.'}, status=404)
+    # Primeiro tenta geocode
+    lat, lon = None, None
+    coords: Optional[dict] = None
+    try:
+        # tenta cache rápido
+        termo_busca = normalizar_texto(origem_text)
+        cache_key = f"geo:{termo_busca}"
+        latlon_cache = cache.get(cache_key)
+        if latlon_cache:
+            lat, lon = latlon_cache
+        else:
+            lat, lon = geocode_endereco(origem_text)
+            if lat is not None and lon is not None:
+                cache.set(cache_key, (lat, lon), timeout=60 * 60)
+    except Exception as e:
+        logger.exception("Erro no geocode (API) para '%s': %s", origem_text, e)
+        lat, lon = None, None
 
     corridas_encontradas = []
-    resultados = find_corridas_near(lat, lon, tolerancia) or []
-    for corrida, distancia in resultados:
+    # Se geocode OK → busca por proximidade
+    if lat is not None and lon is not None:
+        coords = {'lat': float(lat), 'lon': float(lon)}
+        resultados = []
+        try:
+            resultados = find_corridas_near(lat, lon, tolerancia) or []
+        except Exception as e:
+            logger.exception("Erro em find_corridas_near (API): %s", e)
+            resultados = []
 
-        corrida_dict = serialize_corrida(corrida, distancia_m=distancia)
-        corridas_encontradas.append(corrida_dict)
+        for corrida, distancia in resultados:
+            corrida_dict = serialize_corrida(corrida, distancia_m=distancia)
+            corridas_encontradas.append(corrida_dict)
 
-    return JsonResponse({'ok': True, 'coords': {'lat': float(lat), 'lon': float(lon)}, 'corridas': corridas_encontradas}, json_dumps_params={'ensure_ascii': False})
+        return JsonResponse({'ok': True, 'coords': coords, 'corridas': corridas_encontradas},
+                            json_dumps_params={'ensure_ascii': False})
+
+    # Senão: fallback textual (procura por cidade/bairro/rua)
+    try:
+        termo_busca = normalizar_texto(origem_text)
+        palavras = [p for p in termo_busca.split() if p]
+        tokens = list(dict.fromkeys(palavras + [termo_busca]))
+
+        texto_q = Q()
+        for t in tokens:
+            texto_q |= (
+                Q(origem__icontains=t) |
+                Q(destino__icontains=t) |
+                Q(bairro_origem__icontains=t) |
+                Q(bairro_destino__icontains=t) |
+                Q(cidade_origem__icontains=t) |
+                Q(cidade_destino__icontains=t) |
+                Q(estado_origem__icontains=t) |
+                Q(estado_destino__icontains=t)
+            )
+
+        candidatos_qs = Corrida.objects.filter(Q(status="ativa") & texto_q).distinct()
+
+        for c in candidatos_qs:
+            corrida_dict = serialize_corrida(c)
+            corridas_encontradas.append(corrida_dict)
+
+        return JsonResponse({'ok': True, 'coords': None, 'corridas': corridas_encontradas},
+                            json_dumps_params={'ensure_ascii': False})
+
+    except Exception as e:
+        logger.exception("Erro no fallback textual (API): %s", e)
+        return JsonResponse({'ok': False, 'erro': 'Erro ao buscar corridas.'}, status=500)
+
 
 
 @require_GET
@@ -1051,7 +1190,6 @@ def minha_solicitacao_api(request, corrida_id):
     })
 
 
-
 @login_required
 @require_POST
 def api_aceitar_solicitacao(request):
@@ -1061,28 +1199,324 @@ def api_aceitar_solicitacao(request):
     except Exception:
         return HttpResponseBadRequest("IDs inválidos")
 
-    solicitacao = SolicitacaoCarona.objects.filter(
+    solicitacao = SolicitacaoCarona.objects.select_related('corrida').filter(
         id=solicitacao_id,
         corrida_id=corrida_id,
-        corrida__motorista=request.user
     ).first()
 
     if not solicitacao:
         return JsonResponse({"ok": False, "error": "Solicitação não encontrada"}, status=404)
 
+    corrida = solicitacao.corrida
+
+    # autorização
+    if corrida.motorista_id != request.user.id:
+        return JsonResponse({"ok": False, "error": "Sem permissão."}, status=403)
+
     if solicitacao.status == SolicitacaoCarona.STATUS_ACEITA:
         return JsonResponse({"ok": False, "error": "Solicitação já aceita"}, status=400)
 
-    solicitacao.status = SolicitacaoCarona.STATUS_ACEITA
-    solicitacao.save(update_fields=['status'])
+    try:
+        with transaction.atomic():
+            # bloqueia a corrida para checagem/atualização segura
+            corrida_locked = Corrida.objects.select_for_update().get(id=corrida.id)
 
-    # opcional: marcar notificação do passageiro como lida ou criar notificação
-    Notificacao.objects.create(
-        usuario=solicitacao.passageiro,
-        titulo="Solicitação Aceita",
-        mensagem=f"Sua solicitação para a corrida de {solicitacao.corrida.origem} → {solicitacao.corrida.destino} foi aceita!",
-        tipo=Notificacao.TIPO_SOLICITACAO_RESPONDIDA,
-        dados={"corrida_id": solicitacao.corrida.id, "solicitacao_id": solicitacao.id}
-    )
+            if corrida_locked.vagas_disponiveis <= 0:
+                return JsonResponse({"ok": False, "error": "Não há vagas disponíveis."}, status=400)
+
+            # aceita a solicitação
+            solicitacao.status = SolicitacaoCarona.STATUS_ACEITA
+            solicitacao.save(update_fields=['status'])
+
+            # decrementa uma vaga (campo int) de forma atômica
+            corrida_locked.vagas_disponiveis = dj_models.F('vagas_disponiveis') - 1
+            corrida_locked.save(update_fields=['vagas_disponiveis'])
+
+            # notificação ao passageiro — usar reverse para link
+            Notificacao.objects.create(
+                usuario=solicitacao.passageiro,
+                titulo="Solicitação Aceita",
+                mensagem=f"Sua solicitação para a corrida {corrida.origem} → {corrida.destino} foi aceita!",
+                tipo=Notificacao.TIPO_SOLICITACAO_RESPONDIDA,
+                dados={
+                    "corrida_id": corrida.id,
+                    "solicitacao_id": solicitacao.id,
+                    "link": reverse("corrida:acompanhamento", args=[corrida.id])
+                }
+            )
+
+    except Exception as e:
+        logger.exception("Erro ao aceitar solicitação: %s", e)
+        return JsonResponse({"ok": False, "error": "Erro interno ao processar."}, status=500)
 
     return JsonResponse({"ok": True, "status": solicitacao.status})
+
+
+@login_required
+@require_POST
+def motorista_iniciar_corrida(request, corrida_id):
+    corrida = get_object_or_404(Corrida, pk=corrida_id)
+
+    if request.user != corrida.motorista:
+        return HttpResponseForbidden("Apenas o motorista pode iniciar a corrida.")
+
+    if corrida.status == Corrida.STATUS_EM_ANDAMENTO:
+        messages.info(request, "Corrida já está em andamento.")
+        return redirect(reverse("corrida:detalhe_corrida", args=[corrida_id]))
+
+    with transaction.atomic():
+        # opcional lock: select_for_update sobre corrida
+        corrida_locked = Corrida.objects.select_for_update().get(pk=corrida.id)
+        corrida_locked.iniciar()
+
+        solicitacoes_aceitas = SolicitacaoCarona.objects.filter(corrida=corrida_locked, status=SolicitacaoCarona.STATUS_ACEITA)
+        for sol in solicitacoes_aceitas:
+            Notificacao.objects.create(
+                usuario=sol.passageiro,
+                titulo="Corrida Iniciada",
+                mensagem=f"A corrida {corrida_locked.origem} → {corrida_locked.destino} foi iniciada pelo motorista.",
+                tipo=Notificacao.TIPO_INICIO_CORRIDA,
+                dados={"corrida_id": corrida_locked.id, "solicitacao_id": sol.id, "link": reverse("corrida:acompanhamento", args=[corrida_locked.id])}
+            )
+
+    messages.success(request, "Corrida iniciada com sucesso.")
+    return redirect(reverse("corrida:detalhe_corrida", args=[corrida_id]))
+
+
+@login_required
+@require_POST
+def motorista_encerrar_corrida(request, corrida_id):
+    corrida = get_object_or_404(Corrida, pk=corrida_id)
+
+    if request.user != corrida.motorista:
+        return HttpResponseForbidden("Apenas o motorista pode encerrar a corrida.")
+
+    if corrida.status == Corrida.STATUS_FINALIZADA:
+        messages.info(request, "Corrida já está finalizada.")
+        return redirect(reverse("corrida:detalhe_corrida", args=[corrida_id]))
+
+    with transaction.atomic():
+        corrida_locked = Corrida.objects.select_for_update().get(pk=corrida.id)
+        corrida_locked.encerrar()
+
+        solicitacoes_aceitas = SolicitacaoCarona.objects.filter(corrida=corrida_locked, status=SolicitacaoCarona.STATUS_ACEITA)
+        for sol in solicitacoes_aceitas:
+            Notificacao.objects.create(
+                usuario=sol.passageiro,
+                titulo="Corrida Encerrada",
+                mensagem=f"A corrida {corrida_locked.origem} → {corrida_locked.destino} foi encerrada pelo motorista.",
+                tipo=Notificacao.TIPO_FIM_CORRIDA,
+                dados={"corrida_id": corrida_locked.id, "solicitacao_id": sol.id}
+            )
+
+    messages.success(request, "Corrida encerrada com sucesso.")
+    return redirect(reverse("corrida:detalhe_corrida", args=[corrida_id]))
+
+
+@login_required
+def passageiro_acompanhamento(request, corrida_id):
+    corrida = get_object_or_404(Corrida, pk=corrida_id)
+
+    # validação de acesso do passageiro
+    solicitacao = None
+    if request.user != corrida.motorista:
+        from .models import SolicitacaoCarona
+        solicitacao = SolicitacaoCarona.objects.filter(
+            corrida=corrida, passageiro=request.user, status=SolicitacaoCarona.STATUS_ACEITA
+        ).first()
+        if not solicitacao:
+            raise Http404("Você não tem acesso a esta corrida.")
+
+    # busca último Payment existente
+    payment_obj = Payment.objects.filter(corrida=corrida).order_by('-created_at').first()
+    payment = None
+
+    def _normalize_payload(payload_raw):
+        """Garante dict para payload e extrai data se houver."""
+        if not payload_raw:
+            return {}, {}
+        if isinstance(payload_raw, dict):
+            payload = payload_raw
+        else:
+            try:
+                payload = json.loads(payload_raw)
+            except Exception:
+                payload = {"raw": str(payload_raw)}
+        data = {}
+        if isinstance(payload, dict):
+            data = payload.get("data") or payload.get("payload") or {}
+            if not isinstance(data, dict):
+                data = {}
+        return payload, data
+
+    if payment_obj:
+        # normaliza payload
+        payload, data = _normalize_payload(payment_obj.payload)
+
+        # extrair billing_url (prioriza campo do model se existir)
+        billing_url = getattr(payment_obj, "billing_url", None) or data.get("billing_url") or data.get("url") or data.get("payment_url") or data.get("checkout_url")
+
+        # extrair brCode / brCodeBase64
+        brCodeBase64 = getattr(payment_obj, "brCodeBase64", None) or data.get("brCodeBase64") or (data.get("payload") or {}).get("brCodeBase64")
+        brCode = getattr(payment_obj, "brCode", None) or data.get("brCode") or (data.get("payload") or {}).get("brCode")
+
+        # expires_in preferencialmente vindo do data, senão default 3600
+        expires_in = data.get("expires_in", 3600)
+
+        # amount_display amigável — assumes model has amount_display method
+        try:
+            amount_display = payment_obj.amount_display()
+        except Exception:
+            try:
+                amount_display = f"R$ {payment_obj.amount_cents/100:.2f}"
+            except Exception:
+                amount_display = None
+
+        payment = {
+            "id": payment_obj.id,
+            "status": payment_obj.status,
+            "abacate_id": getattr(payment_obj, "abacate_id", None),
+            "amount_display": amount_display,
+            "brCodeBase64": brCodeBase64,
+            "brCode": brCode,
+            "expires_in": expires_in,
+            "billing_url": billing_url,
+            "payload": payload,
+        }
+
+    else:
+        # tentar criar/obter payment via service centralizado (recomendado)
+        try:
+            result = create_payment_for_corrida(corrida, user=request.user if request.user.is_authenticated else None)
+        except Exception as exc:
+            logger.exception("Erro ao chamar create_payment_for_corrida: %s", exc)
+            result = None
+
+        if result and isinstance(result, dict) and result.get("payment"):
+            p = result.get("payment")
+            data = result.get("data") or {}
+
+            # normalize billing_url & brcodes
+            billing_url = getattr(p, "billing_url", None) or data.get("billing_url") or data.get("url") or data.get("payment_url") or data.get("checkout_url")
+            brCodeBase64 = getattr(p, "brCodeBase64", None) or data.get("brCodeBase64") or (data.get("payload") or {}).get("brCodeBase64")
+            brCode = getattr(p, "brCode", None) or data.get("brCode") or (data.get("payload") or {}).get("brCode")
+            expires_in = data.get("expires_in", 3600)
+
+            try:
+                amount_display = p.amount_display()
+            except Exception:
+                try:
+                    amount_display = f"R$ {p.amount_cents/100:.2f}"
+                except Exception:
+                    amount_display = None
+
+            payment = {
+                "id": p.id,
+                "amount_display": amount_display,
+                "brCode": brCode,
+                "brCodeBase64": brCodeBase64,
+                "status": p.status,
+                "payload": p.payload,
+                "expires_in": expires_in,
+                "billing_url": billing_url,
+            }
+
+        else:
+            # fallback antigo: criar manualmente (se create_payment_for_corrida falhar)
+            valor = corrida.valor if corrida.valor is not None else (getattr(corrida, 'parent_template', None) and corrida.parent_template.valor)
+            if valor is None:
+                payment = None
+            else:
+                valor = Decimal(str(valor)) if not isinstance(valor, Decimal) else valor
+                amount_cents = int(round(float(valor) * 100))
+                p = Payment.objects.create(
+                    corrida=corrida,
+                    user=request.user if request.user.is_authenticated else None,
+                    amount_cents=amount_cents,
+                    status=getattr(Payment, "STATUS_PENDING", "PENDING")
+                )
+
+                description = f"Pagamento corrida #{corrida.id}"
+                external_id = f"corrida-{corrida.id}-payment-{p.id}"
+
+                # montar customer
+                customer = None
+                if request.user.is_authenticated:
+                    nome = getattr(request.user, "nome", "") or ""
+                    email = getattr(request.user, "email", "") or ""
+                    telefone = getattr(request.user, "telefone", "") or ""
+                    taxid = getattr(request.user, "cpf", None) or getattr(getattr(request.user, "profile_data", {}), "cpf", "")
+                    phone_digits = re.sub(r"\D", "", telefone)
+                    taxid_digits = re.sub(r"\D", "", str(taxid))
+                    if phone_digits and taxid_digits:
+                        customer = {
+                            "name": nome,
+                            "email": email,
+                            "cellphone": phone_digits,
+                            "taxId": taxid_digits
+                        }
+
+                # chama serviço AbacatePay diretamente (fallback)
+                try:
+                    result = criar_pix_qr(amount_cents, description, external_id, customer=customer)
+                except Exception as exc:
+                    logger.exception("Erro ao chamar criar_pix_qr fallback: %s", exc)
+                    result = None
+
+                raw = result.get("body") if isinstance(result, dict) else result
+                status_code = int(result.get("status_code", 0)) if isinstance(result, dict) else 200
+                ok = result.get("ok") if isinstance(result, dict) else True
+
+                if not ok or (status_code and status_code not in (200, 201)):
+                    # falha ao criar cobrança
+                    p.payload = raw
+                    p.status = getattr(Payment, "STATUS_FAILED", "FAILED")
+                    p.save(update_fields=["payload", "status"])
+                    payment = None
+                else:
+                    data = {}
+                    if isinstance(raw, dict):
+                        data = raw.get("data", {}) or {}
+
+                    billing_url = data.get("url") or data.get("billing_url") or data.get("payment_url") or data.get("checkout_url")
+                    p.abacate_id = data.get("id") or data.get("payment_id") or p.abacate_id
+                    p.brCode = data.get("brCode") or p.brCode
+                    p.brCodeBase64 = data.get("brCodeBase64") or p.brCodeBase64
+                    p.payload = raw
+                    p.status = getattr(Payment, "STATUS_CREATED", "CREATED")
+
+                    if billing_url and hasattr(p, "billing_url"):
+                        try:
+                            setattr(p, "billing_url", billing_url)
+                        except Exception:
+                            logger.exception("Falha ao setar campo billing_url no Payment")
+
+                    save_fields = ["abacate_id", "brCode", "brCodeBase64", "payload", "status"]
+                    if hasattr(p, "billing_url") and billing_url:
+                        save_fields.append("billing_url")
+                    try:
+                        p.save(update_fields=[f for f in save_fields if hasattr(p, f)])
+                    except Exception:
+                        p.save()
+
+                    payment = {
+                        "id": p.id,
+                        "amount_display": p.amount_display(),
+                        "brCode": p.brCode,
+                        "brCodeBase64": p.brCodeBase64,
+                        "status": p.status,
+                        "payload": p.payload,
+                        "expires_in": data.get("expires_in", 3600),
+                        "billing_url": billing_url,
+                    }
+
+    # notificações
+    from notificacao.models import Notificacao
+    notificacoes = Notificacao.objects.filter(usuario=request.user).order_by('-criada_em')[:50]
+
+    return render(request, "corrida/acompanhamento.html", {
+        "corrida": corrida,
+        "solicitacao": solicitacao,
+        "payment": payment,
+        "notificacoes": notificacoes,
+    })

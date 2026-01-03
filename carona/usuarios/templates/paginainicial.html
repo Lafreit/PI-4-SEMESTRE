@@ -1,263 +1,394 @@
-{% extends "base.html" %}
+
 {% load static %}
 
 {% block extra_head %}
+
 <link rel="stylesheet" href="{% static 'paginainicial.css' %}">
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<style>
-/* ======= SINO DE NOTIFICAÇÕES ======= */
-.notif-icon {
-  position:absolute;
-  top:15px;
-  right:70px; /* deixa espaço para o botão 🌙 */
-  font-size:24px;
-  cursor:pointer;
-  user-select:none;
-}
-
-.notif-count {
-  background:red;
-  color:white;
-  font-size:12px;
-  padding:2px 6px;
-  border-radius:999px;
-  margin-left:4px;
-  font-weight:bold;
-  position:relative;
-  top:-8px;
-}
-
-/* quando não houver notificações */
-.notif-count.zero {
-  background:gray;
-}
-
-/* Ícone de notificações */
-.notif-icon {
-  position: absolute;
-  top: 15px;
-  right: 70px;
-  font-size: 24px;
-  cursor: pointer;
-  text-decoration: none;
-  z-index: 9999; /* FICA NA FRENTE */
-}
-
-.notif-count {
-  background: red;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 50%;
-  font-size: 12px;
-}
-
-
-/* Botão de modo escuro */
-.theme-btn {
-  position: absolute !important;
-  top: 15px;
-  right: 20px;
-  z-index: 9999; /* FICA NA FRENTE */
-}
-
-
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 {% endblock %}
 
 {% block content %}
-
+<title>Carona | Pagina Inicial</title>
 <div class="dashboard-container">
-  <aside class="sidebar">
-    <div class="user-info">
-      <img src="{% static 'img/user.png' %}" alt="Usuário" class="user-avatar-small">
-      <h3>Olá, {{ user.nome }}!</h3>
-      <p class="user-type">{{ user.get_tipo_display }}</p>
+    
+   <nav class="top-navbar" id="mainNavbar">
+
+    <div class="logo-area">
+        <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo-img">
     </div>
 
-    <nav class="menu">
-      <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
-      <a href="#" class="menu-item">Minha Carteira</a>
-
-      {% if user.tipo_usuario == 'motorista' %}
-        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Carona</a>
-        <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Caronas</a>
-        <a href="#" class="menu-item">Meus Veiculos</a>
-      {% elif user.tipo_usuario == 'passageiro'%}
-        <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Carona</a>
-      {% endif %}
-
-      {% if user.tipo_usuario == 'admin' %}
-        <a href="{% url 'corrida:cadastrar_corrida' %}" class="menu-item">Cadastrar Carona</a>
-        <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Caronas</a>
-        <a href="{% url 'corrida:buscar_corridas' %}" class="menu-item">Buscar Carona</a>
-        <a href="#" class="menu-item">Meus Veiculos</a>
-        <a href="{% url 'admin:index' %}" class="menu-item">Painel Admin</a>
-      {% endif %}
-      <a href="{% url 'usuarios:logout' %}" class="menu-item logout">Sair</a>
-    </nav>
-  </aside>
-
-  <main class="main-content">
-    <div class="header-banner">
-      <!-- 🔔 ÍCONE DE NOTIFICAÇÕES -->
-      <a href="{% url 'notificacao:lista' %}" class="notif-icon">
-        🔔 <span id="notif-count" class="notif-count zero">0</span>
-      </a>
-
-      <!-- 🌙 BOTÃO DARK MODE -->
-      <button onclick="toggleDarkMode()" class="action-btn theme-btn">🌙</button>
-
-      <h1 id="greeting-message"></h1>
-      <p>Pronto para sua próxima viagem?</p>
+    <div class="menu">
+        <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+        <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
+        <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
+        <a href="{% url 'notificacao:lista' %}" class="menu-item">Notificações</a>
+        <a href="{% url 'pagamentos:carteira' %}" class="menu-item">Carteira</a>
+        <a href="#" class="menu-item" onclick="openTabFromNavbar(event, 'dicas-usuario')">Dicas de Usuário</a>
     </div>
 
-    <div class="map-and-actions">
-        <div id="map"></div>
-        <div class="action-card">
-            {% if user.tipo_usuario == 'motorista' or user.tipo_usuario == 'admin' %}
-            <h2>Você está online?</h2>
-            <p>Altere seu status para aceitar novas corridas.</p>
-            <button class="action-btn start">Ficar Online</button>
-            {% elif user.tipo_usuario == 'passageiro' or user.tipo_usuario == 'admin'  %}
-            <h2>Encontre seu motorista</h2>
-            <p>Inicie sua busca agora e encontre a melhor carona!</p>
-            <button class="action-btn search">Procurar Carona</button>
-            {% endif %}
+    <div class="user-and-logout">
+
+        <div class="user-info-navbar">
+            <button onclick="toggleDarkMode()" id="themeToggleBtn" class="action-btn mode-toggle-btn">
+        ☀️
+    </button>
+            <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
+            <span>{{ user.nome }}</span>
         </div>
+
+        <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn red-btn">Sair</a>
     </div>
 
-    <section class="safety-tips card">
-      <h3>Dicas de Segurança <span class="icon">🛡️</span></h3>
-      <ul>
-        <li>Verifique o nome e a placa do motorista antes de entrar no carro.</li>
-        <li>Compartilhe sua viagem com amigos ou familiares.</li>
-        <li>Sente-se no banco traseiro em corridas individuais.</li>
-        <li>Evite informar dados pessoais ao motorista.</li>
-        <li>Em caso de emergência, use o botão de ajuda no aplicativo.</li>
-      </ul>
-    </section>
-  </main>
+</nav>
+
+
+    <main class="main-content">
+        <div class="header-banner">
+            <h1 id="greeting-message"></h1>
+            <p>Pronto para sua próxima viagem?</p>
+            
+            <div id="weather-and-location"></div>
+
+            <div class="scroll-indicator">
+                <span class="arrow-down">↓</span> Role para ver o mapa e mais
+            </div>
+        </div>
+
+        <div class="map-and-actions">
+            <div id="map"></div>
+            <div class="action-card">
+                {% if user.tipo_usuario == 'motorista' %}
+                <h2>Cadastre Corridas</h2>
+                <p>Cadastre suas corridas, encontre Passageiros.</p>
+                <a href="{% url 'corrida:cadastrar_corrida' %}" class="action-btn start">Cadastrar Corrida</a>
+                {% else %}
+                <h2>Encontre seu motorista</h2>
+                <p>Inicie sua busca agora e encontre a melhor carona!</p>
+                <a href="{% url 'corrida:buscar_corridas' %}" class="action-btn search">Procurar Carona</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="modular-sections">
+            <div class="tab-menu">
+                
+                {% if user.tipo_usuario == 'motorista' %}
+                    <button class="tab-button active" onclick="openTab(event, 'driver-tools')">
+                        🛠️ Ferramentas do Motorista
+                    </button>
+                {% else %}
+                    <button class="tab-button active" onclick="openTab(event, 'passenger-tools')">
+                        🔧 Ferramentas do Passageiro
+                    </button>
+                {% endif %}
+
+                <button class="tab-button" onclick="openTab(event, 'dicas-seguranca')">
+                    🛡️ Dicas de Segurança
+                </button>
+                
+                <button class="tab-button" onclick="openTab(event, 'help-center')">
+                    ❓ Central de Dúvidas
+                </button>
+
+                <button class="tab-button hidden-tab" id="dicas-usuario-btn" onclick="openTab(event, 'dicas-usuario')"></button>
+
+                <button class="tab-button vip" onclick="openTab(event, 'vip-plan')">
+                    👑 Plano Carona VIP
+                </button>
+            </div>
+
+            <div class="tab-content-container">
+                
+                {% if user.tipo_usuario == 'motorista' %}
+                    <div id="driver-tools" class="tab-content active">
+                        <h3>Ferramentas de Gerenciamento</h3>
+                        <ul>
+                            <li><b>Corridas Ativas:</b> Veja as corridas que você está realizando no momento.</li>
+                            <li><b>Meus Ganhos:</b> Acompanhe seu histórico de faturamento e extrato de pagamentos.</li>
+                            <li><b>Alterar Status:</b> Use o botão "Ficar Online" no card ao lado para começar a aceitar pedidos.</li>
+                            <li><b>Relatórios:</b> Acesse relatórios mensais de desempenho e avaliações.</li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <div id="passenger-tools" class="tab-content active">
+                        <h3>Gerenciamento e Busca de Caronas</h3>
+                        <p>Use o link abaixo para acessar a busca avançada por viagens.</p>
+                        <p>Você também pode acompanhar suas viagens agendadas e ver as avaliações de motoristas favoritos.</p>
+                        <a href="{% url 'corrida:buscar_corridas' %}" class="action-btn start" style="padding: 0.7rem 1.2rem; margin-top: 10px;">Procurar Carona Agora</a>
+                        <ul>
+                            <li><b>Viagens Agendadas:</b> Consulte o status e os detalhes das suas reservas.</li>
+                            <li><b>Avaliações:</b> Veja as notas e comentários dos seus motoristas preferidos.</li>
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div id="dicas-usuario" class="tab-content">
+                    <h3>👍 Dicas para uma Experiência Perfeita</h3>
+                    <p>Maximize sua experiência no Carona Fácil, seja você um motorista ou passageiro, seguindo estas recomendações:</p>
+                    <ul>
+                        <li><b>Sempre Confirme:</b> Motoristas, liguem para o passageiro para confirmar o local exato antes de iniciar a rota.</li>
+                        <li><b>Mantenha seu Perfil Atualizado:</b> Uma boa foto e informações completas aumentam a confiança.</li>
+                        <li><b>Seja Pontual:</b> A pontualidade é essencial para o respeito mútuo e uma boa avaliação.</li>
+                        <li><b>Use o Chat:</b> Para dúvidas rápidas sobre a viagem, use o chat do aplicativo para manter o histórico.</li>
+                        <li><b>Dê Feedback:</b> Avalie sua viagem para ajudar a comunidade a manter a qualidade.</li>
+                    </ul>
+                    <a href="{% url 'usuarios:meu_perfil' %}" class="action-btn start" style="padding: 0.7rem 1.2rem; margin-top: 10px;">Ver Meu Perfil para Atualizar</a>
+                </div>
+                <div id="dicas-seguranca" class="tab-content">
+                    <h3>Sua Segurança é Nossa Prioridade</h3>
+                    <p>Leia as nossas dicas para garantir que todas as suas viagens sejam tranquilas e seguras. Em caso de emergência, use o botão de suporte imediato.</p>
+                    <ul>
+                        <li><b>Compartilhe a Viagem:</b> Sempre use a função de compartilhamento de rota com amigos ou familiares.</li>
+                        <li><b>Verifique o Motorista/Carro:</b> Confirme a placa, modelo do veículo e nome do motorista antes de entrar.</li>
+                        <li><b>Comunicação:</b> Mantenha a comunicação dentro do app e evite compartilhar informações pessoais desnecessárias.</li>
+                        <li><b>Relate Problemas:</b> Não hesite em usar a Central de Dúvidas ou o Suporte ao Cliente para relatar qualquer comportamento estranho.</li>
+                    </ul>
+                    <button class="action-btn start" style="padding: 0.7rem 1.2rem; margin-top: 10px;">Suporte Imediato 🚨</button>
+                </div>
+                
+                <div id="help-center" class="tab-content">
+                    <h3>Central de Dúvidas e Suporte</h3>
+                    <p>Encontre respostas rápidas para as perguntas mais frequentes sobre o aplicativo, pagamentos e mais.</p>
+                    <ul>
+                        <li><b>Dúvidas Comuns:</b> Como funciona o cancelamento? Como é calculada a tarifa?</li>
+                        <li><b>Suporte ao Cliente:</b> Fale com um de nossos atendentes.</li>
+                        <li><b>Dicas de Segurança:</b> Acesse o guia de segurança na aba ao lado para mais informações.</li>
+                    </ul>
+                    <a href="#" class="action-btn start" style="padding: 0.7rem 1.2rem; margin-top: 10px;">Acessar Central de Ajuda Completa</a>
+                </div>
+
+                <div id="vip-plan" class="tab-content vip">
+                    <h3>Benefícios Exclusivos do Carona VIP</h3>
+                    <p>Assine o plano VIP e tenha acesso a benefícios exclusivos, garantindo a melhor experiência em todas as suas viagens:</p>
+                    <ul>
+                        <li>Descontos maiores e tarifas reduzidas.</li>
+                        <li>Prioridade na busca e aceitação de corridas.</li>
+                        <li>Suporte ao Cliente 24h dedicado.</li>
+                        <li>Acesso a eventos e promoções exclusivas.</li>
+                    </ul>
+                    <button class="action-btn start" style="margin-top:10px;">Assinar VIP Agora</button>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 
 <script>
-// ====================== Atualizar contador do sino ======================
-async function atualizarSino() {
-  try {
-    const res = await fetch("/notificacoes/api/contagem/?_=" + Date.now());
-    if (!res.ok) return;
-    const data = await res.json();
+// Variável global para o caminho base das imagens estáticas do Django
+const STATIC_IMG_BASE = "{% static 'img/' %}";
 
-    const el = document.getElementById("notif-count");
-    el.textContent = data.unread;
+// Variáveis para armazenar a saudação e o emoji atuais
+let currentGreeting = "";
+let currentEmoji = "";
+// Variável global para armazenar o nome do arquivo de imagem atual
+let currentImageFile = "";
 
-    if (data.unread > 0) {
-      el.classList.remove("zero");
+// ====================== LÓGICA DE SAUDAÇÃO E BACKGROUND DINÂMICO ======================
+function getGreetingAndBackground(isToggle = false) {
+    const hour = new Date().getHours();
+    
+    // 1. Determina o horário, a saudação e o nome do arquivo de imagem padrão
+    if (hour >= 6 && hour < 12) {
+        currentGreeting = "Bom dia";
+        currentEmoji = "";
+        currentImageFile = "imgsol.png";
+    } else if (hour >= 12 && hour < 18) {
+        currentGreeting = "Boa tarde";
+        currentEmoji = "";
+        currentImageFile = "imgtarde.png";
     } else {
-      el.classList.add("zero");
+        currentGreeting = "Boa noite";
+        currentEmoji = "";
+        currentImageFile = "imglua.png"; // Imagem com estrelas e as duas luas grandes nas laterais
     }
-  } catch (e) {}
+
+    // 2. Define o background dinâmico
+    const banner = document.querySelector('.header-banner');
+    const darkModeActive = document.body.classList.contains("dark-mode");
+    
+    let finalImageUrl = STATIC_IMG_BASE + currentImageFile;
+    
+    // Lógica para mostrar a lua grande SOMENTE se for noite E Dark Mode estiver ativo
+    if (currentImageFile === "imglua.png" && darkModeActive) {
+        // Quando o Dark Mode está ativo na noite, ajustamos para mostrar a lua grande
+        banner.style.backgroundPosition = 'center top';
+    } else if (currentImageFile === "imglua.png" && !darkModeActive) {
+        
+        banner.style.backgroundPosition = 'center center';
+    } else {
+        // Para dia e tarde, a posição pode ser 'cover' normal
+        banner.style.backgroundPosition = 'center center';
+    }
+
+    // Adiciona um overlay escuro semi-transparente para melhor contraste do texto
+    const gradientOverlay = 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)),';
+    banner.style.backgroundImage = `${gradientOverlay} url('${finalImageUrl}')`;
+    
+    // Atualiza o texto e a hora
+    updateClock();
 }
 
-setInterval(atualizarSino, 15000);
-document.addEventListener("DOMContentLoaded", atualizarSino);
+// ====================== OUTRAS FUNÇÕES JS ======================
 
-// (resto DO SEU SCRIPT PERMANECE IGUAL)
+// CÓDIGO DO SMART HEADER (ESCONDE/REVELA)
+let lastScrollTop = 0;
+const navbar = document.getElementById('mainNavbar');
+let navbarHeight = navbar ? navbar.offsetHeight : 0;
 
-// ====================== SAUDAÇÃO COM EMOJI ======================
-function getGreeting() {
-  const hour = new Date().getHours();
-  let greeting, emoji;
-  if (hour < 12) { greeting = "Bom dia"; emoji = "☀️"; }
-  else if (hour < 18) { greeting = "Boa tarde"; emoji = "🌤️"; }
-  else { greeting = "Boa noite"; emoji = "🌙"; }
-  document.getElementById('greeting-message').textContent = `${emoji} ${greeting}, {{ user.nome }}!`;
+window.addEventListener('scroll', function() {
+    if (!navbar) return;
+    let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    if (currentScroll > lastScrollTop && currentScroll > navbarHeight) {
+        navbar.classList.add('hidden');
+    } else if (currentScroll < lastScrollTop || currentScroll <= navbarHeight) {
+        navbar.classList.remove('hidden');
+    }
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+}, false);
+
+// EXPANDIR/RECOLHER SEÇÕES (TABS)
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].classList.remove("active");
+    }
+    tablinks = document.getElementsByClassName("tab-button");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+    }
+    
+    // Ativa a aba
+    document.getElementById(tabName).classList.add("active");
+    // Ativa o botão (se existir, para o caso do botão escondido)
+    const tabButton = evt.currentTarget;
+    if (tabButton) {
+         tabButton.classList.add("active");
+    }
+
+    // Rola a tela para baixo para mostrar a seção modular
+    document.getElementById(tabName).scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ====================== RELOGIO ======================
+// NOVA FUNÇÃO: Lida com o clique na Navbar e foca o botão de aba correspondente
+function openTabFromNavbar(evt, tabName) {
+    evt.preventDefault();
+    // 1. Pega o botão de aba escondido
+    const targetButton = document.getElementById(tabName + '-btn');
+    
+    if (targetButton) {
+        // 2. Chama a função openTab, simulando o evento no botão
+        openTab({ currentTarget: targetButton }, tabName);
+    } else {
+        // Caso o botão esteja no menu de abas e seja visível (não tem "-btn")
+        const visibleButton = document.querySelector(`.tab-button[onclick*="'${tabName}'"]`);
+         if (visibleButton) {
+             openTab({ currentTarget: visibleButton }, tabName);
+        }
+    }
+}
+
+
+// RELÓGIO (Atualiza o H1 com o emoji, a saudação e a hora)
 function updateClock() {
-  const now = new Date();
-  const time = now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
-  const greetingEl = document.getElementById('greeting-message');
-  if (!greetingEl.querySelector("span")) {
-    const span = document.createElement("span");
-    span.style.fontSize = "16px";
-    span.textContent = ` 🕒 ${time}`;
-    greetingEl.appendChild(span);
-  } else {
-    greetingEl.querySelector("span").textContent = ` 🕒 ${time}`;
-  }
+    const now = new Date();
+    const time = now.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+    const greetingEl = document.getElementById('greeting-message');
+
+    // Monta o H1 com o emoji, saudação, nome do usuário e a hora
+    greetingEl.innerHTML = `
+        ${currentEmoji} ${currentGreeting}, {{ user.nome }}!
+        <span class="clock-display"> ${time}</span>
+    `;
 }
+// Atualiza a cada 60 segundos
 setInterval(updateClock, 60000);
 
-// ====================== MAPA ======================
+// MAPA E LOCALIZAÇÃO (LEAFLET)
 function initMap() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(async function(position) {
-      const userLocation = [position.coords.latitude, position.coords.longitude];
-      const map = L.map('map').setView(userLocation, 14);
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async function(position) {
+            const userLocation = [position.coords.latitude, position.coords.longitude];
+            const map = L.map('map').setView(userLocation, 14);
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
 
-      L.marker(userLocation).addTo(map).bindPopup("Você está aqui!").openPopup();
-
-      showWeather(userLocation[0], userLocation[1]);
-      showAddress(userLocation[0], userLocation[1]);
-    }, function(error) {
-      // ...
-    });
-  }
+            L.marker(userLocation).addTo(map).bindPopup("Você está aqui!").openPopup();
+            
+            showAddress(userLocation[0], userLocation[1]);
+        }, function(error) {
+            console.error("Erro de geolocalização: ", error);
+            const defaultLocation = [-23.5505, -46.6333];
+            const map = L.map('map').setView(defaultLocation, 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            L.marker(defaultLocation).addTo(map).bindPopup("Localização padrão");
+        });
+    } else {
+        console.warn("Geolocalização não suportada.");
+    }
 }
 
-// ====================== SHOW WEATHER ======================
-async function showWeather(lat, lon) {
-  try {
-    const apiKey = ORS_API_KEY;
-    const res = await fetch(`https://api.openweathermap.org/...`);
-    // ...
-  } catch (err) {}
-}
-
-// ====================== ENDEREÇO ======================
+// Função para reverter geocodificação
 async function showAddress(lat, lon) {
-  const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-  const data = await res.json();
-  const city = data.address.city || data.address.town || data.address.village || "local desconhecido";
-  const el = document.createElement("p");
-  el.textContent = `📍 Localização aproximada: ${city}`;
-  document.querySelector(".header-banner").appendChild(el);
+    try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        const data = await res.json();
+        const city = data.address.city || data.address.town || data.address.village || "Local Desconhecido";
+        
+        const infoContainer = document.getElementById("weather-and-location");
+        if (infoContainer) {
+            infoContainer.innerHTML = `<p class="location-info">📍 Localização aproximada: ${city}</p>`;
+        }
+    } catch (err) {
+        console.warn("Erro ao obter endereço:", err);
+    }
 }
+function updateThemeIcon() {
+    const btn = document.getElementById("themeToggleBtn");
+    const darkModeActive = document.body.classList.contains("dark-mode");
 
-// ====================== MODO ESCURO ======================
+    // Se estiver no modo escuro → mostra o sol
+    btn.textContent = darkModeActive ? "🌙" : "☀️";
+}
+// MODO ESCURO
 function toggleDarkMode() {
-  document.body.classList.toggle("dark-mode");
-  localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+    document.body.classList.toggle("dark-mode");
+    
+    // salva preferência
+    const darkModeActive = document.body.classList.contains("dark-mode");
+    localStorage.setItem("darkMode", darkModeActive);
+
+    // atualiza ícone do botão
+    updateThemeIcon();
+
+    // atualiza o background conforme modo
+    getGreetingAndBackground(true);
 }
 
-// ====================== NOTIFICAÇÃO POPUP ======================
-function showNotification(msg) {
-  const box = document.createElement("div");
-  box.className = "popup-notification";
-  box.textContent = msg;
-  document.body.appendChild(box);
-  setTimeout(() => box.remove(), 4000);
-}
-
-// ====================== CHAMADA PRINCIPAL ======================
+// INICIALIZAÇÃO
 window.onload = function() {
-  getGreeting();
-  updateClock();
-  initMap();
+    const navbarElement = document.getElementById('mainNavbar');
+    if (navbarElement) {
+        navbarHeight = navbarElement.offsetHeight;
+    }
 
-  if (localStorage.getItem("darkMode") === "true") {
-    document.body.classList.add("dark-mode");
-  }
-
-  setTimeout(() => showNotification("🚗 Há novas corridas disponíveis na sua área!"), 5000);
+    // A chamada inicial já aplica a preferência de dark mode salva
+    if (localStorage.getItem("darkMode") === "true") {
+        document.body.classList.add("dark-mode");
+    }
+     updateThemeIcon();   // ⬅️ AQUI
+    getGreetingAndBackground();
+    initMap();
 };
 </script>
 

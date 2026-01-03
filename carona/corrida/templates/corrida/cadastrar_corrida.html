@@ -1,52 +1,107 @@
-{% extends "base.html" %}
 {% load static %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'corrida/css/cadastrar_corrida.css' %}">
-    <link rel="stylesheet" href="{% static 'corrida/css/autocomplete.css' %}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="{% static 'corrida/css/cadastrar_corrida.css' %}">
+<link rel="stylesheet" href="{% static 'corrida/css/autocomplete.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
-
+ <title>Carona | Cadastrar Corrida</title>
 {% block content %}
-<div class="corrida-container">
-    <section class="corrida-card">
-        <h3>Cadastrar Corrida 🚗</h3>
+<div class="dashboard-container">
 
-        <form method="POST" class="form-corrida">
-            {% csrf_token %}
+    <nav class="top-navbar" id="mainNavbar">
+       <div class="logo-area">
+    <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo-img">
+</div>
+        <div class="menu">
+            <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
+            <a href="{% url 'corrida:lista_corridas' %}" class="menu-item active">Minhas Viagens</a>
+            <a href="#" class="menu-item">Central de Ajuda</a>
+        </div>
 
-            {% if messages %}
-                <div>
-                    {% for message in messages %}
-                        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            {% if form.non_field_errors %}
-                <div class="alert-danger">
-                    {{ form.non_field_errors }}
-                </div>
-            {% endif %}
-
-            {% include "corrida/form_corrida_fields.html" %}
-
-            <button type="submit" class="action-btn" style= "border: none; padding: 10px 20px; border-radius: 15px;">Cadastrar Corrida</button>
-            
+        <div class="user-and-logout">
+            <div class="user-info-navbar">
+                <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
+                <span>{{ user.nome|default:"Usuário" }}</span>
+            </div>
+            <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
+        </div>
+    </nav>
+    
+    <main class="main-content">
+        <div class="corrida-container">
+            <div class="two-column-layout">
                 
-            <a href="{% url 'usuarios:pagina_inicial' %}">Cancelar</a>
+                <!-- COLUNA ESQUERDA: FORMULÁRIO -->
+                <section class="corrida-card">
+                    <h3>Cadastrar Corrida </h3>
+                    
+                    <form method="POST" class="form-corrida">
+                        {% csrf_token %}
+                        
+                        {% if messages %}
+                            <div>
+                                {% for message in messages %}
+                                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
 
-        </form>
-    </section>
+                        {% include "corrida/form_corrida_fields.html" %}
 
-    <!-- Mapa interativo -->
-    <div id="map"></div>
+                        {# Render explicitamente o campo de periodicidade (adicionado no form) #}
+                        {% if form.periodicidade %}
+                          <div class="form-group">
+                            {{ form.periodicidade.label_tag }}
+                            {{ form.periodicidade }}
+                            {% if form.periodicidade.errors %}
+                              <div class="alert-danger">
+                                {{ form.periodicidade.errors }}
+                              </div>
+                            {% endif %}
+                          </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="action-btn">Cadastrar Corrida</button>
+                    </form>
+                </section>
+
+                <!-- COLUNA DIREITA: MAPA E DICAS -->
+                <div class="right-column-sidebar">
+                    <div class="map-and-tips-container">
+
+                        <!-- MAPA -->
+                        <div id="map"></div>
+
+                        <!-- DICAS -->
+                        <section class="tips-section">
+                            <h4>Dicas Importantes ao Cadastrar sua Viagem</h4>
+                            <ul class="tips-list">
+                                <li>Confirme Ponto de Partida e Destino no mapa.</li>
+                                <li>Informe a data e hora exatas da partida para melhor precisão.</li>
+                                <li>Preencha os Assentos Disponíveis corretamente.</li>
+                                <li>Preencha as observações com base no seu veículo.</li>
+                               
+                        </section>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
 </div>
 
-<!-- autocomplete (DEVE vir antes do mapa e antes de qualquer script que use as funções) -->
 <script src="{% static 'corrida/js/autocomplete.js' %}"></script>
-
-<!-- Scripts do Leaflet e mapa -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="{% static 'corrida/js/cadastrar_corrida_map.js' %}"></script>
 {% endblock %}

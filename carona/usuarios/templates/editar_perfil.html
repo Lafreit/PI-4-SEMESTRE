@@ -1,70 +1,111 @@
-{% extends "base.html" %}
+
+{% block active_perfil %}active{% endblock %}
 {% load static %}
-
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'perfil.css' %}">
+<link rel="stylesheet" href="{% static 'editar.css' %}">
+
 {% endblock %}
-
+ <title>Carona | Editar Perfil</title>
 {% block content %}
-<main class="profile-container">
-    
-    <div class="header-banner">
-        <h1>Editar Perfil ✏️</h1>
-        <p>Atualize seus dados pessoais e informações de conta.</p>
-    </div>
+<div class="dashboard-container">
 
-    {# --- POSIÇÃO CORRETA DA NOTIFICAÇÃO --- #}
-    {% if messages %}
-        <div class="message-container" style="margin-bottom: 20px;">
-            {% for message in messages %}
-                <div class="notification-banner {% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}" role="alert">
-                    <span style="margin-right: 10px; font-size: 1.2em;">
-                        {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% endif %}
-                    </span>
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <div class="form-container">
+    <nav class="top-navbar" id="mainNavbar">
         
-        <form method="POST">
-            {% csrf_token %}
+        <!-- LOGO AQUI -->
+        <div class="logo-area">
+            <img src="{% static 'img/logo.png' %}" alt="Carona Fácil" class="logo-img">
+        </div>
 
-            {# Card 1 de Edição #}
-            <div class="info-section">
-                <h3 class="form-section-title">Informações Pessoais</h3>
-                {# Renderiza os campos do formulário principal #}
-                {% for field in usuario_form %}
-                    <div class="form-field">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        {{ field.errors }}
+        <div class="menu">
+            <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+            <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item active">Meu Perfil</a>
+            <a href="{% url 'corrida:lista_corridas' %}" class="menu-item">Minhas Viagens</a>
+            <a href="#" class="menu-item">Central de Ajuda</a>
+        </div>
+
+        <div class="user-and-logout">
+            <div class="user-info-navbar">
+                <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
+                <span>{{ user.nome }}</span>
+            </div>
+            <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
+        </div>
+    </nav>
+    
+    <main class="main-content">
+    
+        <div class="header-banner">
+        </div>
+
+        {% if messages %}
+            <div class="message-container" style="max-width: 950px; margin: 0 auto 20px auto;">
+                {% for message in messages %}
+                    <div class="notification-banner {{ message.tags }}" role="alert">
+                        <span>
+                            {% if message.tags == 'success' %}✅ Sucesso!
+                            {% elif message.tags == 'error' %}❌ Erro:
+                            {% else %}💡 Aviso:{% endif %}
+                        </span>
+                        {{ message }}
                     </div>
                 {% endfor %}
             </div>
+        {% endif %}
 
-            {# Card 2 de Edição (Somente se for motorista) #}
-            {% if profile_form %}
-            <div class="info-section" style="margin-top: 25px;">
-                <h3 class="form-section-title">Dados do Veículo e Documentos</h3>
-                {# Renderiza os campos do formulário de perfil/veículo #}
-                {% for field in profile_form %}
-                    <div class="form-field">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        {{ field.errors }}
+        <div class="register-single-wrapper" style="padding: 0; min-height: auto;">
+            <div class="register-container">
+                
+                <div class="register-box form-card-container" style="padding: 40px 50px;"> 
+                    
+                    <h1 style="font-size: 2rem; margin-bottom: 30px;">Dados da sua Conta</h1>
+
+                    <form method="POST">
+                        {% csrf_token %}
+        
+                        <div class="info-section">
+                            {% for field in usuario_form %}
+                                <p class="form-field-p">
+                                    {{ field.label_tag }}
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <span class="error-message">{{ field.errors }}</span>
+                                    {% endif %}
+                                </p>
+                            {% endfor %}
+                        </div>
+
+                        <div class="form-actions" style="margin-top: 25px; display: flex; justify-content: space-between; gap: 10px;">
+                            <a href="{% url 'usuarios:meu_perfil' %}" class="btn-back" style="width: 48%;">Cancelar</a>
+                            <button type="submit" class="btn-help" style="width: 48%;">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="side-content">
+                    
+                    <div class="side-top-group">
+                        <img src="{% static 'img/editar.png' %}" alt="Ilustração de Edição de Perfil" style="max-width: 110%;">
+                        
+                        <div class="tip-section" style="margin-top: 5px;"> 
+                            <h2>Informações Importantes:</h2>
+                            <ul>
+                                <li>Altere seu e-mail se precisar de uma nova conta de acesso.</li>
+                                <li>Lembre-se de usar uma senha forte e única.</li>
+                                <li>A alteração do seu tipo de perfil (Motorista/Passageiro) é instantânea.</li>
+                                <li>Seus dados são criptografados e confidenciais.</li>
+                            </ul>
+                        </div>
                     </div>
-                {% endfor %}
-            </div>
-            {% endif %}
+                    
+                    <div class="side-actions">
+                        <a href="{% url 'usuarios:meu_perfil' %}" class="btn-back">Ver Meu Perfil</a>
+                        <a href="{% url 'usuarios:logout' %}" class="btn-help" style="background-color: var(--red-danger);">Sair da Conta</a>
+                    </div>
+                </div>
 
-            <div class="form-actions">
-                <a href="{% url 'usuarios:meu_perfil' %}" class="cancel-btn">Cancelar</a>
-                <button type="submit" class="submit-btn">Salvar Alterações</button>
             </div>
-        </form>
-    </div>
-</main>
+        </div>
+        
+    </main>
+</div>
 {% endblock %}

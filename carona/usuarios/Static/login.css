@@ -177,3 +177,8 @@ form input:focus { border-color: #2a5298; outline: none; }
     .login-box { padding: 30px 20px; }
     .extra-links { flex-direction: column; gap: 5px; }
 }
+.logo img.logo-img {
+    height: 75px;
+    width: auto;
+    display: block;
+}

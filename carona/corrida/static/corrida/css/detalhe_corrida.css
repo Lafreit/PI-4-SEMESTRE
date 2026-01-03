@@ -1,4 +1,4 @@
-/* detalhe_corrida.css */
+/* static/corrida/css/detalhe_corrida.css */
 .corrida-detalhe-page {
   max-width: 900px;
   margin: 18px auto;
@@ -30,6 +30,7 @@
   gap: 12px;
 }
 
+/* Card da solicitação */
 .solicitacao-item {
   padding: 12px;
   border-radius: 8px;
@@ -37,9 +38,11 @@
   background: #fafafa;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  transition: background 0.18s, border-color 0.18s;
 }
 
+/* Estados visuais */
 .solicitacao-item.pendente {
   border-left: 4px solid #2b8cff;
   background: #eef7ff;
@@ -59,34 +62,72 @@
   margin: 0;
 }
 
-.btn-aceitar {
-  background: #2b8cff;
-  color: white;
-  padding: 6px 10px;
-  border-radius: 6px;
+/* Grupo de botões centralizados e mesmo tamanho */
+.botoes-acoes {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+  align-items: center;
+}
+
+/* Botões de ação (mesmo tamanho) */
+.btn-acao {
+  padding: 8px 16px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   font-weight: 600;
-  margin-top: 8px;
-  align-self: flex-start;
-  transition: background 0.2s;
+  min-width: 120px;
+  text-align: center;
+  transition: transform 0.08s ease, opacity 0.12s;
 }
 
-.btn-aceitar:hover {
-  background: #1a6ed0;
+/* Aceitar */
+.btn-aceitar {
+  background: #2b8cff;
+  color: white;
 }
 
+/* Rejeitar / Cancelar */
+.btn-rejeitar {
+  background: #dc3545;
+  color: white;
+}
+
+/* hover / active */
+.btn-acao:hover { transform: translateY(-1px); opacity: 0.98; }
+.btn-acao:active { transform: translateY(0); }
+
+/* Estado desabilitado visual */
+.btn-acao.disabled,
+.btn-acao[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Classe de loading visual */
+.btn-acao.loading::after {
+  content: ' ...';
+}
+
+/* Controls (Iniciar/Encerrar) */
+.corrida-controles .btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.corrida-controles .btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsivo */
 @media (max-width: 640px) {
-  .corrida-detalhe-page {
-    padding: 8px;
-  }
-
-  .solicitacao-item {
-    padding: 10px;
-  }
-
-  .btn-aceitar {
-    width: 100%;
-    text-align: center;
-  }
+  .corrida-detalhe-page { padding: 8px; }
+  .solicitacao-item { padding: 10px; }
+  .botoes-acoes { flex-direction: column; gap: 8px; }
+  .btn-acao { min-width: unset; width: 100%; }
 }

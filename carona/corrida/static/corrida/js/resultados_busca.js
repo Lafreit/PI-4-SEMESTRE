@@ -154,13 +154,34 @@
 
       card.innerHTML = `
         <div class="corrida-info">
-          <div class="corrida-origem-destino"><strong>${escapeHtml(c.origem)}</strong> → <strong>${escapeHtml(c.destino)}</strong></div>
+          <div class="corrida-origem-destino">
+            <strong>${escapeHtml(c.origem)}</strong> → <strong>${escapeHtml(c.destino)}</strong>
+          </div>
+
           <div class="corrida-meta">
-            <span class="corrida-vagas">Vagas: <span class="vagas-count">${escapeHtml(String(c.vagas_disponiveis || '0'))}</span></span>
+            <span class="corrida-vagas">
+              Vagas: <span class="vagas-count">${escapeHtml(String(c.vagas_disponiveis || '0'))}</span>
+            </span>
+
             ${ valorDisplay ? `<span class="corrida-valor">${escapeHtml(valorDisplay)}</span>` : '' }
+
             <div class="corrida-datas">Saída: ${escapeHtml(c.horario_saida || '--:--')}</div>
+
+            <!-- novos campos -->
+            <div class="corrida-motorista">
+              Motorista: <strong>${escapeHtml(c.motorista_nome || '—')}</strong>
+            </div>
+
+            <div class="corrida-data-inicio">
+              Início: ${escapeHtml(c.data || '--/--/----')}
+            </div>
+
+            <div class="corrida-periodicidade">
+              Periodicidade: <strong>${escapeHtml(c.periodicidade || 'Única')}</strong>
+            </div>
           </div>
         </div>
+
 
         <div class="corrida-actions">
           <button type="button" class="btn-solicitar btn" data-id="${c.id}" data-corrida-id="${c.id}">Solicitar vaga</button>

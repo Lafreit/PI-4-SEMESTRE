@@ -1,0 +1,26 @@
+#pix-qrcode {
+  width: 250px;
+  height: 250px;
+  margin-bottom: 10px;
+}
+
+#brcode {
+  width: 100%;
+  font-size: 1em;
+  padding: 5px;
+}
+
+#copy-btn {
+  padding: 5px 10px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+#status {
+  font-weight: bold;
+}
+
+#countdown {
+  font-weight: bold;
+  margin-top: 5px;
+}

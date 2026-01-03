@@ -1,0 +1,138 @@
+:root{
+  --bg: #f5f7fb;
+  --card-bg: #ffffff;
+  --muted: #6b7280;
+  --accent: #0057d9;
+  --success: #16a34a;
+  --danger: #ef4444;
+  --border: #e6e9ef;
+  --shadow: 0 6px 18px rgba(20,24,40,0.06);
+  --radius: 12px;
+}
+
+.page-wrapper{
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 16px;
+  background: var(--bg);
+}
+
+.card-container{
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.card-acomp{
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  padding: 20px;
+  position: relative;
+}
+
+.card-header{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.card-title{
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.card-subtitle{
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.card-body{
+  padding: 6px 0 12px 0;
+}
+
+.row{
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.row.small{
+  padding: 6px 0;
+  font-size: 0.95rem;
+}
+
+.col-label{
+  width: 160px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.col-value{
+  flex: 1;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.sep{
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 8px 0 12px 0;
+}
+
+.status-badge{
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.status-ativa { background: rgba(13,110,253,0.08); color: var(--accent); }
+.status-em_andamento { background: rgba(255,193,7,0.08); color: #b45309; }
+.status-finalizada { background: rgba(16,185,129,0.08); color: var(--success); }
+.status-cancelada { background: rgba(239,68,68,0.08); color: var(--danger); }
+
+.card-footer{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.btn-empty{
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: 1px dashed var(--border);
+  background: transparent;
+  cursor: not-allowed;
+}
+
+.btn-primary{
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: 1;
+}
+
+@media (max-width: 560px){
+  .col-label{ width: 110px; font-size: 0.9rem; }
+  .card-container{ padding: 0 8px; }
+  .card-acomp{ padding: 16px; }
+}

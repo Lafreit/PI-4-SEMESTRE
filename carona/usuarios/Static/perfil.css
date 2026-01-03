@@ -1,273 +1,354 @@
-/* ========================================================= */
-/* VARIÁVEIS DE ESTILO (PADRÃO MODERNO) */
-/* ========================================================= */
 :root {
-    --primary-blue: #3A8DFF;        /* Azul principal vibrante (Botões e Destaques) */
-    --secondary-blue: #0056b3;      /* Azul escuro (Para títulos e texto principal) */
-    --light-bg: #f5f7fa;            /* Fundo leve do body */
-    --card-bg: #ffffff;             /* Fundo do card */
-    --text-color: #333;             /* Cor do texto geral */
-    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra suave */
-    --border-color: #e0e0e0;        /* Cor da borda suave */
-    --status-approved: #28a745;     /* Verde de aprovação (Status Ativo) */
-    --status-upgrade: #ffc107;      /* Amarelo de Upgrade */
-    --card-header-blue: #4d94ff;    /* Azul claro para borda do card de dados pessoais */
-    --card-header-purple: #8A2BE2;  /* Roxo para borda do card de planos */
+  --primary-blue: #2a5298;
+  --primary-darker-blue: #22437B;
+  --accent-green: #28C76F;
+  --red-danger: #E74C3C;
+  --red-danger-darker: #C0392B;
+  --text-color: #333333;
+  --text-secondary: #707070;
+  --background-light: #F8F8F8;
+  --white: #FFFFFF;
+  --border-radius-lg: 16px;
+  --border-radius-sm: 8px;
+  --shadow-soft: 0 4px 20px rgba(0,0,0,0.08);
+  --navbar-height: 64px;
 }
 
-/* 1. Reset Básico e Container Principal */
+/* ======== BASE ======== */
 body {
-    background-color: var(--light-bg);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--text-color);
-    margin: 0;
-    padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--background-light);
+  margin: 0;
+  padding: 0;
+  color: var(--text-color);
+  line-height: 1.6;
+  transition: background-color 0.3s;
 }
 
-.profile-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+.dashboard-container {
+  display: block;
+  min-height: 100vh;
 }
 
-/* 2. Navbar (Limpa e Moderna) */
-.navbar {
-    background-color: var(--card-bg);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    padding: 15px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* ======== NAVBAR ======== */
+.top-navbar {
+  background: var(--white);
+  border-bottom: none;
+  color: var(--text-color);
+  padding: 0 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--navbar-height);
+  box-sizing: border-box;
+  transition: top 0.3s ease-out;
 }
 
-.logo {
-    font-size: 1.5em;
-    font-weight: 700;
-    color: var(--primary-blue) !important;
-    text-decoration: none;
+.top-navbar.hidden {
+  top: calc(-1 * var(--navbar-height));
 }
 
-.nav-links {
-    display: flex;
-    gap: 20px;
+.logo-area {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary-blue);
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
 }
 
-.nav-item, .nav-logout {
-    color: var(--secondary-blue);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
+.menu {
+  display: flex;
+  gap: 20px;
 }
 
-.nav-item:hover, .nav-logout:hover {
-    color: var(--primary-blue);
+.menu-item {
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 0.5rem 0;
+  transition: color 0.3s;
+  font-weight: 500;
+  font-size: 1rem;
 }
 
-/* 3. Header/Banner do Perfil */
+.menu-item:hover {
+  color: var(--primary-blue);
+}
+
+.menu-item.active {
+  font-weight: 600;
+  padding-bottom: 21px;
+}
+
+.user-and-logout {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-info-navbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.user-avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-blue);
+}
+
+/* ======== MAIN ======== */
+.main-content {
+  padding: 3rem 2.5rem;
+  margin-top: var(--navbar-height);
+}
+
+/* ======== HEADER (Meu Perfil) ======== */
 .header-banner {
-    background: linear-gradient(135deg, var(--primary-blue), #2e71d8);
-    color: white;
-    padding: 20px 40px; 
-    border-radius: 12px;
-    box-shadow: var(--shadow-soft);
-    margin-bottom: 30px;
+  width: 100%;
+  height: 280px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  color: white;
+
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+    url("{% static 'img/imgperfilp.png' %}");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .header-banner h1 {
-    font-size: 2.2em;
-    margin-bottom: 5px;
-    font-weight: 700;
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  z-index: 2;
+  position: relative;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 .header-banner p {
-    font-size: 1.1em;
-    opacity: 0.9;
+  font-size: 1.3rem;
+  color: #f0f0f0;
+  z-index: 2;
+  position: relative;
+  max-width: 700px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
 }
 
-/* 4. Layout e Estilo dos Cards (Visualização) */
-.profile-cards-grid {
-    display: grid;
-    /* Grid de ajuste automático, resolvendo problemas de desalinhamento */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 25px;
-}
-
-/* Estilo Básico de Todo Card */
-.card {
-    background-color: var(--card-bg);
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border-color);
-    border-top: 5px solid var(--border-color); 
-    display: flex;
-    flex-direction: column;
-    min-height: 200px;
-}
-
-.card h3 {
-    color: var(--secondary-blue);
-    font-size: 1.3em;
-    margin-top: 0;
-    margin-bottom: 15px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.card p { margin: 8px 0; font-size: 1em; }
-.card strong { font-weight: 600; color: var(--text-color); }
-
-/* Destaque da Borda Superior dos Cards */
-.profile-info-card { border-top-color: var(--card-header-blue); }
-.plans-card { border-top-color: var(--card-header-purple); }
-.trips-card { border-top-color: #5cb85c; }
-.payment-info-card { border-top-color: #f0ad4e; }
-.favorites-card { border-top-color: #ff99cc; }
-.help-center-card { border-top-color: #00bcd4; }
-.vehicle-info-card { border-top-color: var(--status-approved); }
-.documents-card { border-top-color: #4CAF50; }
-
-
-/* Estilos de Botões de Ação dentro dos Cards */
-.action-btn {
-    padding: 12px 15px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
-    margin-top: auto; /* Empurra o botão para baixo, alinhando-os */
-    display: block; 
-}
-
-.edit-btn, .primary-btn { background-color: var(--primary-blue); color: white; }
-.edit-btn:hover, .primary-btn:hover { background-color: var(--secondary-blue); }
-
-.secondary-btn { background-color: var(--border-color); color: var(--text-color); }
-.secondary-btn:hover { background-color: #ccc; }
-
-/* Estilos de Status e Plano */
-.status { padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 0.9em; }
-.active { background-color: rgba(40, 167, 69, 0.1); color: var(--status-approved); }
-.upgrade { background-color: rgba(255, 193, 7, 0.1); color: var(--status-upgrade); }
-.plan-item { display: flex; justify-content: space-between; margin: 5px 0; padding: 5px 0; }
-.link-details { color: var(--primary-blue); text-decoration: none; font-weight: 600; transition: color 0.2s; margin-top: 10px; }
-
-
-/* 5. Estilos de Notificação (Posicionamento dentro do Main) */
-.notification-banner {
-    padding: 15px 25px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1.05em;
+/* ======== BOTÃO DARK MODE — AGORA AO LADO ESQUERDO DA FOTO ======== */
+.user-info-navbar {
     display: flex;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    gap: 10px; /* espaço entre os itens */
 }
 
-.success-message {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-.error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-
-/* 6. Estilos de Edição/Formulário (Para o editar_perfil.html) */
-
-.form-container {
-    max-width: 700px;
-    margin: 40px auto;
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-soft);
-    border-top: 5px solid var(--primary-blue);
-}
-.form-section-title {
-    margin-top: 30px;
-    margin-bottom: 20px;
-    color: var(--primary-blue);
-    font-size: 1.3em;
-    font-weight: 600;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 5px;
-}
-.form-field { margin-bottom: 18px; }
-.form-field label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--text-color); font-size: 0.95em; }
-.form-field input, .form-field select {
-    width: 100%; padding: 12px 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1em;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-.form-field input:focus, .form-field select:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(58, 141, 255, 0.2); outline: none; }
-.form-actions { display: flex; justify-content: flex-end; margin-top: 30px; gap: 15px; }
-
-.submit-btn { background-color: var(--primary-blue); color: white; border: none; border-radius: 10px; padding: 12px 25px; font-weight: 600; font-size: 1em; cursor: pointer; }
-.cancel-btn { background-color: #6c757d; color: #fff; border: none; border-radius: 10px; padding: 12px 25px; font-weight: 600; font-size: 1em; cursor: pointer; text-decoration: none; display: inline-block; }
-
-
-/* Media Queries para Responsividade */
-@media (max-width: 992px) {
-    .profile-cards-grid { grid-template-columns: repeat(2, 1fr); }
+.mode-toggle-btn {
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-color);
+    font-size: 1.8rem;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-@media (max-width: 600px) {
-    .profile-cards-grid { grid-template-columns: 1fr; }
-    .navbar { flex-direction: column; gap: 10px; }
-    .nav-links { justify-content: center; }
+.mode-toggle-btn:hover {
+    transform: scale(1.1);
 }
-/* ========================================================= */
-/* MODO ESCURO (Dark Mode) */
-/* ========================================================= */
 
+/* ======== BOTÕES GERAIS ======== */
+.action-btn,
+.btn {
+  background-color: var(--primary-blue);
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  padding: 1rem 2rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+  text-transform: uppercase;
+  box-shadow: 0 4px 15px rgba(42,82,152,0.3);
+  text-decoration: none;
+}
+
+.action-btn:hover,
+.btn:hover {
+  background-color: var(--primary-darker-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(42,82,152,0.45);
+}
+
+/* ======== CARDS ======== */
+.profile-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.action-card {
+  background-color: var(--white);
+  padding: 30px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px;
+}
+
+.action-card h3 {
+  color: var(--primary-blue);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.action-card p {
+  margin-bottom: 10px;
+  color: var(--text-color);
+}
+
+/* ======== DARK MODE ======== */
 body.dark-mode {
-    background-color: #121212; /* Fundo escuro */
-    color: #eee; /* Texto claro */
+  background: #1a1a1a;
+  color: #e0e0e0;
 }
 
-body.dark-mode .navbar {
-    background-color: #1e1e1e;
-    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
-}
-
-body.dark-mode .nav-item, body.dark-mode .nav-logout {
-    color: #bbb;
-}
-
-body.dark-mode .card, body.dark-mode .form-container {
-    background-color: #1e1e1e;
-    border: 1px solid #333;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* Sombra mais escura */
-}
-
-body.dark-mode .card h3 {
-    color: var(--primary-blue); /* Mantém o azul vibrante */
+body.dark-mode .top-navbar {
+  background: #2a2a2a;
+  box-shadow: 0 2px 10px rgba(255,255,255,0.05);
 }
 
 body.dark-mode .header-banner {
-    /* Mantém o gradiente, se possível, ou usa um fundo escuro */
-    background: linear-gradient(135deg, #1f4f8f, #002b66); 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  background-color: #222;
 }
 
-body.dark-mode .action-btn.secondary-btn {
-    background-color: #333;
-    color: #eee;
+body.dark-mode .banner-overlay {
+  background: rgba(0, 0, 0, 0.6);
 }
 
-/* Campos de Formulário no modo escuro */
-body.dark-mode .form-field input, body.dark-mode .form-field select {
-    background-color: #2b2b2b;
-    border: 1px solid #444;
-    color: #eee;
+body.dark-mode .action-card,
+body.dark-mode .modular-sections {
+  background: #2a2a2a;
+  box-shadow: var(--shadow-soft);
 }
-body.dark-mode .form-field input:focus, body.dark-mode .form-field select:focus { 
-    border-color: var(--primary-blue); 
-    box-shadow: 0 0 0 3px rgba(58, 141, 255, 0.4);
+
+body.dark-mode .menu-item {
+  color: #b0b0b0;
+}
+
+body.dark-mode .menu-item:hover,
+body.dark-mode .menu-item.active {
+  color: var(--primary-blue);
+}
+
+body.dark-mode .action-card h3,
+body.dark-mode .action-card p {
+  color: #e0e0e0;
+}
+
+/* ======== RESPONSIVIDADE ======== */
+@media (max-width: 900px) {
+
+  .mode-toggle-btn {
+    left: 10px; 
+    top: 10px;
+    width: 50px;
+    height: 50px;
+    font-size: 1.4rem;
+  }
+
+  .top-navbar {
+    flex-wrap: wrap;
+    padding: 0.8rem 1rem;
+    height: auto;
+  }
+
+  .menu {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    order: 2;
+    margin-top: 10px;
+  }
+
+  .user-and-logout {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    order: 3;
+    margin-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 10px;
+  }
+
+  .main-content {
+    margin-top: 120px;
+    padding-top: 1rem;
+  }
+
+  .profile-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-banner h1 {
+    font-size: 2rem;
+  }
+
+  .header-banner p {
+    font-size: 1.1rem;
+  }
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+}
+
+.logo-area .logo-img {
+  height: 75px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ======== BOTÃO LOGOUT ======== */
+.logout-btn {
+  background-color: var(--red-danger) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
+}
+
+.logout-btn:hover {
+  background-color: var(--red-danger-darker) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(192, 57, 43, 0.45) !important;
 }

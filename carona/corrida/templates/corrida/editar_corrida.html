@@ -1,48 +1,99 @@
-{% extends "base.html" %}
+
 {% load static %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'corrida/css/cadastrar_corrida.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
 
 {% block content %}
-<div class="corrida-container">
-    <section class="corrida-card">
-        <h3>Editar Corrida 🚗</h3>
+ <title>Carona | Editar Corrida</title>
+<div class="dashboard-container">
 
-        <form method="POST" class="form-corrida">
-            {% csrf_token %}
+    <nav class="top-navbar" id="mainNavbar">
+       <div class="logo-area">
+            <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo-img">
+       </div>
+       <div class="menu">
+           <a href="{% url 'usuarios:pagina_inicial' %}" class="menu-item">Início</a>
+           <a href="{% url 'usuarios:meu_perfil' %}" class="menu-item">Meu Perfil</a>
+           <a href="{% url 'corrida:lista_corridas' %}" class="menu-item active">Minhas Viagens</a>
+           <a href="#" class="menu-item">Central de Ajuda</a>
+       </div>
 
-            {% if messages %}
-            <div>
-                {% for message in messages %}
-                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
-                {% endfor %}
+       <div class="user-and-logout">
+           <div class="user-info-navbar">
+               <img src="{% static 'img/imgusu.png' %}" alt="Usuário" class="user-avatar-small">
+               <span>{{ user.nome|default:"Usuário" }}</span>
+           </div>
+           <a href="{% url 'usuarios:logout' %}" class="action-btn logout-btn btn-danger">Sair</a>
+       </div>
+    </nav>
+    
+    <main class="main-content">
+        <div class="corrida-container">
+            <div class="two-column-layout">
+                
+                <section class="corrida-card">
+                    <h3>Editar Corrida 🚗</h3>
+                    
+                    <form method="POST" class="form-corrida">
+                        {% csrf_token %}
+                        
+                        {% if messages %}
+                            <div>
+                                {% for message in messages %}
+                                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        {% include "corrida/form_corrida_fields.html" %}
+                        
+                        <div class="form-group">
+                            <label for="{{ form.status.id_for_label }}">Status da Corrida</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}
+                                <div class="errorlist">{{ form.status.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="action-btn">Atualizar Corrida</button>
+                    </form>
+                </section>
+
+                <div class="right-column-sidebar">
+                    <div class="map-and-tips-container">
+
+                        <div id="map"></div>
+
+                        <section class="tips-section">
+                            <h4>Dicas Importantes ao Editar sua Viagem</h4>
+                            <ul class="tips-list">
+                                <li>Confirme Ponto de Partida e Destino no mapa.</li>
+                                <li>Lembre-se de atualizar o Status se a viagem já tiver ocorrido.</li>
+                                <li>Se alterar a rota, informe os passageiros.</li>
+                                <li>Verifique os horários para garantir a pontualidade.</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </div>
+
             </div>
-            {% endif %}
-
-            {% if form.non_field_errors %}
-            <div class="alert-danger">
-                {{ form.non_field_errors }}
-            </div>
-            {% endif %}
-
-
-            <!-- Inclui os campos via template parcial -->
-            {% include "corrida/form_corrida_fields.html" %}
-
-            
-            <!-- Status (apenas no editar) -->
-            <div class="form-group">
-                <label for="{{ form.status.id_for_label }}">Status da Corrida</label>
-                {{ form.status }}
-            </div>
-
-            <button type="submit" class="action-btn">Atualizar Corrida</button>
-        </form>
-    </section>
+        </div>
+    </main>
 </div>
 
-<!-- JS para autocomplete -->
 <script src="{% static 'corrida/js/autocomplete.js' %}"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'corrida/js/cadastrar_corrida_map.js' %}"></script>
 {% endblock %}

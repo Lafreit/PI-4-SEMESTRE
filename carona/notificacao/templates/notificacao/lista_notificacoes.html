@@ -2,56 +2,99 @@
 {% load static %}
 
 {% block content %}
-<div class="notif-page">
-
-  <!-- Cabeçalho -->
-  <div class="notif-header">
-    <h2>Notificações</h2>
-    <div id="notif-badge" class="notif-badge">Carregando...</div>
-  </div>
-
-  <!-- Lista de notificações -->
-  <div id="notif-list" class="notif-list">
-    {% for n in notificacoes %}
-      <div class="notif-item {% if not n.lida %}nao-lida{% endif %}" data-id="{{ n.id }}">
-        <div class="notif-main">
-          <div class="notif-title">{{ n.titulo }}</div>
-          <div class="notif-msg">{{ n.mensagem }}</div>
-        </div>
-        <div class="notif-meta">
-          <div class="notif-time">{{ n.criada_em|date:"d/m/Y H:i" }}</div>
-
-          {% if not n.lida %}
-            <button class="btn-marcar-lida" data-id="{{ n.id }}">Marcar como lida</button>
-          {% endif %}
-
-          {% if n.tipo == n.TIPO_SOLICITACAO_RECEBIDA and n.dados.corrida_id %}
-            <a href="{% url 'corrida:detalhe' n.dados.corrida_id %}" class="btn-detalhe">Ver corrida</a>
-
-            <!-- Botão aceitar solicitação -->
-            {% if n.dados.solicitacao_id %}
-              <button class="btn-aceitar" data-corrida="{{ n.dados.corrida_id }}" data-solicitacao="{{ n.dados.solicitacao_id }}">
-                Aceitar solicitação
-              </button>
-            {% endif %}
-          {% endif %}
-        </div>
-      </div>
-    {% empty %}
-      <p>Você não possui notificações.</p>
-    {% endfor %}
-  </div>
-
-</div>
-
-<!-- URLs e CSRF -->
-<script>
-  const URL_MARCAR_LIDA = "{% url 'notificacao:api_marcar_lida' %}";
-  const URL_CONTAGEM = "{% url 'notificacao:api_contagem' %}";
-  const URL_ACEITAR = "{% url 'corrida:api_aceitar_solicitacao' %}";
-  const CSRF_TOKEN = "{{ csrf_token }}";
-</script>
 
 <link rel="stylesheet" href="{% static 'notificacao/css/notificacoes.css' %}">
+
+<main class="main-content">
+  <div class="notif-page">
+
+    <div class="notif-header">
+      <h2>Notificações</h2>
+      <div class="notif-badge" id="notif-badge">--</div>
+    </div>
+
+    <div id="notif-list" class="notif-list">
+      {% for n in notificacoes %}
+        <div class="notif-item tipo-{{ n.tipo }} {% if not n.lida %}nao-lida{% endif %}"
+             data-id="{{ n.id }}"
+             {% if n.corrida_id %} data-corrida="{{ n.corrida_id }}" {% endif %}
+             role="button"
+             tabindex="0">
+
+          <div class="notif-main">
+            <div class="notif-title"><strong>{{ n.titulo }}</strong></div>
+
+            <div class="notif-msg">{{ n.mensagem }}</div>
+
+            <div class="notif-extra">
+              {% if n.dados_normalizados.origem or n.dados_normalizados.destino %}
+                <div class="campo-origem-destino" style="margin-top:8px;">
+                  {% if n.dados_normalizados.origem %}
+                    <span class="lbl">Origem:</span>
+                    <span class="val"><strong>{{ n.dados_normalizados.origem }}</strong></span>
+                  {% endif %}
+                  {% if n.dados_normalizados.destino %}
+                    <span class="lbl" style="margin-left:8px;">Destino:</span>
+                    <span class="val"><strong>{{ n.dados_normalizados.destino }}</strong></span>
+                  {% endif %}
+                </div>
+              {% endif %}
+
+              {% if n.dados_normalizados.passageiro_nome or n.dados_normalizados.passageiro or n.dados_normalizados.usuario %}
+                <div class="campo-solicitante" style="margin-top:6px;">
+                  <span class="lbl">Solicitação por:</span>
+                  <span class="val"><strong>
+                    {% if n.dados_normalizados.passageiro_nome %}
+                      {{ n.dados_normalizados.passageiro_nome }}
+                    {% elif n.dados_normalizados.passageiro %}
+                      {{ n.dados_normalizados.passageiro }}
+                    {% else %}
+                      {{ n.dados_normalizados.usuario }}
+                    {% endif %}
+                  </strong></span>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="notif-meta">
+            <div class="notif-time">{{ n.criada_em|date:"d/m/Y H:i" }}</div>
+
+            {% if not user.eh_motorista and n.corrida_exists and "Corrida Iniciada" in n.titulo %}
+              <a href="{% url 'corrida:acompanhamento' n.dados_normalizados.corrida_id %}"
+                 class="btn-acao btn-acompanhamento"
+                 data-corrida="{{ n.corrida_id }}"
+                 data-notif="{{ n.id }}">
+                 Acompanhar & Pagar
+              </a>
+            {% endif %}
+
+            {% if not n.lida %}
+              <button class="btn-acao btn-marcar-lida" data-id="{{ n.id }}">Marcar como lida</button>
+            {% endif %}
+
+            {% if n.tipo == n.TIPO_SOLICITACAO_RECEBIDA and n.dados_normalizados.corrida_id %}
+              <a href="{% url 'corrida:detalhe' n.dados_normalizados.corrida_id %}"
+                 class="btn-acao btn-detalhe">Ver corrida</a>
+            {% endif %}
+          </div>
+        </div>
+
+      {% empty %}
+        <p class="nenhuma-notif">Nenhuma notificação encontrada.</p>
+      {% endfor %}
+    </div>
+
+  </div>
+</main>
+
+<script>
+  window.USER_IS_MOTORISTA = "{{ user.eh_motorista|yesno:'true,false' }}" === "true";
+
+  const URL_MARCAR_LIDA = "{% url 'notificacao:api_marcar_lida' %}";
+  const URL_CONTAGEM = "{% url 'notificacao:api_contagem' %}";
+</script>
+
 <script src="{% static 'notificacao/js/notificacoes.js' %}" defer></script>
+
 {% endblock %}

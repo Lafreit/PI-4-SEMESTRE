@@ -1,358 +1,399 @@
-/* paginainicial.css — Estilo moderno e harmonizado com a landing page */
-
-/* 1) Fonte */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-
+/*Definição de Cores:Design System Moderno e Limpo*/
 :root{
-  --bg: #f6f8fc;
-  --card: #ffffff;
-  --primary: #3366ff;        /* cor forte principal */
-  --primary-2: #5ea0ff;      /* tom mais claro */
-  --muted: #6b7280;
-  --text: #0f1724;
-  --shadow: rgba(17,24,39,0.08);
-  --accent: #ffb86b;
-  --danger: #ef4444;
-  --glass: rgba(255,255,255,0.7);
+--primary-blue:#2a5298;/*NOVO AZUL:Mais escuro e elegante*/
+--primary-darker-blue:#22437B;/*NOVO AZUL ESCURO:Para estados de hover*/
+--accent-green:#28C76F;/*Verde de Destaque/VIP*/
+--red-danger:#E74C3C;/*Vermelho para ações destrutivas (Sair, Excluir)*/
+--red-danger-darker:#C0392B;
+--text-color:#333333;/*Texto Principal Mais Escuro para Leitura*/
+--text-secondary:#707070;/*Texto Secundário/Detalhes*/
+--background-light:#F8F8F8;/*Fundo Levemente Cinza*/
+--white:#FFFFFF;
+--border-radius-lg:16px;/*Bordas grandes e suaves*/
+--border-radius-sm:8px;
+--shadow-soft:0 4px 20px rgba(0,0,0,0.08);/*Sombra mais sutil e espalhada*/
+--navbar-height:64px;
 }
-
-/* Reset minimal */
-*{box-sizing:border-box}
-html,body{height:100%}
+/*======ESTILO GERAL======*/
 body{
-  margin:0;
-  min-height:100%;
-  background:linear-gradient(180deg,#f8fbff 0%, var(--bg) 100%);
-  font-family:'Poppins',system-ui,Segoe UI,Roboto,Arial,sans-serif;
-  color:var(--text);
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
+font-family:'Poppins',sans-serif;
+background-color:var(--background-light);
+margin:0;
+padding:0;
+color:var(--text-color);
+line-height:1.6;
+transition:background-color 0.3s;
 }
-
-/* Layout container */
-.dashboard-container{
-  display:flex;
-  min-height:100vh;
-  width:100%;
+.dashboard-container{display:block;min-height:100vh;}
+/*======TOP NAVBAR (SMART HEADER FIXO E SUPER CLEAN)======*/
+.top-navbar{
+background:var(--white);
+border-bottom:none;
+color:var(--text-color);
+padding:0 2.5rem;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 2px 10px rgba(0,0,0,0.05);
+z-index:100;
+position:fixed;
+top:0;
+left:0;
+right:0;
+height:var(--navbar-height);
+box-sizing:border-box;
+transition:top 0.3s ease-out;
 }
-
-/* SIDEBAR */
-.sidebar{
-  width:270px;
-  position:fixed;
-  left:0;
-  top:0;
-  bottom:0;
-  background:linear-gradient(180deg,var(--card),#fbfdff);
-  padding:28px 20px;
-  border-right:1px solid rgba(15,23,36,0.04);
-  box-shadow: 6px 0 30px rgba(17,24,39,0.03);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-  z-index:50;
-  transition:width .3s ease;
+/*EFEITO ESCONDE/REVELA*/
+.top-navbar.hidden{
+top:calc(-1 * var(--navbar-height));
 }
-
-/* logo / avatar area */
-.user-avatar-small{
-  width:72px;
-  height:72px;
-  border-radius:50%;
-  object-fit:cover;
-  border:3px solid rgba(81,144,255,0.16);
-  box-shadow:0 6px 18px rgba(51,102,255,0.08);
-  background:linear-gradient(135deg,#eff7ff,#f7fbff);
+.logo-area{
+font-size:1.8rem;
+font-weight:800;
+color:var(--primary-blue);
+text-transform:uppercase;
+letter-spacing:-0.5px;
 }
-
-.user-info{
-  text-align:center;
-  margin-top:2px;
-  margin-bottom:6px;
-}
-.user-info h3{
-  color:var(--primary);
-  font-size:15px;
-  font-weight:700;
-  letter-spacing:0.2px;
-}
-.user-type{
-  font-size:13px;
-  color:var(--muted);
-  margin-top:6px;
-}
-
-/* menu */
-.menu{
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  margin-top:12px;
-  padding-bottom:12px;
-}
+/*MENU DE NAVEGAÇÃO*/
+.menu{display:flex;gap:20px;}
 .menu-item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  width:100%;
-  text-decoration:none;
-  color:var(--text);
-  background:transparent;
-  padding:11px 14px;
-  border-radius:12px;
-  font-weight:600;
-  font-size:14px;
-  transition: all .18s ease;
-  justify-content:flex-start;
+color:var(--text-secondary);
+text-decoration:none;
+/* CORRIGIDO: Padroniza o padding vertical para que a linha não desça */
+padding:19.5px 0 19.5px 0; /* Padding superior e inferior para centralizar o item dentro dos 64px */
+transition:color 0.3s, border-bottom 0.3s, font-weight 0.3s; /* Adicionado font-weight para transição */
+font-weight:500;
+font-size:1rem;
+height: var(--navbar-height); /* Garante que todos os items tenham a altura da barra */
+box-sizing: border-box; /* Inclui o padding na altura */
 }
-.menu-item svg{opacity:.9}
+
 .menu-item:hover{
-  transform:translateX(6px);
-  background:linear-gradient(90deg, rgba(94,160,255,0.12), rgba(51,102,255,0.06));
-  color:var(--primary);
-  box-shadow: 0 6px 18px rgba(51,102,255,0.06);
+color:var(--primary-blue);
 }
 .menu-item.active{
-  background:linear-gradient(90deg,var(--primary-2),var(--primary));
-  color:#fff;
-  box-shadow: 0 8px 28px rgba(51,102,255,0.2);
-}
+font-weight:600;
 
-/* logout placed at bottom */
-.menu .logout{
-  margin-top:auto;
-  background:linear-gradient(90deg,#ffecec,#ffd6d6);
-  color:var(--danger);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:700;
-  border-radius:10px;
-  padding:10px;
-  width:100%;
-  transition:all .16s;
+/* LINHA REMOVIDA: padding-bottom:21px; */
 }
-.menu .logout:hover{
-  background:var(--danger);
-  color:#fff;
-  transform:translateY(-2px);
-  box-shadow:0 8px 18px rgba(239,68,68,0.18);
+/*Links VIP e Especiais*/
+.menu-item.vip-link{
+color:var(--accent-green);
+font-weight:700;
 }
-
-/* MAIN content */
+.menu-item.vip-link:hover{
+color:var(--accent-green);
+}
+/*ÁREA DO USUÁRIO E LOGOUT*/
+.user-and-logout{display:flex;align-items:center;gap:20px;}
+.user-info-navbar{display:flex;align-items:center;gap:10px;color:var(--text-color);font-size:0.95rem;font-weight:600;}
+.user-avatar-small{width:40px;height:40px;border-radius:50%;border:3px solid var(--primary-blue);}
+/*Botão de Logout como Ícone*/
+.logout-btn{
+color:var(--text-secondary);
+font-size:1.4rem;
+transition:color 0.2s;
+}
+.logout-btn:hover{
+color:var(--primary-blue);
+background:none;
+}
+/*======CONTEÚDO PRINCIPAL (COM MARGEM PARA A NAVBAR FIXA)======*/
 .main-content{
-  margin-left:270px; /* space for fixed sidebar */
-  width:calc(100% - 270px);
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-  padding:26px 36px;
+padding:3rem 2.5rem;
+margin-top:var(--navbar-height);
 }
-
-/* HEADER BANNER — grande e arredondado conforme landing */
+/*======HEADER BANNER (COM IMAGEM DE FUNDO E OVERLAY)======*/
 .header-banner{
-  background:linear-gradient(90deg,var(--primary-2), var(--primary));
-  color:#fff;
-  padding:36px 34px;
-  border-radius:18px;
-  border-bottom-left-radius:42px;
-  border-bottom-right-radius:42px;
-  box-shadow: 0 16px 40px rgba(51,102,255,0.12);
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  position:relative;
-  overflow:visible;
+padding:3rem;
+border-radius:var(--border-radius-lg);
+box-shadow:var(--shadow-soft);
+margin-bottom:3rem;
+text-align:center;
+position:relative;
+overflow:hidden;
+/*>>>ESTILOS DA IMAGEM DE FUNDO<<<*/
+min-height:250px;
+background-image:
+linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),/*Overlay Escuro*/
+url('{%static "img/header_image.jpg"%}');/*Sua Imagem*/
+background-size:cover;
+background-position:center;
+}
+/*Ajustar a cor do texto para ser legível sobre a imagem escura*/
+.header-banner h1,.header-banner p,.header-banner .weather-info,.header-banner .location-info{
+color:var(--white)!important;/*Mudar texto para branco*/
+text-shadow:1px 1px 3px rgba(0,0,0,0.8);/*Sombra no texto para POP*/
+z-index:20;
+}
+/*Mover o botão do Modo Escuro e ajustar para fundo escuro*/
+.mode-toggle-btn {
+    position: static;
+    margin-right: 5px;
+    background-color: transparent;
+    color: var(--text-color);
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    font-size: 1.6rem !important;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent !important;
+    color: var(--text-color) !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
-/* header content layout */
-.header-banner .top-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+.mode-toggle-btn:hover{
+background-color:rgba(255, 255, 255, 0);
+transform:none;
+box-shadow:0 4px 8px rgba(0, 0, 0, 0);
 }
-.header-banner h1{
-  font-size:30px;
-  font-weight:800;
-  margin:0;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  letter-spacing:-0.4px;
-}
-.header-banner p{
-  margin:0;
-  color:rgba(255,255,255,0.92);
-  font-weight:500;
-  opacity:0.95;
-}
-
-/* weather and time styling appended to header by JS */
-.header-banner .weather-info{
-  margin-top:10px;
-  font-weight:600;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  color:rgba(255,255,255,0.95);
-}
-
-/* small pill for time in header (JS inject) */
-.header-banner .time-pill{
-  background: rgba(255,255,255,0.12);
-  padding:5px 10px;
-  border-radius:999px;
-  font-weight:600;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  color:#fff;
-  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06);
-}
-
-/* MAIN body area with map and cards */
+/*======LAYOUT PRINCIPAL:MAPA e AÇÕES (USANDO CARDS MODERNOS)======*/
 .map-and-actions{
-  display:flex;
-  gap:28px;
-  margin-top:20px;
-  align-items:flex-start;
-  flex-wrap:wrap;
+display:grid;
+grid-template-columns:3fr 1.5fr;
+gap:2.5rem;
+margin-bottom:2rem;
+align-items:stretch;
 }
-
-/* Map card */
 #map{
-  flex: 1 1 65%;
-  min-height:460px;
-  height:60vh;
-  background:var(--card);
-  border-radius:18px;
-  padding:12px;
-  box-shadow: 0 10px 30px var(--shadow);
-  border: 1px solid rgba(15,23,36,0.04);
-  overflow:hidden;
+height:450px;
+border-radius:var(--border-radius-lg);
+box-shadow:var(--shadow-soft);
 }
-
-/* Ensure leaflet map tiles rounded */
-#map .leaflet-container{
-  border-radius:14px;
-  height:100%;
-}
-
-/* Action card (right column) */
 .action-card{
-  flex: 1 1 30%;
-  min-width:300px;
-  background:linear-gradient(180deg,var(--card),#fcfeff);
-  border-radius:18px;
-  padding:28px;
-  box-shadow: 0 10px 30px rgba(9,30,66,0.04);
-  border-top:4px solid rgba(81,144,255,0.08);
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  justify-content:space-between;
+background-color:var(--white);
+border-radius:var(--border-radius-lg);
+padding:2.5rem;
+box-shadow:var(--shadow-soft);
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+}
+.action-card h2{color:var(--primary-blue);font-size:1.6rem;margin-bottom:0.8rem;}
+.action-card p{color:var(--text-secondary);margin-bottom:2rem;font-size:1rem;}
+/*======SEÇÕES EM ABAS MODULARES (CARDS MODERNOS)======*/
+.modular-sections{
+background:var(--white);
+border-radius:var(--border-radius-lg);
+box-shadow:var(--shadow-soft);
+margin-top:3rem;
+}
+.tab-menu{
+display:flex;
+border-bottom:1px solid #eeeeee;
+padding:0 2rem;
+}
+.tab-button{
+background:transparent;
+border:none;
+padding:1rem 1.8rem;
+font-size:1rem;
+font-weight:600;
+color:var(--text-secondary);
+cursor:pointer;
+transition:color 0.3s,border-bottom 0.3s;
+border-bottom:3px solid transparent;
+margin-right:20px;
+text-transform:none;
+}
+.tab-button:hover{color:var(--primary-blue);}
+.tab-button.active{color:var(--primary-blue);border-bottom:3px solid var(--primary-blue);}
+.tab-button.vip{color:var(--accent-green);}
+.tab-button.vip:hover{color:var(--accent-green);}
+.tab-button.vip.active{border-bottom:3px solid var(--accent-green);color:var(--accent-green);}
+.tab-content-container{padding:2.5rem;}
+.tab-content{display:none;animation:fadeIn 0.5s;}
+.tab-content.active{display:block;}
+.tab-content h3{color:var(--primary-blue);font-size:1.5rem;margin-top:0;margin-bottom:1.5rem;font-weight:700;}
+.tab-content.vip h3{color:var(--accent-green);}
+.tab-content ul{padding-left:20px;}
+.tab-content li{
+padding:10px 0;
+border-bottom:1px solid #f0f0f0;
+font-size:1rem;
+color:var(--text-secondary);
+}
+.tab-content li:last-child{border-bottom:none;}
+/*======BOTÕES (MODERNIZADOS)======*/
+.action-btn,.btn{
+background-color:var(--primary-blue);
+color:var(--white);
+border:none;
+border-radius:var(--border-radius-sm);
+padding:1rem 2rem;
+font-weight:700;
+font-size:1.05rem;
+cursor:pointer;
+transition:background-color 0.3s,transform 0.2s,box-shadow 0.2s;
+text-transform:uppercase;
+box-shadow:0 4px 15px rgba(42,82,152,0.3);/*Usa a cor primária para a sombra*/
+text-decoration:none;
+}
+.action-btn:hover,.btn:hover{
+background-color:var(--primary-darker-blue);
+transform:translateY(-2px);
+box-shadow:0 6px 18px rgba(42,82,152,0.45);/*Usa a cor primária para a sombra*/
+}
+/*Botões com estilo de ação 'start' (Verde)*/
+.action-btn.start{
+background-color:var(--accent-green);
+box-shadow:0 4px 15px rgba(40,199,111,0.3);
+}
+.action-btn.start:hover{
+background-color:#22ad60;
+box-shadow:0 6px 18px rgba(40,199,111,0.45);
+}
+/*ESTILO NOVO:Botão de Sair Vermelho (red-btn)*/
+.action-btn.red-btn,.red-btn{
+background-color:var(--red-danger);/*Usa a nova variável de cor*/
+box-shadow:0 4px 15px rgba(231,76,60,0.3);
+padding:0.8rem 1.5rem;/*Ajustado para caber melhor na navbar*/
+font-size:0.95rem;
+}
+.action-btn.red-btn:hover,.red-btn:hover{
+background-color:var(--red-danger-darker);
+box-shadow:0 6px 18px rgba(231,76,60,0.45);
+}
+/*ESTILO NOVO:Esconder o botão de aba que só ativa o JS (hidden-tab)*/
+.hidden-tab{
+display:none!important;
+}
+/*======MODO ESCURO (AJUSTADO)======*/
+body.dark-mode{background:#1a1a1a;color:#e0e0e0;}
+body.dark-mode .top-navbar{background:#2a2a2a;box-shadow:0 2px 10px rgba(255,255,255,0.05);}
+body.dark-mode .header-banner,body.dark-mode .action-card,body.dark-mode .modular-sections{
+background:#2a2a2a;
+box-shadow:var(--shadow-soft);
+}
+body.dark-mode .user-avatar-small{border:3px solid var(--primary-blue);}
+body.dark-mode .menu-item{color:#b0b0b0;}
+body.dark-mode .menu-item:hover,body.dark-mode .menu-item.active{color:var(--primary-blue);}
+body.dark-mode .tab-button{color:#b0b0b0;}
+body.dark-mode .tab-menu{border-bottom:1px solid #3a3a3a;}
+body.dark-mode .tab-content li{border-bottom:1px solid #3a3a3a;color:#b0b0b0;}
+body.dark-mode .header-banner h1,body.dark-mode .action-card h2,body.dark-mode .tab-content h3{
+color:var(--primary-blue);
+}
+body.dark-mode .mode-toggle-btn{
+background-color:rgba(255,255,255,0.2);
+color:var(--white);
+}
+body.dark-mode .mode-toggle-btn:hover{
+background-color:rgba(255,255,255,0.4);
+}
+body.dark-mode .tab-button{color:#eee;}
+body.dark-mode .tab-button:hover{color:var(--primary-blue);}
+body.dark-mode .tab-content li{border-bottom:1px dashed #444;}
+/*======RESPONSIVIDADE (MANTIDA)======*/
+@media (max-width:900px){
+.top-navbar{
+flex-wrap:wrap;
+padding:0.8rem 1rem;
+height:auto;
+}
+.top-navbar .menu,.top-navbar .user-and-logout{display:none;}
+.logo-area{flex:1;}
+.user-and-logout{display:none;}
+.main-content{margin-top:60px;}
+.map-and-actions{grid-template-columns:1fr;gap:1rem;}
+#map{height:300px;}
+.tab-menu{flex-wrap:wrap;padding:0 0.5rem;}
+.tab-button{
+flex:1 1 auto;
+padding:0.7rem 1rem;
+margin-right:5px;
+font-size:0.9rem;
+text-transform:uppercase;
+}
+.tab-button.active{border-bottom:3px solid var(--primary-blue);} /* Garante a linha azul no mobile */
+.mode-toggle-btn{
+position:static;
+margin-left:auto;
+background-color:var(--background-light);
+}
+body.dark-mode .mode-toggle-btn{background-color:#333;}
 }
 
-/* Titles inside cards */
-.action-card h2{
-  color:var(--primary);
-  margin:0;
-  font-size:20px;
-  font-weight:700;
-}
-.action-card p{ color:var(--muted); margin:0 0 12px 0; line-height:1.5; }
-
-/* Buttons */
-.action-btn{
-  background:linear-gradient(90deg,var(--primary-2),var(--primary));
-  color:#fff;
-  border:none;
-  border-radius:12px;
-  padding:12px 18px;
-  font-weight:700;
-  font-size:15px;
-  cursor:pointer;
-  box-shadow:0 8px 20px rgba(51,102,255,0.18);
-  transition:transform .16s ease, box-shadow .16s ease;
-}
-.action-btn:hover{ transform:translateY(-3px); box-shadow:0 14px 30px rgba(51,102,255,0.22); }
-
-/* Safety tips card — full width below */
-.safety-tips.card{
-  margin-top:28px;
-  padding:22px;
-  border-radius:16px;
-  background:linear-gradient(180deg,var(--card),#ffffff);
-  box-shadow:0 10px 30px rgba(17,24,39,0.03);
-  border-left:4px solid #f7b267;
+.logo-area {
+display: flex;
+align-items: center;
+height: var(--navbar-height);
 }
 
-/* safety list */
-.safety-tips h3{ color:var(--primary); margin:0 0 10px 0; font-size:18px; font-weight:700; }
-.safety-tips ul{ list-style:none; padding-left:0; margin:0; display:grid; gap:8px; }
-.safety-tips li{ padding:10px 8px; background:linear-gradient(90deg, rgba(81,144,255,0.03), transparent); border-radius:8px; color:var(--muted); }
+.logo-img {
+height: 75px; /* tamanho ideal para não estourar */
+width: auto;
+object-fit: contain;
+ display: block;
+}
+/* Estilos adicionais para o banner */
+.imagem-horario { display: none; }
 
-/* popup-notification (from JS) */
-.popup-notification{
-  position:fixed;
-  bottom:22px;
-  right:22px;
-  background:linear-gradient(90deg,#4f8cff,#2f6eff);
-  color:#fff;
-  padding:12px 16px;
-  border-radius:12px;
-  box-shadow:0 12px 30px rgba(47,110,255,0.16);
-  z-index:9999;
-  font-weight:700;
+/* Estilo para o indicador de scroll (animação de seta) */
+.scroll-indicator {
+ position: absolute;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+color: var(--white);
+ font-size: 0.9rem;
+ font-weight: 500;
+ text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+ opacity: 0.8;
+ animation: bounce 2s infinite;
 }
 
-/* weather-info small style used inside header (JS append) */
-.weather-info{
-  display:inline-flex;
-  gap:8px;
-  align-items:center;
-  color:rgba(255,255,255,0.95);
+.arrow-down {
+ display: block;
+font-size: 2rem;
+line-height: 1;
 }
 
-/* RESPONSIVENESS */
-@media (max-width:1100px){
-  #map{ min-height:420px; height:52vh; }
-  .action-card{ min-width:320px; }
+@keyframes bounce {
+ 0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+ 40% { transform: translateY(-10px) translateX(-50%); }
+60% { transform: translateY(-5px) translateX(-50%); }
 }
 
-@media (max-width:850px){
-  .sidebar{ position:relative; width:100%; height:auto; flex-direction:row; padding:12px 16px; align-items:center; gap:12px; border-right:none; box-shadow:none }
-  .user-info{ display:flex; gap:10px; align-items:center; text-align:left }
-  .menu{ flex-direction:row; gap:10px; overflow:auto; padding:8px 0; width:auto; margin-left:8px }
-  .menu-item{ padding:8px 10px; font-size:13px; white-space:nowrap }
-  .main-content{ margin-left:0; width:100%; padding:16px; }
-  .header-banner{ border-radius:12px; padding:20px; }
-  .map-and-actions{ flex-direction:column; gap:18px; }
-  #map{ width:100%; height:56vh; min-height:360px }
-  .action-card{ width:100%; min-width:0; }
+.location-info {
+font-size: 1.1rem;
+ font-weight: 500;
+ margin-top: 10px;
+}
+/* Estilo para o relógio dentro do H1 */
+#greeting-message .clock-display {
+ font-size: 1.5rem; /* Ajuste o tamanho da fonte para o relógio */
+font-weight: 400; /* Deixe mais leve que o nome */
+ margin-left: 20px;
 }
 
-/* SMALLER PHONES */
-@media (max-width:420px){
-  .header-banner h1{ font-size:20px }
-  .header-banner p{ font-size:13px }
-  .menu-item{ font-size:13px; padding:8px 10px }
+/* ESTILOS NOVOS */
+.red-btn {
+ background-color: #e74c3c !important; /* Vermelho forte */
+ color: white !important;
+ border: none !important;
+ padding: 0.5rem 1rem !important;
+ border-radius: 5px;
+ font-weight: 600;
+ text-decoration: none;
+ transition: background-color 0.2s;
+ box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* ANIMATIONS */
-.header-banner h1, .header-banner p{ transform:translateY(-6px); opacity:0; animation:bannerIn .8s ease forwards; }
-@keyframes bannerIn{ to { transform:none; opacity:1 } }
+.red-btn:hover {
+ background-color: #c0392b !important; /* Vermelho mais escuro no hover */
+}
 
-/* small helpers for dark-mode (if JS toggles body.dark-mode) */
-body.dark-mode{
-  background: linear-gradient(180deg,#0b1220,#071021);
-  color:#e6eef8;
+/* Esconde o botão duplicado de aba que só serve para ativar o JS */
+.hidden-tab {
+ display: none !important;
 }
-body.dark-mode .header-banner{
-  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
-}
-body.dark-mode .sidebar{ background: linear-gradient(180deg,#071224,#081627); border-right:1px solid rgba(255,255,255,0.04) }
-body.dark-mode .menu-item{ color:#dbeafe }
-body.dark-mode .menu-item.active{ box-shadow:0 8px 28px rgba(81,144,255,0.22) }

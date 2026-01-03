@@ -40,6 +40,20 @@ class CorridaForm(forms.ModelForm):
         decimal_places=7
     )
 
+    # Novo campo: periodicidade (diária, semanal, mensal)
+    PERIODICIDADE_CHOICES = [
+        ('', '— Nenhuma / Ocorrência única —'),
+        ('daily', 'Diariamente'),
+        ('weekly', 'Semanalmente'),
+        ('monthly', 'Mensalmente'),
+    ]
+    periodicidade = forms.ChoiceField(
+        choices=PERIODICIDADE_CHOICES,
+        required=False,
+        label="Periodicidade",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = Corrida
         fields = [
@@ -49,6 +63,8 @@ class CorridaForm(forms.ModelForm):
             'origem_lat', 'origem_lon', 'destino_lat', 'destino_lon',
             'bairro_origem', 'cidade_origem', 'estado_origem', 'cep_origem',
             'bairro_destino', 'cidade_destino', 'estado_destino', 'cep_destino',
+            # campo de periodicidade adicionado ao form (opcional)
+            'periodicidade',
         ]
         widgets = {
             'origem': forms.TextInput(attrs={

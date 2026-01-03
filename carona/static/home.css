@@ -186,3 +186,8 @@ footer {
     text-align: center;
     padding: 40px 0;
 }
+.logo img.logo-img {
+    height: 75px;
+    width: auto;
+    display: block;
+}

@@ -1,0 +1,90 @@
+.carteira-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    font-family: "Arial", sans-serif;
+}
+
+.carteira-container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.saldo-section {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1rem 2rem;
+    background: #f5f5f5;
+    border-radius: 8px;
+}
+
+.saldo-label {
+    font-weight: bold;
+}
+
+.adicionar-saldo-section {
+    margin-bottom: 2rem;
+}
+
+#adicionar-saldo-form input[type="number"] {
+    padding: 0.5rem;
+    font-size: 1rem;
+    width: 200px;
+    margin-right: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+#adicionar-saldo-form button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#adicionar-saldo-form button:hover {
+    background-color: #218838;
+}
+
+.historico-section table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.historico-section th, .historico-section td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.historico-section th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+
+.status-pending { background-color: #fff3cd; }
+.status-created { background-color: #d1ecf1; }
+.status-paid { background-color: #d4edda; }
+.status-expired { background-color: #f8d7da; }
+.status-failed { background-color: #f5c6cb; }
+
+.btn-pagar {
+    padding: 0.25rem 0.5rem;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.btn-pagar:hover {
+    background-color: #0056b3;
+}
