@@ -28,3 +28,6 @@ Thumbs.db
 .env
 *.env
 carona/.env
+
+# conservando os arquivos lista_remota.txt
+lista_remota*.txt
